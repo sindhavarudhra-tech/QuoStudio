@@ -1,275 +1,385 @@
 import os
+import csv
+import json
+from io import StringIO
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 import psycopg2
 import psycopg2.extras
-from flask import Flask, render_template, request, redirect, url_for, jsonify
-from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'static/uploads'
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+app.secret_key = "quostudio_super_secret_key"
 
-DB_CONFIG = {
-    "dbname": "quotation_maker",
-    "user": "rudhrasindhava",
-    "password": "",
-    "host": "127.0.0.1",
-    "port": "5432"
-}
+# ==========================================
+# DATABASE CONNECTION & SETUP
+# ==========================================
 
 def get_db_connection():
-    db_url = os.environ.get('DATABASE_URL')
-    if db_url:
-        return psycopg2.connect(db_url, cursor_factory=psycopg2.extras.RealDictCursor)
-    return psycopg2.connect(**DB_CONFIG, cursor_factory=psycopg2.extras.RealDictCursor)
+    supabase_url = "postgresql://postgres:Rudhrapatel15*@db.ureklqoahnubcxzqjynd.supabase.co:5432/postgres"
+    return psycopg2.connect(supabase_url, cursor_factory=psycopg2.extras.RealDictCursor)
 
-def init_app_db():
+def init_db():
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    # 1. Quotations Table
+    # 1. Users Table (Updated with username, company, avatar)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id SERIAL PRIMARY KEY,
+            email VARCHAR(255) UNIQUE NOT NULL,
+            username VARCHAR(255) UNIQUE NOT NULL,
+            company_name VARCHAR(255),
+            password VARCHAR(255) NOT NULL,
+            avatar_url TEXT
+        )
+    ''')
+    
+    # 2. Quotations Table (Updated with recipient tracking, status, and signatures)
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS quotations (
             id SERIAL PRIMARY KEY,
+            user_id INTEGER REFERENCES users(id),
+            recipient_id INTEGER REFERENCES users(id),
             client_name VARCHAR(255) NOT NULL,
-            bg_image VARCHAR(255),
-            preloaded_items TEXT
+            document_data TEXT,
+            status VARCHAR(50) DEFAULT 'draft',
+            signature_data TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
-    cursor.execute('ALTER TABLE quotations ADD COLUMN IF NOT EXISTS document_data TEXT;')
-
-    # 2. Categories Table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS categories (
-            id SERIAL PRIMARY KEY,
-            name VARCHAR(255) NOT NULL
-        );
-    ''')
-    cursor.execute('SELECT COUNT(*) FROM categories')
-    if cursor.fetchone()['count'] == 0:
-        cursor.execute('''
-            INSERT INTO categories (id, name) VALUES 
-            (1, 'General Inventory'), (2, 'Fruit Plants'), 
-            (3, 'Flowering & Pooja Related'), (4, 'Creepers'), 
-            (5, 'Avenue Flowering & Shade Trees'), (6, 'Palm Trees'), 
-            (7, 'Ornamental Trees');
-        ''')
-
-    # 3. Items Table with DSR column
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS items (
-            id SERIAL PRIMARY KEY,
-            botanical_name VARCHAR(255) NOT NULL,
-            common_name VARCHAR(255),
-            dsr VARCHAR(255),
-            height VARCHAR(100),
-            spread VARCHAR(100),
-            spacing VARCHAR(100),
-            effect VARCHAR(255),
-            price NUMERIC(10, 2) DEFAULT 0.0,
-            category_id INTEGER REFERENCES categories(id) DEFAULT 1
-        );
-    ''')
-
-    # 4. Services Table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS services (
-            id SERIAL PRIMARY KEY,
-            description VARCHAR(255) NOT NULL,
-            price NUMERIC(10, 2) DEFAULT 0.0,
-            unit_type VARCHAR(50)
-        );
-    ''')
-    cursor.execute('SELECT COUNT(*) FROM services')
-    if cursor.fetchone()['count'] == 0:
-        cursor.execute('''
-            INSERT INTO services (description, price, unit_type) VALUES 
-            ('Site Excavation & Pit Digging', 50.0, 'per pit'),
-            ('Plant Installation & Manuring', 30.0, 'per plant'),
-            ('Drip Irrigation Setup', 1500.0, 'lump sum'),
-            ('Maintenance & Watering', 500.0, 'per month');
-        ''')
     
+    # 3. Catalogs Table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS catalogs (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER REFERENCES users(id),
+            name VARCHAR(255) NOT NULL,
+            headers JSONB,
+            rows JSONB,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # 4. Client History / Ecosystem Connections
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS client_history (
+            sender_id INTEGER REFERENCES users(id),
+            recipient_id INTEGER REFERENCES users(id),
+            last_sent TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (sender_id, recipient_id)
+        )
+    ''')
+    
+    # Schema Migration for existing DBs (Fails safely if columns exist)
+    try:
+        cursor.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS username VARCHAR(255) UNIQUE;")
+        cursor.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS company_name VARCHAR(255);")
+        cursor.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_url TEXT;")
+        cursor.execute("ALTER TABLE quotations ADD COLUMN IF NOT EXISTS recipient_id INTEGER REFERENCES users(id);")
+        cursor.execute("ALTER TABLE quotations ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'draft';")
+        cursor.execute("ALTER TABLE quotations ADD COLUMN IF NOT EXISTS signature_data TEXT;")
+    except:
+        pass
+        
     conn.commit()
     cursor.close()
     conn.close()
 
-init_app_db()
+init_db()
+
+# ==========================================
+# AUTHENTICATION
+# ==========================================
 
 @app.route('/')
-def home():
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute('''
-        SELECT items.*, categories.name AS category_name 
-        FROM items 
-        LEFT JOIN categories ON items.category_id = categories.id 
-        ORDER BY categories.id ASC, items.botanical_name ASC
-    ''')
-    items = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    return render_template('index.html', items=items)
+def index():
+    return render_template('index.html')
+
+@app.route('/auth', methods=['GET', 'POST'])
+def auth():
+    if request.method == 'POST':
+        action = request.form.get('action')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        try:
+            if action == 'login':
+                cursor.execute('SELECT * FROM users WHERE email = %s', (email,))
+                user = cursor.fetchone()
+                if user and user['password'] == password:
+                    session['user_id'] = user['id']
+                    session['user_email'] = user['email']
+                    session['username'] = user.get('username', '')
+                    session['company_name'] = user.get('company_name', '')
+                    return redirect(url_for('dashboard'))
+                else:
+                    flash("Invalid credentials.")
+            
+            elif action == 'signup':
+                username = request.form.get('username')
+                company = request.form.get('company_name')
+                
+                cursor.execute(
+                    'INSERT INTO users (email, username, company_name, password) VALUES (%s, %s, %s, %s) RETURNING id',
+                    (email, username, company, password)
+                )
+                new_id = cursor.fetchone()['id']
+                conn.commit()
+                
+                session['user_id'] = new_id
+                session['user_email'] = email
+                session['username'] = username
+                session['company_name'] = company
+                return redirect(url_for('dashboard'))
+                
+        except Exception as e:
+            flash(f"Error: {str(e)}")
+        finally:
+            cursor.close()
+            conn.close()
+            
+        return redirect(url_for('auth'))
+            
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('auth'))
+
+# ==========================================
+# DASHBOARD & MAILBOX
+# ==========================================
 
 @app.route('/dashboard')
 def dashboard():
+    if 'user_id' not in session:
+        return redirect(url_for('auth'))
+        
+    user_id = session['user_id']
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute('''
-        SELECT items.*, categories.name AS category_name 
-        FROM items 
-        LEFT JOIN categories ON items.category_id = categories.id 
-        ORDER BY categories.id ASC, items.botanical_name ASC
-    ''')
-    items = cursor.fetchall()
     
-    cursor.execute('SELECT * FROM quotations ORDER BY id DESC')
-    quotations = cursor.fetchall()
+    # User Profile Data
+    cursor.execute('SELECT username, company_name, avatar_url FROM users WHERE id = %s', (user_id,))
+    user_profile = cursor.fetchone()
+    
+    # 1. My Quotes (Created by user)
+    cursor.execute('''
+        SELECT q.id, q.client_name, q.status, q.created_at, u.username as recipient_name 
+        FROM quotations q 
+        LEFT JOIN users u ON q.recipient_id = u.id 
+        WHERE q.user_id = %s ORDER BY q.created_at DESC
+    ''', (user_id,))
+    my_quotes = cursor.fetchall()
+    
+    # 2. Inbox (Quotes sent to this user)
+    cursor.execute('''
+        SELECT q.id, q.client_name, q.status, q.created_at, u.username as sender_name, u.company_name as sender_company
+        FROM quotations q 
+        JOIN users u ON q.user_id = u.id 
+        WHERE q.recipient_id = %s ORDER BY q.created_at DESC
+    ''', (user_id,))
+    inbox = cursor.fetchall()
+    
+    # 3. Catalogs
+    cursor.execute('SELECT id, name FROM catalogs WHERE user_id = %s ORDER BY created_at DESC', (user_id,))
+    catalogs = cursor.fetchall()
     
     cursor.close()
     conn.close()
-    return render_template('dashboard.html', items=items, quotations=quotations)
+    
+    # Generate Initials
+    initials = "".join([w[0].upper() for w in user_profile['username'].split()[:2]]) if user_profile['username'] else "Q"
+    
+    return render_template('dashboard.html', 
+                           my_quotes=my_quotes, 
+                           inbox=inbox, 
+                           catalogs=catalogs,
+                           profile=user_profile,
+                           initials=initials)
+
+# ==========================================
+# EDITOR & QUOTE MANAGEMENT
+# ==========================================
 
 @app.route('/new_quotation', methods=['POST'])
 def new_quotation():
-    client_name = request.form.get('client_name', 'Untitled Client')
-    selected_items = request.form.getlist('selected_items')
-    preloaded_items_str = ",".join(selected_items)
+    if 'user_id' not in session: return redirect(url_for('auth'))
     
+    client_name = request.form.get('client_name')
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
-        'INSERT INTO quotations (client_name, preloaded_items) VALUES (%s, %s) RETURNING id',
-        (client_name, preloaded_items_str)
+        'INSERT INTO quotations (user_id, client_name, document_data, status) VALUES (%s, %s, %s, %s) RETURNING id',
+        (session['user_id'], client_name, "", "draft")
     )
-    quote_id = cursor.fetchone()['id']
+    new_quote_id = cursor.fetchone()['id']
     conn.commit()
     cursor.close()
     conn.close()
-    return redirect(url_for('editor', quote_id=quote_id))
-
-@app.route('/delete_quote/<int:quote_id>', methods=['POST'])
-def delete_quote(quote_id):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute('DELETE FROM quotations WHERE id = %s', (quote_id,))
-    conn.commit()
-    cursor.close()
-    conn.close()
-    return redirect(url_for('dashboard'))
+    
+    return redirect(url_for('editor', quote_id=new_quote_id))
 
 @app.route('/editor/<int:quote_id>')
 def editor(quote_id):
+    if 'user_id' not in session: return redirect(url_for('auth'))
+    
+    user_id = session['user_id']
     conn = get_db_connection()
     cursor = conn.cursor()
     
     cursor.execute('SELECT * FROM quotations WHERE id = %s', (quote_id,))
     quote = cursor.fetchone()
     
-    cursor.execute('''
-        SELECT items.*, categories.name AS category_name 
-        FROM items 
-        LEFT JOIN categories ON items.category_id = categories.id 
-        ORDER BY categories.id ASC, items.botanical_name ASC
-    ''')
-    items = cursor.fetchall()
-
-    cursor.execute('SELECT * FROM services ORDER BY id ASC')
-    services = cursor.fetchall()
+    if not quote:
+        return redirect(url_for('dashboard'))
+        
+    # Determine authorization and view mode
+    is_owner = (quote['user_id'] == user_id)
+    is_recipient = (quote['recipient_id'] == user_id)
+    
+    if not is_owner and not is_recipient:
+        return redirect(url_for('dashboard'))
+        
+    cursor.execute('SELECT id, name FROM catalogs WHERE user_id = %s ORDER BY name ASC', (quote['user_id'],))
+    catalogs = cursor.fetchall()
     
     cursor.close()
     conn.close()
-    return render_template('editor.html', quote=quote, items=items, services=services)
+    
+    return render_template('editor.html', quote=quote, catalogs=catalogs, is_owner=is_owner, is_recipient=is_recipient)
 
 @app.route('/save_quote/<int:quote_id>', methods=['POST'])
 def save_quote(quote_id):
-    data = request.json.get('document_data')
+    if 'user_id' not in session: return jsonify({'status': 'error'}), 401
+        
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute('UPDATE quotations SET document_data = %s WHERE id = %s', (data, quote_id))
+    cursor.execute(
+        'UPDATE quotations SET document_data = %s WHERE id = %s AND user_id = %s',
+        (request.json.get('document_data'), quote_id, session['user_id'])
+    )
     conn.commit()
     cursor.close()
     conn.close()
-    return jsonify({"status": "success"})
+    return jsonify({'status': 'success'})
 
-@app.route('/upload_bg/<int:quote_id>', methods=['POST'])
-def upload_bg(quote_id):
-    file = request.files.get('bg_image')
-    if file and file.filename != '':
-        filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute('UPDATE quotations SET bg_image = %s WHERE id = %s', (filename, quote_id))
-        conn.commit()
-        cursor.close()
-        conn.close()
-    return redirect(url_for('editor', quote_id=quote_id))
+# ==========================================
+# ECOSYSTEM: DIRECTORY, SENDING & SIGNING
+# ==========================================
 
-@app.route('/cloud-setup')
-def cloud_setup():
-    import csv
-    import os
+@app.route('/search_users')
+def search_users():
+    if 'user_id' not in session: return jsonify([])
+    query = request.args.get('q', '').lower()
     
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    # 1. Safely drop the broken tables
-    cursor.execute('DROP TABLE IF EXISTS items CASCADE;')
-    cursor.execute('DROP TABLE IF EXISTS services CASCADE;')
-    conn.commit()
-    
-    # 2. Force the app to rebuild them with the correct columns
-    init_app_db()
-    
-    # 3. Import the 8 Services directly
-    cursor.execute('TRUNCATE TABLE services RESTART IDENTITY CASCADE;')
-    services = [
-        ('Fine Grading', 3.50, 'per sqft'),
-        ('Garden Development (small plants)', 30.00, 'per plant'),
-        ('Garden Development (big plants)', 100.00, 'per plant'),
-        ('After Maintenance', 150000.00, 'per month'),
-        ('Extra Charge', 20.00, 'per plant'),
-        ('Lawn Cutting', 15000.00, 'per month'),
-        ('Pesticides and Fertilizers', 15000.00, 'per month'),
-        ('Transportation Charges', 3000.00, 'per tonne')
-    ]
-    cursor.executemany('INSERT INTO services (description, price, unit_type) VALUES (%s, %s, %s)', services)
-    
-    # 4. Import the Master Inventory CSV
-    insert_count = 0
-    if os.path.exists('master_inventory.csv'):
-        cursor.execute('TRUNCATE TABLE items RESTART IDENTITY CASCADE;')
-        with open('master_inventory.csv', 'r', encoding='utf-8-sig') as file:
-            reader = csv.DictReader(file)
-            reader.fieldnames = [name.strip() if name else '' for name in reader.fieldnames]
-            for row in reader:
-                clean_row = {k.strip(): (v.strip() if v else '') for k, v in row.items() if k}
-                price_raw = clean_row.get('Price', '0').replace(',', '').replace('₹', '').strip()
-                try: 
-                    price_val = float(price_raw) if price_raw and price_raw != '-' else 0.0
-                except ValueError: 
-                    price_val = 0.0
-                
-                cat_raw = clean_row.get('Category_ID') or clean_row.get('Category') or clean_row.get('category_id') or '1'
-                if str(cat_raw).strip() in ['-', '', 'None', 'null']: 
-                    cat_id = 1
-                else:
-                    try: 
-                        cat_num = int(float(cat_raw))
-                        cat_id = cat_num if 1 <= cat_num <= 7 else 1
-                    except ValueError: 
-                        cat_id = 1
+    # Get history first
+    if not query:
+        cursor.execute('''
+            SELECT u.id, u.username, u.email, u.company_name 
+            FROM client_history ch
+            JOIN users u ON ch.recipient_id = u.id
+            WHERE ch.sender_id = %s
+            ORDER BY ch.last_sent DESC LIMIT 5
+        ''', (session['user_id'],))
+    else:
+        cursor.execute('''
+            SELECT id, username, email, company_name FROM users 
+            WHERE id != %s AND (LOWER(username) LIKE %s OR LOWER(email) LIKE %s)
+            LIMIT 10
+        ''', (session['user_id'], f"%{query}%", f"%{query}%"))
+        
+    results = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify(results)
 
-                cursor.execute('''
-                    INSERT INTO items (botanical_name, common_name, dsr, height, spread, spacing, effect, price, category_id)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-                ''', (clean_row.get('Botanical Name', ''), clean_row.get('Common Name', ''), clean_row.get('DSR', ''), clean_row.get('Height', ''), clean_row.get('Spread', ''), clean_row.get('Spacing', ''), clean_row.get('Effect', ''), price_val, cat_id))
-                insert_count += 1
-
+@app.route('/send_quote/<int:quote_id>', methods=['POST'])
+def send_quote(quote_id):
+    if 'user_id' not in session: return jsonify({'status': 'error'}), 401
+    
+    recipient_id = request.json.get('recipient_id')
+    sender_id = session['user_id']
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Update quote
+    cursor.execute(
+        "UPDATE quotations SET recipient_id = %s, status = 'sent' WHERE id = %s AND user_id = %s",
+        (recipient_id, quote_id, sender_id)
+    )
+    
+    # Update ecosystem history
+    cursor.execute('''
+        INSERT INTO client_history (sender_id, recipient_id) 
+        VALUES (%s, %s) 
+        ON CONFLICT (sender_id, recipient_id) 
+        DO UPDATE SET last_sent = CURRENT_TIMESTAMP
+    ''', (sender_id, recipient_id))
+    
     conn.commit()
     cursor.close()
     conn.close()
+    return jsonify({'status': 'success'})
+
+@app.route('/accept_quote/<int:quote_id>', methods=['POST'])
+def accept_quote(quote_id):
+    if 'user_id' not in session: return jsonify({'status': 'error'}), 401
     
-    return f"✅ SUCCESS! Cloud Database wiped, {insert_count} plants imported, and 8 services restored. You can now return to the home page."
+    signature = request.json.get('signature')
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "UPDATE quotations SET status = 'accepted', signature_data = %s WHERE id = %s AND recipient_id = %s",
+        (signature, quote_id, session['user_id'])
+    )
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return jsonify({'status': 'success'})
+
+# ==========================================
+# INVENTORY ROUTES
+# ==========================================
+
+@app.route('/upload_catalog', methods=['POST'])
+def upload_catalog():
+    if 'user_id' not in session: return redirect(url_for('auth'))
+    catalog_name = request.form.get('catalog_name')
+    file = request.files.get('csv_file')
+    if file and file.filename.endswith('.csv'):
+        data = list(csv.reader(StringIO(file.stream.read().decode("UTF8"), newline=None)))
+        if len(data) > 0:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute(
+                'INSERT INTO catalogs (user_id, name, headers, rows) VALUES (%s, %s, %s, %s)',
+                (session['user_id'], catalog_name, json.dumps(data[0]), json.dumps(data[1:]))
+            )
+            conn.commit()
+            cursor.close()
+            conn.close()
+    return redirect(url_for('dashboard'))
+
+@app.route('/get_catalog/<int:catalog_id>')
+def get_catalog(catalog_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('SELECT headers, rows FROM catalogs WHERE id = %s', (catalog_id,))
+    catalog = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    if catalog:
+        return jsonify({'status': 'success', 'data': {'headers': catalog['headers'], 'rows': catalog['rows']}})
+    return jsonify({'status': 'error'}), 404
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
