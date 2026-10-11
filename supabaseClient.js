@@ -1,7 +1,4 @@
-import { createClient } from '@supabase/supabase-js'
+const supabaseUrl = window.ENV.SUPABASE_URL;
+const supabaseAnonKey = window.ENV.SUPABASE_KEY;
 
-// This pulls the URL and Key safely from the file you made in Step 1
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+window.supabase = supabase.createClient(supabaseUrl, supabaseAnonKey);
