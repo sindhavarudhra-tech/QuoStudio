@@ -30,7 +30,9 @@ else:
 # DATABASE CONNECTION & SETUP
 # ==========================================
 def get_db_connection():
-    return psycopg2.connect(os.getenv('DATABASE_URL'), cursor_factory=psycopg2.extras.RealDictCursor)
+    # Use Render's DATABASE_URL if available, otherwise fallback to direct Supabase URL for local testing
+    database_url = os.getenv('DATABASE_URL') or "postgresql://postgres:Rudhrapatel15*@db.ureklqoahnubcxzqjynd.supabase.co:5432/postgres"
+    return psycopg2.connect(database_url, cursor_factory=psycopg2.extras.RealDictCursor)
 def init_db():
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -111,24 +113,51 @@ def index():
     return render_template('index.html')
 
 @app.route('/auth', methods=['POST'])
-def auth():
-    data = request.get_json() if request.is_json else request.form
-    access_token = data.get('access_token') # Sent by your frontend after Supabase login
+@app.route('/set_flask_session', methods=['POST'])
+def set_flask_session():
+    data = request.get_json()
+    access_token = data.get('access_token')
     
     if not access_token:
-        return jsonify({"success": False, "error": "No access token provided"}), 400
+        return jsonify({'error': 'No access token provided'}), 400
 
     try:
-        # Verify the user using Supabase Auth over HTTPS
-        user_response = supabase.auth.get_user(access_token)
-        user = user_response.user
-        
-        # Optional: Save or check user in your Render PostgreSQL database here
-        
-        return jsonify({"success": True, "redirect": "/dashboard"})
+        # Securely verify token directly with Supabase
+        user_res = supabase.auth.get_user(access_token)
+        if user_res and user_res.user:
+            sb_user = user_res.user
+            email = sb_user.email
+            username = sb_user.user_metadata.get('username', email.split('@')[0])
+            
+            # Sync Supabase user with local PostgreSQL users table
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            
+            cursor.execute('SELECT * FROM users WHERE email = %s', (email,))
+            local_user = cursor.fetchone()
+            
+            if not local_user:
+                cursor.execute(
+                    'INSERT INTO users (email, username, company_name) VALUES (%s, %s, %s) RETURNING id, username, company_name, email',
+                    (email, username, '')
+                )
+                local_user = cursor.fetchone()
+                conn.commit()
+            
+            session['access_token'] = access_token
+            session['user_id'] = local_user['id']
+            session['user_email'] = local_user['email']
+            session['username'] = local_user['username']
+            session['company_name'] = local_user.get('company_name', '')
+            
+            cursor.close()
+            conn.close()
+            
+            return jsonify({'status': 'success', 'redirect': '/dashboard'})
+        return jsonify({'error': 'Invalid token'}), 401
     except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 401
-
+        return jsonify({'error': str(e)}), 401
+    
 @app.route('/login')
 def login():
     if 'user_id' in session:
@@ -155,14 +184,14 @@ def set_flask_session():
         return jsonify({'error': 'No access token provided'}), 400
 
     try:
-        # Securely verify token directly with Supabase
+        # Securely verify token directly with Supabase via HTTPS
         user_res = supabase.auth.get_user(access_token)
         if user_res and user_res.user:
             sb_user = user_res.user
             email = sb_user.email
             username = sb_user.user_metadata.get('username', email.split('@')[0])
             
-            # Sync Supabase user with local PostgreSQL users table
+            # Sync Supabase user with Render PostgreSQL users table
             conn = get_db_connection()
             cursor = conn.cursor()
             
