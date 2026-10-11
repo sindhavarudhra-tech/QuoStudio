@@ -30,7 +30,7 @@ else:
 # DATABASE CONNECTION & SETUP
 # ==========================================
 def get_db_connection():
-    supabase_db_url = "postgresql://postgres:Rudhrapatel15*@db.ureklqoahnubcxzqjynd.supabase.co:5432/postgres"
+    supabase_db_url = "postgresql://postgres:Rudhrapatel15*@db.ureklqoahnubcxzqjynd.supabase.co:6543/postgres"
     return psycopg2.connect(supabase_db_url, cursor_factory=psycopg2.extras.RealDictCursor)
 
 def init_db():
