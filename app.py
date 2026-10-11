@@ -30,9 +30,7 @@ else:
 # DATABASE CONNECTION & SETUP
 # ==========================================
 def get_db_connection():
-    database_url = os.getenv('DATABASE_URL')
-    return psycopg2.connect(database_url, cursor_factory=psycopg2.extras.RealDictCursor)
-
+    return psycopg2.connect(os.getenv('DATABASE_URL'), cursor_factory=psycopg2.extras.RealDictCursor)
 def init_db():
     conn = get_db_connection()
     cursor = conn.cursor()
