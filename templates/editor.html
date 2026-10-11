@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <title>Editor - {{ quote.client_name }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- html2pdf Library for direct PDF downloading -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root {
             --bg-main: #050810;
@@ -45,13 +47,13 @@
         .status-dot.locked { background: #F59E0B; }
         
         .header-actions { display: flex; align-items: center; gap: 12px; }
-        .btn-outline-darker { background: var(--bg-card); border: 1px solid var(--border-hover); color: var(--text-main); padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; transition: 0.2s; }
+        .btn-outline-darker { background: var(--bg-card); border: 1px solid var(--border-hover); color: var(--text-main); padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; transition: 0.2s; border: none; cursor: pointer;}
         .btn-outline-darker:hover { background: var(--bg-card-hover); }
         .btn-primary-custom { background: #2563EB; border: none; color: white; padding: 8px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; }
         .btn-primary-custom:hover { background: #1D4ED8; }
         .btn-success-custom { background: #10B981; border: none; color: white; padding: 8px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; }
         .btn-warning-custom { background: #F59E0B; border: none; color: white; padding: 8px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; }
-        .avatar { width: 32px; height: 32px; background: #2563EB; border-radius: 50%; border: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: white; margin-left: 12px; cursor: pointer; }
+        .avatar { width: 32px; height: 32px; background: #2563EB; border-radius: 50%; border: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: white; margin-left: 12px; cursor: pointer; text-transform: uppercase; }
 
         .workspace { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 60px 0; background-color: var(--bg-main); transition: 0.3s; }
 
@@ -101,13 +103,11 @@
         .totals-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; color: #64748B; }
         .totals-row.grand { font-size: 16px; font-weight: 800; color: #0F172A; margin-top: 16px; border-top: 2px solid rgba(226, 232, 240, 0.8); padding-top: 16px; }
 
-        .right-panel { width: 340px; background-color: var(--bg-panel); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; overflow-y: auto; z-index: 40; transition: 0.3s; }
-        details { border-bottom: 1px solid var(--border-color); }
-        summary { font-size: 14px; font-weight: 600; color: var(--text-main); padding: 20px 24px; cursor: pointer; display: flex; align-items: center; gap: 8px; list-style: none; }
-        summary::-webkit-details-marker { display: none; }
-        summary::after { content: '▼'; margin-left: auto; font-size: 10px; color: var(--text-muted); transition: transform 0.2s; }
-        details[open] summary::after { transform: rotate(180deg); }
-        .details-content { padding: 0 24px 24px 24px; display: flex; flex-direction: column; }
+        .right-panel { width: 340px; background-color: var(--bg-panel); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; overflow: hidden; z-index: 40; transition: 0.3s; }
+        
+        .tab-btn { background: transparent; border: none; color: var(--text-muted); padding: 16px 0; font-size: 13px; font-weight: 600; border-bottom: 2px solid transparent; cursor: pointer; transition: 0.2s; outline: none; }
+        .tab-btn:hover { color: var(--text-main); background: rgba(255,255,255,0.02); }
+        .tab-btn.active { color: #2563EB; border-bottom-color: #2563EB; }
 
         .db-select { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-main); padding: 10px; border-radius: 8px; width: 100%; margin-bottom: 20px; font-size: 13px; }
         .db-select:focus { outline: none; border-color: #2563EB; }
@@ -153,7 +153,7 @@
             </div>
             
             <div class="header-actions">
-                <button class="btn-outline-darker" onclick="window.print()">Download PDF</button>
+                <button class="btn-outline-darker" onclick="downloadQuotation()">Download PDF</button>
                 
                 {% if is_owner %}
                     {% if quote.status == 'draft' %}
@@ -174,7 +174,7 @@
                 {% endif %}
                 
                 <div class="dropdown">
-                    <div class="avatar dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">Q</div>
+                    <div class="avatar dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{ initials }}</div>
                     <ul class="dropdown-menu dropdown-menu-end shadow-lg" style="background-color: var(--bg-card); border-color: var(--border-color);">
                         <li><a class="dropdown-item" style="color: var(--text-main);" href="/dashboard">🏠 Back to Dashboard</a></li>
                         <li><a class="dropdown-item" style="color: var(--text-main);" href="#" onclick="toggleTheme()">🌓 Toggle Theme</a></li>
@@ -190,16 +190,32 @@
 
     {% if is_editable %}
     <div class="right-panel d-print-none">
-        <details open id="invDetails">
-            <summary><span>🗃️</span> Inventory Sync</summary>
-            <div class="details-content">
+        
+        <div class="tabs-header d-flex border-bottom" style="border-color: var(--border-color) !important; flex-shrink: 0;">
+            <button class="tab-btn active flex-fill" onclick="switchTab('inventory')">🗃️ Inventory</button>
+            <button class="tab-btn flex-fill" onclick="switchTab('setup')">⚙️ Page</button>
+        </div>
+        
+        <div class="tab-content-container" style="flex-grow: 1; overflow-y: auto;">
+            
+            <div id="tab-inventory" class="tab-pane" style="display: block; padding: 24px;">
                 <label class="meta-label">Select Database</label>
-                <select id="dbSelect" class="db-select" onchange="fetchDatabase(this.value)">
+                <select id="dbSelect" class="db-select mb-2" onchange="fetchDatabase(this.value)">
                     <option value="" disabled selected>Choose a loaded catalog...</option>
                     {% for cat in catalogs %}
                     <option value="{{ cat.id }}">{{ cat.name }}</option>
                     {% endfor %}
                 </select>
+
+                <div class="mb-3 p-3 rounded" style="background: rgba(255, 255, 255, 0.03); border: 1px dashed var(--border-color);">
+                    <label class="meta-label">Quick Upload CSV</label>
+                    <form action="/upload_catalog" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="quote_id" value="{{ quote.id }}">
+                        <input type="text" name="catalog_name" class="form-control form-control-sm mb-2" style="background: var(--input-bg); color: var(--text-main); border: 1px solid var(--border-color);" placeholder="Dataset Name" required>
+                        <input type="file" name="csv_file" accept=".csv" class="form-control form-control-sm mb-2" style="background: var(--input-bg); color: var(--text-main); border: 1px solid var(--border-color);" required>
+                        <button type="submit" class="btn btn-sm w-100 fw-bold" style="background: var(--bg-card-hover); color: var(--text-main); border: 1px solid var(--border-hover);">Upload & Reload</button>
+                    </form>
+                </div>
 
                 <label class="meta-label">Dynamic Columns</label>
                 <div class="d-flex align-items-center gap-2 mt-1 p-2 rounded mb-2" style="background: var(--bg-card); border: 1px solid var(--border-color);">
@@ -211,16 +227,18 @@
                 <div id="colMappingContainer" class="mb-4"></div>
 
                 <label class="meta-label">Drag or Click to Add</label>
-                <div id="inventoryList" style="max-height: 400px; overflow-y: auto; padding-right: 4px;">
+                <div id="inventoryList" style="padding-right: 4px;">
                     <div class="text-muted small">Select a database to view items.</div>
                 </div>
             </div>
-        </details>
 
-        <details id="setupDetails">
-            <summary><span>⚙️</span> Document Setup</summary>
-            <div class="details-content">
+            <div id="tab-setup" class="tab-pane" style="display: none; padding: 24px;">
                 <div class="mb-4 pb-4 border-bottom" style="border-color: var(--border-color) !important;">
+                    <label class="meta-label mb-2 text-primary">PAGE CONFIGURATION</label>
+                    <div class="d-flex align-items-center gap-2 mb-4 small" style="color: var(--text-main);">
+                        <input type="checkbox" id="pageNumberToggle" onchange="togglePageNumbers(this.checked)"> Print Page Numbers on PDF
+                    </div>
+
                     <label class="meta-label mb-2 text-primary">TERMS & CONDITIONS PAGE</label>
                     <div class="d-flex align-items-center gap-2 mb-3 small" style="color: var(--text-main);">
                         <input type="checkbox" id="termsToggle" onchange="toggleTerms(this.checked)"> Enable T&C Page
@@ -233,14 +251,23 @@
 
                 <div id="taxesConfigContainer"></div>
 
-                <label class="meta-label mt-4">Brand Logo</label>
+                <div class="d-flex justify-content-between align-items-center mt-4 mb-2">
+                    <label class="meta-label mb-0">Brand Logo</label>
+                    <button class="btn btn-link text-danger p-0 text-decoration-none" style="font-size: 10px; font-weight: bold;" onclick="clearBase64('logo')">REMOVE</button>
+                </div>
                 <input type="file" id="logoUpload" class="db-select" accept="image/*" onchange="loadBase64(this, 'logo')">
-                <label class="meta-label mt-2">Background Artwork</label>
+                
+                <div class="d-flex justify-content-between align-items-center mt-2 mb-2">
+                    <label class="meta-label mb-0">Background Artwork</label>
+                    <button class="btn btn-link text-danger p-0 text-decoration-none" style="font-size: 10px; font-weight: bold;" onclick="clearBase64('bg')">REMOVE</button>
+                </div>
                 <input type="file" id="bgUpload" class="db-select" accept="image/*" onchange="loadBase64(this, 'bg')">
+                
                 <label class="meta-label mt-2">Background Opacity</label>
                 <input type="range" id="bgOpacity" class="db-select p-0 border-0 bg-transparent" min="0.1" max="1" step="0.05" value="1" onchange="updateBgOpacity(this.value)">
             </div>
-        </details>
+
+        </div>
     </div>
     {% endif %}
 </div>
@@ -299,11 +326,77 @@
 <div id="savedDocumentData" style="display: none;">{{ quote.document_data or '' }}</div>
 <div id="savedSignatureData" style="display: none;">{{ quote.signature_data or '' }}</div>
 
-<!-- Bootstrap JS required for Modals -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // --- Theme Engine ---
+    function downloadQuotation() {
+        const container = document.getElementById('documentContainer');
+        
+        const oldPadding = container.style.padding;
+        const oldBg = container.style.backgroundColor;
+        
+        container.style.padding = '0';
+        container.style.backgroundColor = '#ffffff';
+
+        const noPrintElements = container.querySelectorAll('.d-print-none');
+        noPrintElements.forEach(el => el.style.display = 'none');
+
+        const pages = container.querySelectorAll('.page');
+        const expectedPagesCount = pages.length; // We know exactly how many pages SHOULD exist
+
+        pages.forEach((p, index) => {
+            p.style.marginBottom = '0';
+            p.style.boxShadow = 'none';
+            p.style.borderRadius = '0';
+            p.style.pageBreakAfter = (index === pages.length - 1) ? 'auto' : 'always';
+        });
+
+        const opt = {
+            margin:       0,
+            filename:     '{{ quote.client_name }}_Quotation.pdf',
+            image:        { type: 'jpeg', quality: 1.0 },
+            html2canvas:  { scale: 2, useCORS: true, logging: false, scrollY: 0 },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        // We use the PDF instance directly to delete any trailing empty pages caused by render bleeding
+        html2pdf().set(opt).from(container).toPdf().get('pdf').then((pdf) => {
+            const totalPagesGenerated = pdf.internal.getNumberOfPages();
+            
+            if (totalPagesGenerated > expectedPagesCount) {
+                // Loop backwards and delete all extra empty pages
+                for (let i = totalPagesGenerated; i > expectedPagesCount; i--) {
+                    pdf.deletePage(i);
+                }
+            }
+        }).save().then(() => {
+            // Restore UI Elements
+            container.style.padding = oldPadding;
+            container.style.backgroundColor = oldBg;
+            noPrintElements.forEach(el => el.style.display = '');
+            
+            pages.forEach(p => {
+                p.style.marginBottom = '';
+                p.style.boxShadow = '';
+                p.style.borderRadius = '';
+                p.style.pageBreakAfter = '';
+            });
+        });
+    }
+
+    window.switchTab = function(tabId) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(pane => pane.style.display = 'none');
+        
+        if (tabId === 'inventory') {
+            document.querySelectorAll('.tab-btn')[0].classList.add('active');
+            document.getElementById('tab-inventory').style.display = 'block';
+        } else {
+            document.querySelectorAll('.tab-btn')[1].classList.add('active');
+            document.getElementById('tab-setup').style.display = 'block';
+        }
+    };
+
     const currentTheme = localStorage.getItem('theme') || 'dark';
     if (currentTheme === 'light') enableLightMode();
 
@@ -322,7 +415,6 @@
         document.documentElement.style.setProperty('--invert-close', 'invert(0)');
     }
 
-    // --- Variables ---
     let isEditable = {{ 'true' if is_editable else 'false' }};
     let documentPages = [];
     let dynamicHeaders = ['Column 1', 'Column 2'];
@@ -332,6 +424,7 @@
     let bgOpacityVal = 1;
     let documentTaxes = [{ name: 'Tax', rate: 19 }]; 
     let signatureData = document.getElementById('savedSignatureData').innerText;
+    let pageNumbersActive = false; 
 
     let availableCsvHeaders = [];
     let rawCatalogRows = [];
@@ -354,15 +447,6 @@
         quote_id: "UNASSIGNED", 
         payment: "Bank Name: Global Bank<br>Account No: 0000000000<br>Routing/IFSC: BANK0000<br>Notes: Net 30 terms apply."
     };
-
-    if(isEditable) {
-        document.getElementById('invDetails').addEventListener('click', function(e) {
-            if(!this.open) document.getElementById('setupDetails').removeAttribute('open');
-        });
-        document.getElementById('setupDetails').addEventListener('click', function(e) {
-            if(!this.open) document.getElementById('invDetails').removeAttribute('open');
-        });
-    }
 
     function renderTaxesSetup() {
         if(!isEditable) return;
@@ -451,6 +535,8 @@
     function updateTermsPage(val) { termsState.pageNum = parseInt(val) || 2; renderWorkspace(); triggerSave(); }
     function updateTermsContent(html) { termsState.content = html; triggerSave(); }
 
+    window.togglePageNumbers = function(isActive) { if(isEditable) { pageNumbersActive = isActive; renderWorkspace(); triggerSave(); } };
+
     function fetchDatabase(id) {
         if(!id) return;
         fetch('/get_catalog/' + id).then(res => res.json()).then(data => { if(data.status === 'success') parseFetchedCatalog(data.data.headers, data.data.rows); });
@@ -460,8 +546,12 @@
         availableCsvHeaders = headers;
         rawCatalogRows = rows;
         
-        nameIdx = headers.findIndex(h => h.toLowerCase().includes('name') || h.toLowerCase().includes('desc'));
-        if (nameIdx === -1) nameIdx = 0;
+        nameIdx = headers.findIndex(h => {
+            const hLow = h.toLowerCase();
+            return hLow.includes('name') || hLow.includes('title') || hLow.includes('item') || hLow.includes('desc');
+        });
+        if (nameIdx === -1) nameIdx = 0; 
+
         priceIdx = headers.findIndex(h => h.toLowerCase().includes('price') || h.toLowerCase().includes('cost'));
         if (priceIdx === -1) priceIdx = headers.length - 1;
 
@@ -637,6 +727,8 @@
             logoDataUrl = parsed.logo || ''; bgDataUrl = parsed.bg || '';
             bgOpacityVal = parsed.bgOpacity || 1;
             
+            if(parsed.pageNumbersActive !== undefined) pageNumbersActive = parsed.pageNumbersActive;
+
             if(parsed.taxes !== undefined) {
                 documentTaxes = parsed.taxes;
             } else if (parsed.taxRate !== undefined) {
@@ -649,6 +741,7 @@
                 document.getElementById('termsToggle').checked = termsState.active;
                 document.getElementById('termsConfig').style.display = termsState.active ? 'block' : 'none';
                 document.getElementById('termsPageNum').value = termsState.pageNum;
+                document.getElementById('pageNumberToggle').checked = pageNumbersActive;
             }
         } else {
             documentPages.push({ id: 'page-1', items: [] });
@@ -689,7 +782,7 @@
         }
     };
 
-    function loadBase64(input, target) {
+    window.loadBase64 = function(input, target) {
         if(!isEditable) return;
         if (input.files && input.files[0]) {
             var reader = new FileReader();
@@ -702,12 +795,26 @@
         }
     }
 
+    window.clearBase64 = function(target) {
+        if(!isEditable) return;
+        if(target === 'logo') { 
+            logoDataUrl = ''; 
+            document.getElementById('logoUpload').value = ''; 
+        } else if(target === 'bg') { 
+            bgDataUrl = ''; 
+            document.getElementById('bgUpload').value = ''; 
+        }
+        renderWorkspace(); 
+        triggerSave();
+    };
+
     function triggerSave() {
         if(!isEditable) return;
         const payload = {
             pages: documentPages, header: headerState, headers: dynamicHeaders,
             numCols: numDynamicCols, termsState: termsState, logo: logoDataUrl, 
-            bg: bgDataUrl, bgOpacity: bgOpacityVal, taxes: documentTaxes
+            bg: bgDataUrl, bgOpacity: bgOpacityVal, taxes: documentTaxes,
+            pageNumbersActive: pageNumbersActive
         };
         fetch(`/save_quote/{{ quote.id }}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ document_data: JSON.stringify(payload) }) });
     }
@@ -839,6 +946,9 @@
             let isFullHeader = (i === 0 || block.type === 'terms' || i === firstTableIdx);
 
             let editorPageBadge = `<div class="d-print-none" style="position: absolute; top: 16px; right: 16px; background: #F8FAFC; color: #64748B; border: 1px solid #E2E8F0; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; z-index: 50; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">Page ${i + 1} of ${finalTotalPages}</div>`;
+            
+            // Render only the numeral for printed page numbers
+            let printPageBadge = pageNumbersActive ? `<div style="position: absolute; bottom: 10mm; left: 0; right: 0; text-align: center; font-size: 10px; color: #94A3B8; font-weight: 600;">${i + 1}</div>` : '';
 
             if (isFullHeader) {
                 const logoHtml = logoDataUrl ? `<img src="${logoDataUrl}" style="max-height: 150px; max-width: 250px; width: auto; border-radius: 2px; object-fit: contain;">` : `<div style="width: 56px; height: 56px; background: #0F172A; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold;">Q</div>`;
@@ -898,7 +1008,7 @@
 
                 documentTaxes.forEach(t => {
                     let amt = documentSubtotal * (t.rate / 100);
-                    dynamicTotalsHtml += `<div class="totals-row"><span>${t.name} - ${t.rate}%</span><span class="text-dark fw-bold">$${amt.toFixed(2)}</span></div>`;
+                    dynamicTotalsHtml += `<div class="totals-row"><span>${t.name} ${t.rate}%</span><span class="text-dark fw-bold">$${amt.toFixed(2)}</span></div>`;
                 });
                 
                 dynamicTotalsHtml += `<div class="totals-row grand"><span>Grand Total</span><span>$${documentGrandTotal.toFixed(2)}</span></div>`;
@@ -928,6 +1038,7 @@
                         ${headerHtml}
                         ${block.content}
                         ${footerHtml}
+                        ${printPageBadge}
                     </div>
                 </div>
             `;

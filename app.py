@@ -33,6 +33,7 @@ def get_db_connection():
     # Uses Render's DATABASE_URL if available, otherwise falls back to direct Supabase URL for local testing
     database_url = os.getenv('DATABASE_URL') or "postgresql://postgres:Rudhrapatel15*@db.ureklqoahnubcxzqjynd.supabase.co:5432/postgres"
     return psycopg2.connect(database_url, cursor_factory=psycopg2.extras.RealDictCursor)
+
 def init_db():
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -122,7 +123,10 @@ init_db()
 # ==========================================
 @app.route('/')
 def index():
-    return render_template('index.html')
+    # Pass login status and user initials to the landing page
+    logged_in = 'user_id' in session
+    initials = "".join([w[0].upper() for w in session.get('username', '').split()[:2]]) if session.get('username') else "Q"
+    return render_template('index.html', logged_in=logged_in, initials=initials)
 
 @app.route('/auth', methods=['GET', 'POST'])
 def auth():
@@ -314,7 +318,11 @@ def editor(quote_id):
     catalogs = cursor.fetchall()
     cursor.close()
     conn.close()
-    return render_template('editor.html', quote=quote, catalogs=catalogs, is_owner=is_owner, is_recipient=is_recipient)
+
+    # Pass dynamic initials to the editor
+    initials = "".join([w[0].upper() for w in session.get('username', '').split()[:2]]) if session.get('username') else "Q"
+
+    return render_template('editor.html', quote=quote, catalogs=catalogs, is_owner=is_owner, is_recipient=is_recipient, initials=initials)
 
 @app.route('/save_quote/<int:quote_id>', methods=['POST'])
 def save_quote(quote_id):
@@ -446,7 +454,9 @@ def send_message():
 def upload_catalog():
     if 'user_id' not in session: return redirect(url_for('login'))
     catalog_name = request.form.get('catalog_name')
+    quote_id = request.form.get('quote_id') # New field to track if uploaded from editor
     file = request.files.get('csv_file')
+    
     if file and file.filename.endswith('.csv'):
         data = list(csv.reader(StringIO(file.stream.read().decode("UTF8"), newline=None)))
         if len(data) > 0:
@@ -457,6 +467,10 @@ def upload_catalog():
             conn.commit()
             cursor.close()
             conn.close()
+            
+    # Smart redirect: if it came from the editor, go back to the editor
+    if quote_id:
+        return redirect(url_for('editor', quote_id=quote_id))
     return redirect(url_for('dashboard'))
 
 @app.route('/get_catalog/<int:catalog_id>')
