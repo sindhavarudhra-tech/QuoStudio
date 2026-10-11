@@ -112,11 +112,22 @@ def index():
 
 @app.route('/auth', methods=['POST'])
 def auth():
-    # Handle login data or token verification here
-    data = request.get_json() # or request.form
-    # Add your authentication logic using Supabase auth here
-    return jsonify({"success": True, "redirect": "/dashboard"})
+    data = request.get_json() if request.is_json else request.form
+    access_token = data.get('access_token') # Sent by your frontend after Supabase login
+    
+    if not access_token:
+        return jsonify({"success": False, "error": "No access token provided"}), 400
 
+    try:
+        # Verify the user using Supabase Auth over HTTPS
+        user_response = supabase.auth.get_user(access_token)
+        user = user_response.user
+        
+        # Optional: Save or check user in your Render PostgreSQL database here
+        
+        return jsonify({"success": True, "redirect": "/dashboard"})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 401
 
 @app.route('/login')
 def login():
