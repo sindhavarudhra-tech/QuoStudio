@@ -16,6 +16,8 @@
             --border-hover: #374151;
             --modal-bg: #111827;
             --input-bg: #0A0F1D;
+            --pattern-color: rgba(255, 255, 255, 0.02);
+            --glow-color: rgba(37, 99, 235, 0.08);
         }
 
         body.light-theme {
@@ -29,9 +31,24 @@
             --border-hover: #CBD5E1;
             --modal-bg: #FFFFFF;
             --input-bg: #F8FAFC;
+            --pattern-color: rgba(0, 0, 0, 0.03);
+            --glow-color: rgba(37, 99, 235, 0.05);
         }
         
-        body { background-color: var(--bg-main); color: var(--text-main); font-family: -apple-system, sans-serif; transition: background-color 0.3s, color 0.3s; }
+        body { 
+            background-color: var(--bg-main); 
+            background-image: 
+                radial-gradient(circle at 50% 0%, var(--glow-color) 0%, transparent 60%),
+                linear-gradient(var(--pattern-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--pattern-color) 1px, transparent 1px);
+            background-size: 100% 100%, 32px 32px, 32px 32px;
+            background-position: center top;
+            background-attachment: fixed;
+            color: var(--text-main); 
+            font-family: -apple-system, sans-serif; 
+            transition: background-color 0.3s, color 0.3s; 
+        }
+
         .navbar { background: var(--bg-nav); border-bottom: 1px solid var(--border-color); padding: 16px 32px; transition: 0.3s; }
         
         .list-row { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px 24px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; transition: 0.2s; text-decoration: none; color: var(--text-main); }
@@ -57,6 +74,17 @@
         .dropdown-menu-custom .dropdown-item { color: var(--text-main); font-size: 14px; padding: 10px 20px; font-weight: 500; }
         .dropdown-menu-custom .dropdown-item:hover { background-color: var(--bg-card-hover); color: var(--text-main); }
         .dropdown-divider-custom { border-top: 1px solid var(--border-color); }
+
+        /* Custom Chat UI */
+        .chat-container { display: flex; height: 600px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .chat-sidebar { width: 320px; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; background: var(--bg-nav); }
+        .chat-user-item { padding: 16px; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: 0.2s; }
+        .chat-user-item:hover { background: var(--bg-card-hover); }
+        .chat-user-item.active { background: rgba(37,99,235,0.1); border-left: 3px solid #2563EB; }
+        .chat-main { flex-grow: 1; display: flex; flex-direction: column; background: var(--bg-main); }
+        .chat-bubble { padding: 10px 16px; border-radius: 16px; font-size: 14px; max-width: 75%; line-height: 1.4; }
+        .chat-bubble.me { background: #2563EB; color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+        .chat-bubble.them { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); align-self: flex-start; border-bottom-left-radius: 4px; }
     </style>
 </head>
 <body>
@@ -78,14 +106,12 @@
                 <li><hr class="dropdown-divider dropdown-divider-custom"></li>
                 <li><a class="dropdown-item d-flex align-items-center gap-3" href="#"><span style="font-size: 16px;">⚙️</span> Settings</a></li>
                 <li><a class="dropdown-item d-flex align-items-center gap-3" href="#" onclick="toggleTheme()"><span style="font-size: 16px;" id="themeIcon">🌓</span> Toggle Theme</a></li>
-                <li><a class="dropdown-item d-flex align-items-center gap-3" href="#"><span style="font-size: 16px;">🔄</span> Change Account</a></li>
-                <li><hr class="dropdown-divider dropdown-divider-custom"></li>
                 <li><a class="dropdown-item d-flex align-items-center gap-3 text-danger fw-bold" href="/logout"><span style="font-size: 16px;">🚪</span> Log Out</a></li>
             </ul>
         </div>
     </nav>
 
-    <div class="container mt-5" style="max-width: 1000px;">
+    <div class="container mt-5" style="max-width: 1100px;">
         <!-- Pre-calculate Filters -->
         {% set my_drafts = [] %}{% set my_sent = [] %}{% set my_signed = [] %}
         {% for q in my_quotes %}
@@ -109,35 +135,56 @@
                     {% if inbox_active|length > 0 %}<span class="badge bg-primary ms-2">{{ inbox_active|length }}</span>{% endif %}
                 </button>
             </li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#messages" onclick="initChatSystem()">Messages</button></li>
             <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#signed">Signed Quotes</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#databases">Databases</button></li>
         </ul>
 
         <div class="tab-content">
             <!-- 1. Workspace / Drafts -->
             <div class="tab-pane fade show active" id="drafts">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h4 class="m-0 fw-bold">Active Drafts</h4>
-                    <button class="btn btn-primary fw-bold px-4 rounded-pill" data-bs-toggle="modal" data-bs-target="#newQuoteModal">+ New Quote</button>
-                </div>
-                
-                {% for quote in my_drafts %}
-                <a href="/editor/{{ quote.id }}" class="list-row position-relative">
-                    <div class="d-flex align-items-center gap-4">
-                        <div style="width: 48px; height: 48px; background: rgba(37,99,235,0.1); color: #2563EB; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px;">📄</div>
-                        <div>
-                            <h6 class="fw-bold m-0 fs-5">{{ quote.client_name }}</h6>
-                            <small style="color: var(--text-muted);">Quote #QS-{{ quote.id }} • Editing</small>
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h4 class="m-0 fw-bold">Active Drafts</h4>
+                            <button class="btn btn-primary fw-bold px-4 rounded-pill" data-bs-toggle="modal" data-bs-target="#newQuoteModal">+ New Quote</button>
                         </div>
+                        
+                        {% for quote in my_drafts %}
+                        <a href="/editor/{{ quote.id }}" class="list-row position-relative">
+                            <div class="d-flex align-items-center gap-4">
+                                <div style="width: 48px; height: 48px; background: rgba(37,99,235,0.1); color: #2563EB; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px;">📄</div>
+                                <div>
+                                    <h6 class="fw-bold m-0 fs-5">{{ quote.client_name }}</h6>
+                                    <small style="color: var(--text-muted);">Quote #QS-{{ quote.id }} • Editing</small>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-3">
+                                <span class="status-badge status-draft">Draft</span>
+                            </div>
+                        </a>
+                        {% else %}
+                        <div class="text-center py-5 text-muted border border-secondary border-opacity-25 rounded-4">No active drafts. Create one to get started.</div>
+                        {% endfor %}
                     </div>
-                    <div class="d-flex align-items-center gap-3">
-                        <span class="status-badge status-draft">Draft</span>
-                        <button class="btn btn-sm text-danger px-2 border-0 shadow-none" title="Delete Quote" onclick="event.preventDefault(); if(confirm('Delete this draft?')) window.location.href='/delete_quote/{{ quote.id }}';">🗑️</button>
+                    
+                    <!-- Right Column: Inventory Database -->
+                    <div class="col-lg-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h4 class="m-0 fw-bold">Databases</h4>
+                            <button class="btn btn-sm btn-outline-secondary rounded-pill" data-bs-toggle="modal" data-bs-target="#newDbModal">+ Load</button>
+                        </div>
+                        {% for cat in catalogs %}
+                        <div class="list-row px-3 py-3">
+                            <div class="d-flex align-items-center gap-3">
+                                <div style="font-size: 18px;">🗃️</div>
+                                <div class="fw-bold">{{ cat.name }}</div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-4 text-muted small border border-secondary border-opacity-25 rounded-4">No inventory loaded.</div>
+                        {% endfor %}
                     </div>
-                </a>
-                {% else %}
-                <div class="text-center py-5 text-muted border border-secondary border-opacity-25 rounded-4">No active drafts. Create one to get started.</div>
-                {% endfor %}
+                </div>
             </div>
 
             <!-- 2. Sent Quotes -->
@@ -178,7 +225,40 @@
                 {% endfor %}
             </div>
 
-            <!-- 4. Signed Quotes -->
+            <!-- 4. Web Messaging Interface -->
+            <div class="tab-pane fade" id="messages">
+                <div class="chat-container">
+                    
+                    <!-- Chat Sidebar / Search -->
+                    <div class="chat-sidebar">
+                        <div class="p-3 border-bottom" style="border-color: var(--border-color) !important;">
+                            <input type="text" id="chatSearch" class="form-control form-control-sm bg-dark text-white border-secondary" placeholder="Search users to message..." onkeyup="searchChatUsers()">
+                        </div>
+                        <div id="chatUserList" style="flex-grow: 1; overflow-y: auto;">
+                            <!-- JS Injects Conversation List Here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Chat Window -->
+                    <div class="chat-main">
+                        <div id="chatHeader" class="p-3 border-bottom d-flex align-items-center gap-3" style="border-color: var(--border-color) !important; background: var(--bg-card); min-height: 65px;">
+                            <div class="fw-bold text-muted">Select a conversation to start messaging</div>
+                        </div>
+                        <div id="chatMessages" class="p-4" style="flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 16px;">
+                            <!-- JS Injects Messages Here -->
+                        </div>
+                        <div id="chatInputArea" class="p-3 border-top" style="border-color: var(--border-color) !important; background: var(--bg-card); display: none;">
+                            <form onsubmit="sendChatMessage(event)" class="d-flex gap-2">
+                                <input type="text" id="chatInput" class="form-control bg-dark text-white border-secondary" placeholder="Type a message..." required autocomplete="off">
+                                <button type="submit" class="btn btn-primary fw-bold px-4">Send</button>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- 5. Signed Quotes -->
             <div class="tab-pane fade" id="signed">
                 <div class="mb-4"><h4 class="m-0 fw-bold">Locked & Completed Documents</h4></div>
                 
@@ -211,26 +291,6 @@
                 {% if my_signed|length == 0 and inbox_signed|length == 0 %}
                 <div class="text-center py-5 text-muted border border-secondary border-opacity-25 rounded-4">No signed documents yet.</div>
                 {% endif %}
-            </div>
-
-            <!-- 5. Databases -->
-            <div class="tab-pane fade" id="databases">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h4 class="m-0 fw-bold">Inventory Databases</h4>
-                    <button class="btn btn-primary fw-bold px-4 rounded-pill" data-bs-toggle="modal" data-bs-target="#newDbModal">+ Load Database</button>
-                </div>
-                {% for cat in catalogs %}
-                <div class="list-row">
-                    <div class="d-flex align-items-center gap-4">
-                        <div style="width: 48px; height: 48px; background: rgba(139,92,246,0.1); color: #8B5CF6; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px;">🗃️</div>
-                        <div><h6 class="fw-bold m-0 fs-5">{{ cat.name }}</h6></div>
-                    </div>
-                    <div class="d-flex align-items-center gap-3">
-                        <div style="color: var(--text-muted); font-size: 14px; font-weight: 600;">Synced</div>
-                        <button class="btn btn-sm text-danger px-2 border-0 shadow-none" title="Delete Database" onclick="if(confirm('Delete this database?')) window.location.href='/delete_catalog/{{ cat.id }}';">🗑️</button>
-                    </div>
-                </div>
-                {% endfor %}
             </div>
         </div>
     </div>
@@ -300,6 +360,90 @@
             document.documentElement.style.setProperty('--invert-close', 'invert(0)');
             const icon = document.getElementById('themeIcon');
             if(icon) icon.innerText = '🌙';
+        }
+
+        // ==========================================
+        // IN-APP MESSAGING JAVASCRIPT
+        // ==========================================
+        let currentChatUserId = null;
+        let chatPollInterval = null;
+
+        function initChatSystem() {
+            searchChatUsers();
+        }
+
+        function searchChatUsers() {
+            const query = document.getElementById('chatSearch').value;
+            fetch('/search_users?q=' + query).then(res => res.json()).then(data => {
+                const list = document.getElementById('chatUserList');
+                list.innerHTML = '';
+                data.forEach(u => {
+                    const isActive = currentChatUserId === u.id ? 'active' : '';
+                    list.innerHTML += `
+                        <div class="chat-user-item ${isActive}" onclick="openChat(${u.id}, '${u.username}')">
+                            <div class="fw-bold" style="color: var(--text-main);">@${u.username}</div>
+                            <div class="small text-muted">${u.company_name || 'QuoStudio User'}</div>
+                        </div>`;
+                });
+                if(data.length === 0) list.innerHTML = '<div class="p-4 text-center text-muted small">No users found.</div>';
+            });
+        }
+
+        function openChat(userId, username) {
+            currentChatUserId = userId;
+            document.getElementById('chatHeader').innerHTML = `<div class="fw-bold fs-5" style="color: var(--text-main);">@${username}</div>`;
+            document.getElementById('chatInputArea').style.display = 'block';
+            
+            // Highlight active user in sidebar
+            document.querySelectorAll('.chat-user-item').forEach(el => el.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            loadMessages();
+            
+            // Setup polling for live updates every 3 seconds
+            if(chatPollInterval) clearInterval(chatPollInterval);
+            chatPollInterval = setInterval(loadMessages, 3000);
+        }
+
+        function loadMessages() {
+            if(!currentChatUserId) return;
+            fetch('/api/messages/' + currentChatUserId).then(res => res.json()).then(msgs => {
+                const box = document.getElementById('chatMessages');
+                
+                // Only update DOM if new messages arrived to prevent scrolling jumping
+                if (box.dataset.msgCount == msgs.length) return; 
+                box.dataset.msgCount = msgs.length;
+
+                box.innerHTML = '';
+                msgs.forEach(m => {
+                    const isMe = m.sender_id === {{ profile.id }};
+                    const typeClass = isMe ? 'me' : 'them';
+                    const timeString = new Date(m.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    
+                    box.innerHTML += `
+                        <div class="chat-bubble ${typeClass}">
+                            ${m.content}
+                            <div style="font-size: 10px; opacity: 0.7; margin-top: 4px; text-align: right;">${timeString}</div>
+                        </div>`;
+                });
+                box.scrollTop = box.scrollHeight;
+            });
+        }
+
+        function sendChatMessage(e) {
+            e.preventDefault();
+            const input = document.getElementById('chatInput');
+            const content = input.value;
+            if(!content.trim() || !currentChatUserId) return;
+            
+            fetch('/api/messages/send', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({recipient_id: currentChatUserId, content: content})
+            }).then(() => {
+                input.value = '';
+                loadMessages();
+            });
         }
     </script>
 </body>
