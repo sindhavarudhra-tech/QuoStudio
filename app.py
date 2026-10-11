@@ -30,7 +30,9 @@ else:
 # DATABASE CONNECTION & SETUP
 # ==========================================
 def get_db_connection():
-    return psycopg2.connect(os.getenv('DATABASE_URL'), cursor_factory=psycopg2.extras.RealDictCursor)
+    supabase_db_url = "postgresql://postgres:Rudhrapatel15*@db.ureklqoahnubcxzqjynd.supabase.co:5432/postgres"
+    return psycopg2.connect(supabase_db_url, cursor_factory=psycopg2.extras.RealDictCursor)
+
 def init_db():
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -109,6 +111,13 @@ init_db()
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/auth', methods=['POST'])
+def auth():
+    # Handle login data or token verification here
+    data = request.get_json() # or request.form
+    # Add your authentication logic using Supabase auth here
+    return jsonify({"success": True, "redirect": "/dashboard"})
 
 @app.route('/login')
 def login():
