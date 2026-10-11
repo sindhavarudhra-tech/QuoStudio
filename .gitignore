@@ -4,3 +4,4 @@ __pycache__/
 .DS_Store
 static/uploads/*
 !static/uploads/.gitkeep.env.local
+.env.local
