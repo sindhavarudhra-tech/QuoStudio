@@ -18,8 +18,6 @@
             --border-hover: #374151;
             --modal-bg: #111827;
             --input-bg: #0A0F1D;
-            --pattern-color: rgba(255, 255, 255, 0.02);
-            --glow-color: rgba(37, 99, 235, 0.08);
         }
 
         body.light-theme {
@@ -34,9 +32,8 @@
             --border-hover: #CBD5E1;
             --modal-bg: #FFFFFF;
             --input-bg: #F8FAFC;
-            --pattern-color: rgba(0, 0, 0, 0.03);
-            --glow-color: rgba(37, 99, 235, 0.05);
         }
+
         body { background-color: var(--bg-main); margin: 0; padding: 0; font-family: -apple-system, sans-serif; overflow: hidden; color: var(--text-main); transition: 0.3s; }
         .app-layout { display: flex; height: 100vh; width: 100vw; }
         .main-area { flex-grow: 1; display: flex; flex-direction: column; position: relative; }
@@ -56,27 +53,11 @@
         .btn-warning-custom { background: #F59E0B; border: none; color: white; padding: 8px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; }
         .avatar { width: 32px; height: 32px; background: #2563EB; border-radius: 50%; border: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: white; margin-left: 12px; cursor: pointer; }
 
-        .workspace { 
-            flex-grow: 1; 
-            overflow-y: auto; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            padding: 60px 0; 
-            background-color: var(--bg-main); 
-            background-image: 
-                radial-gradient(circle at 50% 0%, var(--glow-color) 0%, transparent 60%),
-                linear-gradient(var(--pattern-color) 1px, transparent 1px),
-                linear-gradient(90deg, var(--pattern-color) 1px, transparent 1px);
-            background-size: 100% 100%, 32px 32px, 32px 32px;
-            background-position: center top;
-            background-attachment: local;
-            transition: 0.3s; 
-        }
+        .workspace { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 60px 0; background-color: var(--bg-main); transition: 0.3s; }
 
         .page { width: 210mm; height: 297mm !important; max-height: 297mm !important; background-color: white; color: #0F172A; position: relative; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); border-radius: 4px; box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden; flex-shrink: 0; margin-bottom: 40px; }
         .bg-layer { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-size: cover; background-position: center; z-index: 0; pointer-events: none; }
-        .content-layer { position: relative; z-index: 1; display: flex; flex-direction: column; height: 100%; padding: 12mm 15mm; }
+        .content-layer { position: relative; z-index: 1; display: flex; flex-direction: column; height: 100%; padding: 20mm; }
 
         {% if is_editable %}
         [contenteditable="true"] { outline: none; border-bottom: 1px dashed transparent; transition: 0.2s; }
@@ -479,13 +460,8 @@
         availableCsvHeaders = headers;
         rawCatalogRows = rows;
         
-        // Match Title, Name, or Desc for the primary item name
-        nameIdx = headers.findIndex(h => {
-            let lower = h.toLowerCase();
-            return lower.includes('title') || lower.includes('name') || lower.includes('desc');
-        });
+        nameIdx = headers.findIndex(h => h.toLowerCase().includes('name') || h.toLowerCase().includes('desc'));
         if (nameIdx === -1) nameIdx = 0;
-        
         priceIdx = headers.findIndex(h => h.toLowerCase().includes('price') || h.toLowerCase().includes('cost'));
         if (priceIdx === -1) priceIdx = headers.length - 1;
 
@@ -865,28 +841,27 @@
             let editorPageBadge = `<div class="d-print-none" style="position: absolute; top: 16px; right: 16px; background: #F8FAFC; color: #64748B; border: 1px solid #E2E8F0; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; z-index: 50; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">Page ${i + 1} of ${finalTotalPages}</div>`;
 
             if (isFullHeader) {
-                // Increased logo size bounds
-                const logoHtml = logoDataUrl ? `<img src="${logoDataUrl}" style="max-height: 120px; max-width: 350px; width: auto; border-radius: 4px; object-fit: contain;">` : `<div style="width: 56px; height: 56px; background: #0F172A; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold;">Q</div>`;
+                const logoHtml = logoDataUrl ? `<img src="${logoDataUrl}" style="max-height: 150px; max-width: 250px; width: auto; border-radius: 2px; object-fit: contain;">` : `<div style="width: 56px; height: 56px; background: #0F172A; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold;">Q</div>`;
                 
                 headerHtml = `
-                    <div class="d-flex justify-content-between align-items-start mb-1">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
                         <div>${logoHtml}</div>
                         <div class="text-end">
                             <div style="font-size: 10px; font-weight: 700; color: #94A3B8; letter-spacing: 1px;">QUOTATION</div>
                             <div style="font-size: 18px; font-weight: 800; color: #0F172A;" ${ce} onblur="updateHeader('quote_id', this.innerText)">${headerState.quote_id}</div>
-                            <div class="mt-1 text-end" ${ce} style="font-size: 12px; color: #64748B; line-height: 1.4; border: 1px dashed transparent; padding: 2px; min-width: 200px;" onblur="updateHeader('company_details', this.innerHTML)">
+                            <div class="mt-2 text-end" ${ce} style="font-size: 12px; color: #64748B; line-height: 1.4; border: 1px dashed transparent; padding: 2px; min-width: 200px;" onblur="updateHeader('company_details', this.innerHTML)">
                                 ${headerState.company_details}
                             </div>
                         </div>
                     </div>
                     
-                    <div class="d-flex justify-content-between align-items-start mb-2 gap-3">
+                    <div class="d-flex justify-content-between align-items-start mb-3 gap-5">
                         <div style="flex: 1; min-width: 0;">
                              <div class="meta-label mb-1">PROJECT NAME</div>
                              <div class="doc-h1" ${ce} style="border: 1px dashed transparent; overflow-wrap: break-word; word-wrap: break-word; line-height: 1.1; padding-bottom: 8px;" onblur="updateHeader('project_name', this.innerText)">
                                  {{ quote.client_name }}
                              </div>
-                             <div class="mt-1 text-muted" ${ce} style="font-size: 13px; font-weight: 500;" onblur="updateHeader('client_details', this.innerHTML)">${headerState.client_details}</div>
+                             <div class="mt-2 text-muted" ${ce} style="font-size: 13px; font-weight: 500;" onblur="updateHeader('client_details', this.innerHTML)">${headerState.client_details}</div>
                         </div>
                         <div class="d-flex gap-4 flex-shrink-0 align-items-end" style="padding-top: 10px;">
                              <div class="meta-col text-end"><div class="meta-label">ISSUED</div><div class="meta-value no-wrap" ${ce} onblur="updateHeader('issued', this.innerText)">${headerState.issued}</div></div>
