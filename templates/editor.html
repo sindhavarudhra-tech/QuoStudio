@@ -75,20 +75,21 @@
 
         .quote-table { width: 100%; font-size: 12px; border-collapse: collapse; color: #0F172A; }
         .quote-table th { padding: 12px 8px; font-weight: 600; text-transform: uppercase; font-size: 10px; color: #94A3B8; text-align: left; border-bottom: 1px solid rgba(226, 232, 240, 0.8); }
-        .quote-table td { padding: 14px 8px; vertical-align: middle; border-bottom: 1px solid rgba(241, 245, 249, 0.5); transition: background-color 0.2s; }
+        .quote-table td { padding: 14px 8px; vertical-align: top; border-bottom: 1px solid rgba(241, 245, 249, 0.5); transition: background-color 0.2s; }
         
         {% if is_editable %}
         .quote-table tbody tr { cursor: grab; }
         .quote-table tbody tr:hover { background-color: rgba(0,0,0,0.02); }
         .quote-table tbody tr:active { cursor: grabbing; }
-        .delete-btn { color: #ef4444; background: transparent; border: none; font-size: 18px; font-weight: bold; cursor: pointer; opacity: 0; transition: 0.2s; padding: 0 4px; outline: none; }
+        .delete-btn { color: #ef4444; background: transparent; border: none; font-size: 20px; font-weight: bold; cursor: pointer; opacity: 0; transition: 0.2s; padding: 0 4px; outline: none; display: inline-flex; align-items: center; justify-content: center; line-height: 1; }
         .quote-table tbody tr:hover .delete-btn { opacity: 0.5; }
-        .delete-btn:hover { opacity: 1 !important; transform: scale(1.1); color: #dc2626; }
+        .delete-btn:hover { opacity: 1 !important; transform: scale(1.2); color: #dc2626; }
         {% else %}
         .delete-btn { display: none !important; }
         {% endif %}
         
-        .item-name { font-weight: 700; color: #0F172A; font-size: 13px; margin-bottom: 4px; }
+        .item-name { font-weight: 700; color: #0F172A; font-size: 13px; margin-bottom: 4px; white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word; min-width: 150px; }
+        
         .dragging { opacity: 0.4; background-color: rgba(248, 250, 252, 0.8); }
         .drag-over { border-top: 2px solid #2563EB !important; background-color: rgba(239, 246, 255, 0.8) !important; }
         .drop-zone-active { background-color: rgba(239, 246, 255, 0.8) !important; border-color: #2563EB !important; color: #2563EB !important; }
@@ -100,7 +101,6 @@
         .totals-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; color: #64748B; }
         .totals-row.grand { font-size: 16px; font-weight: 800; color: #0F172A; margin-top: 16px; border-top: 2px solid rgba(226, 232, 240, 0.8); padding-top: 16px; }
 
-        /* Right Panel */
         .right-panel { width: 340px; background-color: var(--bg-panel); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; overflow-y: auto; z-index: 40; transition: 0.3s; }
         details { border-bottom: 1px solid var(--border-color); }
         summary { font-size: 14px; font-weight: 600; color: var(--text-main); padding: 20px 24px; cursor: pointer; display: flex; align-items: center; gap: 8px; list-style: none; }
@@ -117,7 +117,6 @@
         .inventory-item.selected { border-color: #2563EB; background: rgba(37, 99, 235, 0.1); }
         .inventory-item.selected .inv-name { color: #2563EB; }
         
-        /* Modal & Signature Elements */
         .modal-content { background-color: var(--modal-bg) !important; color: var(--text-main); border: 1px solid var(--border-color); }
         .form-control { background-color: var(--input-bg) !important; color: var(--text-main) !important; border: 1px solid var(--border-color); }
         .client-search-result { padding: 12px; border: 1px solid var(--border-color); background: var(--bg-card); border-radius: 8px; margin-bottom: 8px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
@@ -232,14 +231,14 @@
                     </div>
                 </div>
 
-                <label class="meta-label">Brand Logo</label>
+                <div id="taxesConfigContainer"></div>
+
+                <label class="meta-label mt-4">Brand Logo</label>
                 <input type="file" id="logoUpload" class="db-select" accept="image/*" onchange="loadBase64(this, 'logo')">
                 <label class="meta-label mt-2">Background Artwork</label>
                 <input type="file" id="bgUpload" class="db-select" accept="image/*" onchange="loadBase64(this, 'bg')">
                 <label class="meta-label mt-2">Background Opacity</label>
                 <input type="range" id="bgOpacity" class="db-select p-0 border-0 bg-transparent" min="0.1" max="1" step="0.05" value="1" onchange="updateBgOpacity(this.value)">
-                <label class="meta-label mt-3">Tax Rate (%)</label>
-                <input type="number" id="taxRateInput" class="db-select" value="19" step="0.1" onchange="updateTaxRate(this.value)">
             </div>
         </details>
     </div>
@@ -331,7 +330,7 @@
     let logoDataUrl = '';
     let bgDataUrl = '';
     let bgOpacityVal = 1;
-    let taxRate = 19;
+    let documentTaxes = [{ name: 'Tax', rate: 19 }]; 
     let signatureData = document.getElementById('savedSignatureData').innerText;
 
     let availableCsvHeaders = [];
@@ -364,6 +363,37 @@
             if(!this.open) document.getElementById('invDetails').removeAttribute('open');
         });
     }
+
+    function renderTaxesSetup() {
+        if(!isEditable) return;
+        const container = document.getElementById('taxesConfigContainer');
+        let html = '<label class="meta-label mt-3 mb-2 text-primary">TAXES & FEES</label>';
+        documentTaxes.forEach((tax, idx) => {
+            html += `
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <input type="text" class="form-control bg-dark text-white border-secondary border-opacity-50 form-control-sm" value="${tax.name}" onblur="updateTaxName(${idx}, this.value)">
+                    <input type="number" class="form-control bg-dark text-white border-secondary border-opacity-50 form-control-sm" value="${tax.rate}" step="0.1" style="width: 80px;" onblur="updateTaxRate(${idx}, this.value)">
+                    <span class="text-muted" style="font-size: 13px;">%</span>
+                    <button class="btn btn-sm text-danger border-0 px-2 shadow-none" onclick="removeTax(${idx})">×</button>
+                </div>
+            `;
+        });
+        html += `<button class="btn btn-sm btn-outline-secondary w-100 mt-1 mb-3 text-white border-secondary border-opacity-50" onclick="addTax()">+ Add Tax Option</button>`;
+        container.innerHTML = html;
+    }
+
+    window.addTax = function() { if(isEditable) { documentTaxes.push({ name: 'New Tax', rate: 0 }); renderTaxesSetup(); renderWorkspace(); triggerSave(); } };
+    window.updateTaxName = function(idx, val) { if(isEditable) { documentTaxes[idx].name = val; renderWorkspace(); triggerSave(); } };
+    window.updateTaxRate = function(idx, val) { if(isEditable) { documentTaxes[idx].rate = parseFloat(val) || 0; renderWorkspace(); triggerSave(); } };
+    window.removeTax = function(idx) { if(isEditable) { documentTaxes.splice(idx, 1); renderTaxesSetup(); renderWorkspace(); triggerSave(); } };
+
+    window.addBlankRow = function() {
+        if(isEditable) {
+            documentPages[0].items.push({ name: 'New Item (Click to edit)', col1: '', col2: '', col3: '', col4: '', qty: 1, price: 0 });
+            renderWorkspace();
+            triggerSave();
+        }
+    };
 
     function searchClients() {
         const query = document.getElementById('clientSearch').value;
@@ -541,7 +571,7 @@
         renderWorkspace(); 
         triggerSave();
     }
-
+    
     window.deleteRow = function(idx) { if(!isEditable) return; documentPages[0].items.splice(idx, 1); renderWorkspace(); triggerSave(); };
 
     let draggedItemIdx = null;
@@ -605,10 +635,15 @@
             if(parsed.termsState) termsState = parsed.termsState;
             
             logoDataUrl = parsed.logo || ''; bgDataUrl = parsed.bg || '';
-            bgOpacityVal = parsed.bgOpacity || 1; taxRate = parsed.taxRate || 0;
+            bgOpacityVal = parsed.bgOpacity || 1;
+            
+            if(parsed.taxes !== undefined) {
+                documentTaxes = parsed.taxes;
+            } else if (parsed.taxRate !== undefined) {
+                documentTaxes = [{ name: 'Tax', rate: parsed.taxRate }];
+            }
             
             if(isEditable) {
-                document.getElementById('taxRateInput').value = taxRate;
                 document.getElementById('bgOpacity').value = bgOpacityVal;
                 document.getElementById('colCountDisplay').innerText = numDynamicCols + ' Columns';
                 document.getElementById('termsToggle').checked = termsState.active;
@@ -637,6 +672,7 @@
 
         if(isEditable && needsSave) triggerSave();
 
+        renderTaxesSetup();
         renderWorkspace();
         if(isEditable) searchClients();
     };
@@ -671,7 +707,7 @@
         const payload = {
             pages: documentPages, header: headerState, headers: dynamicHeaders,
             numCols: numDynamicCols, termsState: termsState, logo: logoDataUrl, 
-            bg: bgDataUrl, bgOpacity: bgOpacityVal, taxRate: taxRate
+            bg: bgDataUrl, bgOpacity: bgOpacityVal, taxes: documentTaxes
         };
         fetch(`/save_quote/{{ quote.id }}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ document_data: JSON.stringify(payload) }) });
     }
@@ -680,7 +716,6 @@
     window.updateDynamicHeader = function(index, val) { if(isEditable) { dynamicHeaders[index] = val; triggerSave(); } };
     window.updateItemQty = function(index, val) { if(isEditable) { let v = parseInt(val); documentPages[0].items[index].qty = isNaN(v) ? 1 : v; renderWorkspace(); triggerSave(); } };
     window.updateRowField = function(index, field, val) { if(isEditable) { documentPages[0].items[index][field] = val; triggerSave(); } };
-    window.updateTaxRate = function(val) { if(isEditable) { taxRate = parseFloat(val) || 0; renderWorkspace(); triggerSave(); } };
     window.updateBgOpacity = function(val) { if(isEditable) { bgOpacityVal = val; renderWorkspace(); triggerSave(); } };
 
     function renderWorkspace() {
@@ -689,8 +724,7 @@
         
         let ce = isEditable ? 'contenteditable="true"' : '';
         
-        let projectName = "{{ quote.client_name|replace('\"', '\\\"') }}";
-        const ITEMS_FIRST_PAGE = projectName.length > 35 ? 7 : 10; 
+        const ITEMS_FIRST_PAGE = 7; 
         const ITEMS_PER_PAGE = 13;
 
         let totalTablePages = 1;
@@ -699,8 +733,9 @@
         }
 
         let documentSubtotal = items.reduce((sum, item) => sum + (item.qty * item.price), 0);
-        let documentTaxAmount = documentSubtotal * (taxRate / 100);
-        let documentGrandTotal = documentSubtotal + documentTaxAmount;
+        let totalTaxAmount = 0;
+        documentTaxes.forEach(t => totalTaxAmount += (documentSubtotal * (t.rate / 100)));
+        let documentGrandTotal = documentSubtotal + totalTaxAmount;
         
         let pagesContent = [];
         let itemIndex = 0;
@@ -709,6 +744,8 @@
             let chunk = [];
             let limit = (p === 0) ? ITEMS_FIRST_PAGE : ITEMS_PER_PAGE;
             for (let i = 0; i < limit && itemIndex < items.length; i++) { chunk.push({ ...items[itemIndex], originalIndex: itemIndex }); itemIndex++; }
+
+            let pageTotal = chunk.reduce((sum, item) => sum + (item.qty * item.price), 0);
 
             let rowsHtml = '';
             chunk.forEach((item) => {
@@ -722,28 +759,28 @@
                         <td class="text-center" ${ce} onblur="updateItemQty(${item.originalIndex}, this.innerText)">${item.qty}</td>
                         <td class="text-end">$${item.price.toFixed(2)}</td>
                         <td class="text-end fw-bold">$${total.toFixed(2)}</td>
-                        <td class="d-print-none text-center" style="width: 32px; padding: 0;"><button class="delete-btn" title="Delete Row" onclick="deleteRow(${item.originalIndex})">&times;</button></td>
+                        <td class="d-print-none text-center align-middle" style="width: 32px; padding: 0;"><button class="delete-btn" title="Delete Row" onclick="deleteRow(${item.originalIndex})">&times;</button></td>
                     </tr>
                 `;
             });
 
             if (p === totalTablePages - 1 && isEditable) {
-                rowsHtml += `<tr class="d-print-none"><td colspan="10" style="padding: 16px 0;" ondragover="onDragOverTable(event)" ondragleave="onDragLeaveTable(event)" ondrop="onDropTableZone(event)"><div id="mainDropZone" style="border: 1px dashed #CBD5E1; color: #64748B; border-radius: 8px; text-align: center; padding: 12px; font-weight: 600; font-size: 11px; cursor: pointer; transition: 0.2s;">+ Drop item here (Drag from right panel or click)</div></td></tr>`;
+                rowsHtml += `<tr class="d-print-none"><td colspan="100%" style="padding: 16px 0;" ondragover="onDragOverTable(event)" ondragleave="onDragLeaveTable(event)" ondrop="onDropTableZone(event)"><div id="mainDropZone" style="border: 1px dashed #CBD5E1; color: #64748B; border-radius: 8px; text-align: center; padding: 12px; font-weight: 600; font-size: 11px; cursor: pointer; transition: 0.2s;" onclick="addBlankRow()">+ Drop item here or click to add a blank row</div></td></tr>`;
             }
 
             let dynamicThs = '';
             for(let c = 0; c < numDynamicCols; c++) { dynamicThs += `<th ${ce} onblur="updateDynamicHeader(${c}, this.innerText)">${dynamicHeaders[c] || `Col ${c+1}`}</th>`; }
 
-            let tableHtml = `<table class="quote-table"><thead><tr><th style="width: auto;">ITEM</th>${dynamicThs}<th class="text-center" style="width: 10%;">QTY</th><th class="text-end" style="width: 15%;">RATE</th><th class="text-end" style="width: 15%;">TOTAL</th><th class="d-print-none" style="width: 32px;"></th></tr></thead><tbody>${rowsHtml}</tbody></table>`;
+            let tableHtml = `<table class="quote-table"><thead><tr><th style="width: 35%;">ITEM</th>${dynamicThs}<th class="text-center" style="width: 10%;">QTY</th><th class="text-end" style="width: 15%;">RATE</th><th class="text-end" style="width: 15%;">TOTAL</th><th class="d-print-none" style="width: 32px;"></th></tr></thead><tbody>${rowsHtml}</tbody></table>`;
             
-            pagesContent.push({ type: 'table', content: tableHtml });
+            pagesContent.push({ type: 'table', content: tableHtml, pageTotal: pageTotal });
         }
 
         if (termsState.active) {
             let termsHtml = `<div style="flex-grow: 1; outline: none; color: #0F172A; font-size: 13px; line-height: 1.6;" ${ce} onblur="updateTermsContent(this.innerHTML)">${termsState.content}</div>`;
             let targetIndex = Math.max(0, termsState.pageNum - 1);
-            if (targetIndex >= pagesContent.length) pagesContent.push({ type: 'terms', content: termsHtml });
-            else pagesContent.splice(targetIndex, 0, { type: 'terms', content: termsHtml });
+            if (targetIndex >= pagesContent.length) pagesContent.push({ type: 'terms', content: termsHtml, pageTotal: 0 });
+            else pagesContent.splice(targetIndex, 0, { type: 'terms', content: termsHtml, pageTotal: 0 });
         }
 
         let finalHtml = '';
@@ -765,6 +802,8 @@
             
             let headerHtml = '';
             let isFullHeader = (i === 0 || block.type === 'terms' || i === firstTableIdx);
+
+            let editorPageBadge = `<div class="d-print-none" style="position: absolute; top: 16px; right: 16px; background: #F8FAFC; color: #64748B; border: 1px solid #E2E8F0; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; z-index: 50; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">Page ${i + 1} of ${finalTotalPages}</div>`;
 
             if (isFullHeader) {
                 const logoHtml = logoDataUrl ? `<img src="${logoDataUrl}" style="max-height: 80px; max-width: 250px; width: auto; border-radius: 4px; object-fit: contain;">` : `<div style="width: 56px; height: 56px; background: #0F172A; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold;">Q</div>`;
@@ -803,9 +842,31 @@
                             <div style="font-size: 16px; font-weight: 800; color: #0F172A;">{{ quote.client_name }}</div>
                             <div style="font-size: 12px; font-weight: 600; color: #64748B; margin-top: 4px;">${subtext}</div>
                         </div>
-                        <div style="font-size: 12px; font-weight: 600; color: #94A3B8;">Page ${i + 1} of ${finalTotalPages}</div>
                     </div>
                 `;
+            }
+
+            let dynamicTotalsHtml = '';
+            let isLastFinancialPage = (i === finalTotalPages - 1);
+            
+            if (!isLastFinancialPage) {
+                if (block.type === 'table') {
+                    dynamicTotalsHtml += `<div class="totals-row"><span>Page Subtotal</span><span class="text-dark fw-bold">$${block.pageTotal.toFixed(2)}</span></div>`;
+                }
+            } else {
+                if (block.type === 'table' && finalTotalPages > 1) {
+                    dynamicTotalsHtml += `<div class="totals-row"><span>Page Subtotal</span><span class="text-dark fw-bold">$${block.pageTotal.toFixed(2)}</span></div>`;
+                    dynamicTotalsHtml += `<div class="totals-row mt-2 pt-2" style="border-top: 1px solid rgba(226, 232, 240, 0.8);"><span>Subtotal (All Pages)</span><span class="text-dark fw-bold">$${documentSubtotal.toFixed(2)}</span></div>`;
+                } else {
+                    dynamicTotalsHtml += `<div class="totals-row"><span>Subtotal</span><span class="text-dark fw-bold">$${documentSubtotal.toFixed(2)}</span></div>`;
+                }
+
+                documentTaxes.forEach(t => {
+                    let amt = documentSubtotal * (t.rate / 100);
+                    dynamicTotalsHtml += `<div class="totals-row"><span>${t.name} - ${t.rate}%</span><span class="text-dark fw-bold">$${amt.toFixed(2)}</span></div>`;
+                });
+                
+                dynamicTotalsHtml += `<div class="totals-row grand"><span>Grand Total</span><span>$${documentGrandTotal.toFixed(2)}</span></div>`;
             }
 
             let footerHtml = `
@@ -818,9 +879,7 @@
                         ${sigBlock}
                     </div>
                     <div class="totals-section" style="width: 35%;">
-                        <div class="totals-row"><span>Subtotal</span><span class="text-dark fw-bold">$${documentSubtotal.toFixed(2)}</span></div>
-                        <div class="totals-row"><span>Tax - ${taxRate}%</span><span class="text-dark fw-bold">$${documentTaxAmount.toFixed(2)}</span></div>
-                        <div class="totals-row grand"><span>Total</span><span>$${documentGrandTotal.toFixed(2)}</span></div>
+                        ${dynamicTotalsHtml}
                     </div>
                 </div>
             `;
@@ -830,6 +889,7 @@
                 <div class="page">
                     <div class="bg-layer" ${bgStyle}></div>
                     <div class="content-layer">
+                        ${editorPageBadge}
                         ${headerHtml}
                         ${block.content}
                         ${footerHtml}
