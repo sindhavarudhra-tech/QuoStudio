@@ -30,9 +30,9 @@ else:
 # DATABASE CONNECTION & SETUP
 # ==========================================
 def get_db_connection():
-    supabase_db_url = "postgresql://postgres:Rudhrapatel15*@db.ureklqoahnubcxzqjynd.supabase.co:5432/postgres"
-    return psycopg2.connect(supabase_db_url, cursor_factory=psycopg2.extras.RealDictCursor)
-
+    # Uses Render's DATABASE_URL if available, otherwise falls back to direct Supabase URL for local testing
+    database_url = os.getenv('DATABASE_URL') or "postgresql://postgres:Rudhrapatel15*@db.ureklqoahnubcxzqjynd.supabase.co:5432/postgres"
+    return psycopg2.connect(database_url, cursor_factory=psycopg2.extras.RealDictCursor)
 def init_db():
     conn = get_db_connection()
     cursor = conn.cursor()
