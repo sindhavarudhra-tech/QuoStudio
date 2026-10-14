@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: quostudio-backend-app
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: 1
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        value: https://ureklqoahnubcxzqjynd.supabase.co
+      - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+        value: sb_publishable_3hXokyfcfrKcIGqFp8TTnA_GoKPRYXa
