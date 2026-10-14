@@ -2,69 +2,362 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Authentication - QuoStudio</title>
+    
+    <!-- Premium Fonts: Clash Grotesk (Headings) & Geist (Body) -->
+    <link href="https://api.fontshare.com/v2/css?f[]=clash-grotesk@400,500,600,700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
     <style>
-        body { 
-            background-color: #0F172A; color: white; font-family: -apple-system, sans-serif; 
-            display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; 
-            background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-            background-size: 48px 48px;
+        :root {
+            --bg-nav: rgba(11, 15, 25, 0.4);
+            --bg-card: rgba(17, 24, 39, 0.7);
+            --bg-tab-container: rgba(11, 15, 25, 0.5);
+            --text-main: #ffffff;
+            --text-muted: #94A3B8;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --input-bg: rgba(11, 15, 25, 0.5);
+            --accent-blue: #2563EB;
         }
-        .login-box { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); padding: 40px; border-radius: 16px; width: 100%; max-width: 400px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
-        .form-control { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 14px; border-radius: 8px; margin-bottom: 16px; font-size: 15px; }
+
+        body { 
+            color: var(--text-main); 
+            font-family: 'Geist', -apple-system, sans-serif; 
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            overflow-y: auto;
+            background-color: #0F172A;
+            padding: 40px 0;
+        }
+
+        h1, h2, h3, h4, h5, h6, .brand-text {
+            font-family: 'Clash Grotesk', sans-serif;
+        }
+
+        .cinematic-bg {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: -1;
+            background-image: 
+                linear-gradient(to bottom, rgba(11, 15, 25, 0.93), rgba(11, 15, 25, 0.93)),
+                url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            pointer-events: none;
+        }
+
+        .login-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(24px) saturate(150%);
+            -webkit-backdrop-filter: blur(24px) saturate(150%);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+            animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        @keyframes fadeUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .brand-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .brand-logo {
+            width: 36px; height: 36px; 
+            background: var(--text-main); 
+            color: #0F172A; 
+            border-radius: 10px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-weight: 700; 
+            font-size: 18px; 
+            font-family: 'Clash Grotesk', sans-serif;
+        }
+
+        /* Tabs */
+        .auth-tabs {
+            display: flex;
+            background: var(--bg-tab-container);
+            border-radius: 14px;
+            padding: 6px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border-color);
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            font-family: 'Geist', sans-serif;
+        }
+
+        .auth-tab.active {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-main);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .auth-tab:hover:not(.active) {
+            color: #E2E8F0;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        /* Inputs */
+        .form-control {
+            background-color: var(--input-bg) !important;
+            color: var(--text-main) !important;
+            border: 1px solid var(--border-color);
+            padding: 14px 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+            font-family: 'Geist', sans-serif;
+            font-size: 15px;
+        }
+        
+        .form-control:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 4px rgba(37,99,235,0.15);
+            background-color: rgba(11, 15, 25, 0.7) !important;
+        }
+
         .form-control::placeholder { color: #64748B; }
-        .form-control:focus { background: rgba(0,0,0,0.3); border-color: #2563EB; color: white; box-shadow: 0 0 0 3px rgba(37,99,235,0.2); }
-        .btn-primary { background: #2563EB; border: none; padding: 14px; border-radius: 8px; font-weight: 600; width: 100%; margin-top: 10px; font-size: 15px; transition: 0.2s; }
-        .btn-primary:hover { background: #1D4ED8; transform: translateY(-2px); }
-        .toggle-link { color: #2563EB; cursor: pointer; text-decoration: underline; font-size: 14px; }
+
+        /* Button */
+        .btn-primary {
+            background-color: var(--accent-blue);
+            border: none;
+            font-weight: 600;
+            padding: 14px;
+            border-radius: 12px;
+            width: 100%;
+            transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            font-family: 'Geist', sans-serif;
+            font-size: 15px;
+            margin-top: 8px;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(37,99,235,0.3);
+            background-color: #1D4ED8;
+        }
+        
+        /* Alerts */
+        .alert-error {
+            background: rgba(239, 68, 68, 0.15); 
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #FCA5A5;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            font-weight: 500;
+            text-align: center;
+        }
+        
+        .alert-success {
+            background: rgba(16, 185, 129, 0.15); 
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #6EE7B7;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        /* Glowing Blue Highlight Link Effect with Underline */
+        .glowing-link {
+            color: #60A5FA;
+            font-weight: 600;
+            text-decoration: underline;
+            text-shadow: 0 0 10px rgba(37, 99, 235, 0.6), 0 0 20px rgba(59, 130, 246, 0.4);
+            transition: all 0.3s ease;
+        }
+        .glowing-link:hover {
+            color: #93C5FD;
+            text-shadow: 0 0 15px rgba(37, 99, 235, 0.9), 0 0 30px rgba(59, 130, 246, 0.7);
+        }
+
+        /* Modal styling */
+        .modal-content {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(24px);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            border-radius: 20px;
+        }
     </style>
 </head>
 <body>
-    <div class="login-box">
-        <div class="d-flex align-items-center justify-content-center gap-3 mb-4">
-            <div style="width: 32px; height: 32px; background: white; color: #0F172A; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: bold;">Q</div>
-            <h3 class="m-0 fw-bold">QuoStudio</h3>
+
+    <div class="cinematic-bg"></div>
+
+    <div class="login-card">
+        <div class="brand-header">
+            <div class="brand-logo">Q</div>
+            <h2 class="brand-text m-0 fw-semibold" style="letter-spacing: -0.02em;">QuoStudio</h2>
         </div>
         
-        <p class="text-center mb-4 text-muted" id="formSubtitle">Sign in to your workspace</p>
-        
-        <form method="POST" action="/auth">
-            {% with messages = get_flashed_messages() %}
+        <div class="auth-tabs">
+            <button type="button" class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Sign In</button>
+            <button type="button" class="auth-tab" id="tabSignup" onclick="switchTab('signup')">Create Account</button>
+        </div>
+
+        <form method="POST" action="/auth" id="authForm" onsubmit="return validateAuthForm(event)">
+            {% with messages = get_flashed_messages(with_categories=true) %}
               {% if messages %}
-                <div class="text-danger small mb-3 text-center p-2 rounded" style="background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444;">{{ messages[0] }}</div>
+                {% for category, message in messages %}
+                    <div class="alert-{{ 'error' if category == 'error' else 'success' }}">{{ message }}</div>
+                {% endfor %}
               {% endif %}
             {% endwith %}
+
+            <div id="clientErrorAlert" class="alert-error" style="display: none;"></div>
 
             <input type="hidden" name="action" id="actionField" value="login">
             
             <div id="signupFields" style="display: none;">
-                <input type="text" name="username" class="form-control" placeholder="Unique Username (@yourname)">
+                <div class="mb-3 position-relative">
+                    <input type="text" name="username" id="usernameInput" class="form-control mb-1" placeholder="Username (@yourname)">
+                    <div id="usernameFeedback" style="font-size: 12px; font-weight: 500; margin-left: 4px; display: none;"></div>
+                </div>
                 <input type="text" name="company_name" class="form-control" placeholder="Company / Freelance Name">
             </div>
             
             <input type="email" name="email" class="form-control" placeholder="Email address" required>
-            <input type="password" name="password" class="form-control" placeholder="Password" required>
+            
+            <div class="position-relative mb-1">
+                <input type="password" name="password" id="passwordInput" class="form-control mb-0" placeholder="Password" required style="padding-right: 45px;">
+                <button type="button" id="eyeBtn" class="btn border-0 position-absolute" style="right: 8px; top: 50%; transform: translateY(-50%); color: var(--text-muted); padding: 4px; background: transparent; z-index: 5;" onclick="togglePassword()">
+                    <i data-lucide="eye" id="eyeIcon" style="width: 20px; height: 20px;"></i>
+                </button>
+            </div>
+            
+            <!-- Terms & Privacy Checkboxes (Only shown on Signup) -->
+            <div id="signupTermsContainer" style="display: none; margin-top: 16px; margin-bottom: 16px; font-size: 13px; color: var(--text-muted);">
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" id="termsCheck" style="accent-color: var(--accent-blue); cursor: pointer;">
+                    <label class="form-check-label" for="termsCheck" style="cursor: pointer;">
+                        I agree to the <a href="#" onclick="openModal(event, 'terms')" class="glowing-link">Terms of Service</a>
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="privacyCheck" style="accent-color: var(--accent-blue); cursor: pointer;">
+                    <label class="form-check-label" for="privacyCheck" style="cursor: pointer;">
+                        I agree to the <a href="#" onclick="openModal(event, 'privacy')" class="glowing-link">Privacy Policy</a>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Forgot Password Link -->
+            <div class="text-end mb-3" id="forgotPasswordWrapper">
+                <a href="/forgot-password" style="font-size: 13px; color: var(--text-muted); text-decoration: none; transition: 0.2s;" onmouseover="this.style.color='var(--accent-blue)'" onmouseout="this.style.color='var(--text-muted)'">Forgot password?</a>
+            </div>
             
             <button type="submit" class="btn btn-primary" id="submitBtn">Sign In</button>
         </form>
-        
+
+        <!-- Back to Website Link -->
         <div class="text-center mt-4">
-            <span class="text-muted small" id="toggleText">New to QuoStudio? </span>
-            <span class="toggle-link" onclick="toggleForm()">Create an account</span>
+            <a href="/" style="font-size: 14px; color: var(--text-muted); text-decoration: none; transition: 0.2s;" onmouseover="this.style.color='#ffffff'" onmouseout="this.style.color='var(--text-muted)'">
+                <i data-lucide="arrow-left" style="width: 16px; height: 16px; vertical-align: -3px; margin-right: 4px;"></i> Back to website
+            </a>
         </div>
     </div>
 
+    <!-- Info Modal for Terms / Privacy -->
+    <div class="modal fade" id="infoModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content p-4">
+                <div class="modal-header border-0 pb-0">
+                    <h4 class="modal-title fw-bold brand-text" id="modalTitle" style="color: var(--text-main);"></h4>
+                    <button type="button" class="btn-close" style="filter: invert(1);" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body py-3" id="modalBody" style="font-size: 1rem; color: var(--text-muted); line-height: 1.7; max-height: 50vh; overflow-y: auto;">
+                </div>
+                <div class="modal-footer border-0 pt-3">
+                    <button type="button" class="btn btn-primary py-3 rounded-pill w-100 fw-semibold" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        let isLogin = true;
-        function toggleForm() {
-            isLogin = !isLogin;
+        lucide.createIcons();
+
+        // Password Toggle
+        function togglePassword() {
+            const pwdInput = document.getElementById('passwordInput');
+            const eyeIcon = document.getElementById('eyeIcon');
+            if (pwdInput.type === 'password') {
+                pwdInput.type = 'text';
+                eyeIcon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                pwdInput.type = 'password';
+                eyeIcon.setAttribute('data-lucide', 'eye');
+            }
+            lucide.createIcons();
+        }
+
+        // Tab Switching
+        function switchTab(mode) {
+            const isLogin = (mode === 'login');
+            
             document.getElementById('actionField').value = isLogin ? 'login' : 'signup';
             document.getElementById('signupFields').style.display = isLogin ? 'none' : 'block';
+            document.getElementById('signupTermsContainer').style.display = isLogin ? 'none' : 'block';
             document.getElementById('submitBtn').innerText = isLogin ? 'Sign In' : 'Create Account';
-            document.getElementById('formSubtitle').innerText = isLogin ? 'Sign in to your workspace' : 'Set up your profile';
-            document.getElementById('toggleText').innerText = isLogin ? 'New to QuoStudio? ' : 'Already have an account? ';
-            document.querySelector('.toggle-link').innerText = isLogin ? 'Create an account' : 'Sign in';
+            document.getElementById('forgotPasswordWrapper').style.display = isLogin ? 'block' : 'none';
+            document.getElementById('clientErrorAlert').style.display = 'none';
+
+            if(isLogin) {
+                document.getElementById('tabLogin').classList.add('active');
+                document.getElementById('tabSignup').classList.remove('active');
+                document.getElementById('eyeBtn').style.display = 'block'; 
+            } else {
+                document.getElementById('tabSignup').classList.add('active');
+                document.getElementById('tabLogin').classList.remove('active');
+                document.getElementById('eyeBtn').style.display = 'none'; 
+                
+                document.getElementById('passwordInput').type = 'password';
+                document.getElementById('eyeIcon').setAttribute('data-lucide', 'eye');
+                lucide.createIcons();
+            }
             
             if(!isLogin) {
                 document.querySelectorAll('#signupFields input').forEach(inp => inp.required = true);
@@ -72,6 +365,97 @@
                 document.querySelectorAll('#signupFields input').forEach(inp => inp.required = false);
             }
         }
+
+        // Form Validation for Checkboxes
+        function validateAuthForm(e) {
+            const action = document.getElementById('actionField').value;
+            if (action === 'signup') {
+                const termsChecked = document.getElementById('termsCheck').checked;
+                const privacyChecked = document.getElementById('privacyCheck').checked;
+                const errorAlert = document.getElementById('clientErrorAlert');
+
+                if (!termsChecked || !privacyChecked) {
+                    e.preventDefault();
+                    let missing = [];
+                    if (!termsChecked) missing.push('Terms of Service');
+                    if (!privacyChecked) missing.push('Privacy Policy');
+
+                    errorAlert.innerText = `Please agree to the ${missing.join(' and the ')} before creating your account.`;
+                    errorAlert.style.display = 'block';
+                    return false;
+                } else {
+                    errorAlert.style.display = 'none';
+                }
+            }
+            return true;
+        }
+
+        // Open Terms or Privacy Modal
+        function openModal(e, type) {
+            e.preventDefault();
+            const titleEl = document.getElementById('modalTitle');
+            const bodyEl = document.getElementById('modalBody');
+
+            if (type === 'terms') {
+                titleEl.innerText = 'Terms of Service';
+                bodyEl.innerHTML = `
+                    <p>Welcome to QuoStudio. By registering an account and using our platform, you agree to comply with and be bound by the following terms and conditions:</p>
+                    <p><strong>1. Account Security & Responsibilities:</strong> You are responsible for maintaining the confidentiality of your account credentials and password. All activities under your account are your responsibility.</p>
+                    <p><strong>2. Acceptable Use:</strong> You agree not to use QuoStudio for any unlawful activities or to distribute malicious code, spam, or infringing material.</p>
+                    <p><strong>3. Intellectual Property:</strong> All software, branding, and interfaces provided by QuoStudio are the property of QuoStudio and protected by international copyright laws.</p>
+                `;
+            } else {
+                titleEl.innerText = 'Zero-Knowledge & Privacy Policy Agreement';
+                bodyEl.innerHTML = `
+                    <p>Before creating your account on QuoStudio, please review our zero-knowledge security commitments:</p>
+                    <ul>
+                        <li><strong>Client-Side End-to-End Encryption:</strong> All your inventory catalogs, pricing matrices, and business records are encrypted locally in your browser using AES-GCM before touching any cloud storage.</li>
+                        <li><strong>Zero-Knowledge Storage:</strong> Neither QuoStudio administrators nor any third party can read, view, or access your raw catalog data. Only you hold the decryption keys.</li>
+                        <li><strong>Data Portability & Deletion:</strong> You retain complete ownership and can permanently delete any uploaded database catalog or quotation history from the database at any time with a single click.</li>
+                    </ul>
+                `;
+            }
+
+            const infoModal = new bootstrap.Modal(document.getElementById('infoModal'));
+            infoModal.show();
+        }
+
+        // Real-time Username Validation
+        const usernameInput = document.getElementById('usernameInput');
+        const usernameFeedback = document.getElementById('usernameFeedback');
+        let typingTimer;
+
+        usernameInput.addEventListener('input', function() {
+            clearTimeout(typingTimer);
+            const val = this.value.trim();
+            
+            if(val.length < 3) {
+                usernameFeedback.style.display = 'none';
+                return;
+            }
+
+            usernameFeedback.style.display = 'block';
+            usernameFeedback.style.color = 'var(--text-muted)';
+            usernameFeedback.innerText = 'Checking...';
+
+            typingTimer = setTimeout(() => {
+                fetch('/check_username?username=' + encodeURIComponent(val))
+                    .then(response => response.json())
+                    .then(data => {
+                        if(data.available) {
+                            usernameFeedback.style.color = '#10B981';
+                            usernameFeedback.innerHTML = '<i data-lucide="check-circle" style="width: 14px; height: 14px; margin-right: 4px; vertical-align: -2px;"></i>Available';
+                        } else {
+                            usernameFeedback.style.color = '#EF4444';
+                            usernameFeedback.innerHTML = '<i data-lucide="x-circle" style="width: 14px; height: 14px; margin-right: 4px; vertical-align: -2px;"></i>Username taken';
+                        }
+                        lucide.createIcons();
+                    })
+                    .catch(err => {
+                        usernameFeedback.style.display = 'none';
+                    });
+            }, 600);
+        });
     </script>
 </body>
 </html>

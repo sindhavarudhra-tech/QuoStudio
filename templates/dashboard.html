@@ -3,121 +3,205 @@
 <head>
     <meta charset="UTF-8">
     <title>Dashboard - QuoStudio</title>
+    
+    <link href="https://api.fontshare.com/v2/css?f[]=clash-grotesk@400,500,600,700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
-            --bg-main: #050810;
-            --bg-nav: #0A0F1D;
-            --bg-card: #111827;
-            --bg-card-hover: #1E293B;
+            --bg-nav: rgba(11, 15, 25, 0.4);
+            --bg-card: rgba(17, 24, 39, 0.6);
+            --bg-card-hover: rgba(30, 41, 59, 0.8);
             --text-main: #ffffff;
             --text-muted: #94A3B8;
-            --border-color: #1F2937;
-            --border-hover: #374151;
-            --modal-bg: #111827;
-            --input-bg: #0A0F1D;
-            --pattern-color: rgba(255, 255, 255, 0.02);
-            --glow-color: rgba(37, 99, 235, 0.08);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(37, 99, 235, 0.4);
+            --modal-bg: rgba(17, 24, 39, 0.95);
+            --input-bg: rgba(11, 15, 25, 0.5);
+            --blur-val: blur(30px) saturate(150%);
+            --accent-blue: #2563EB;
         }
 
         body.light-theme {
-            --bg-main: #F1F5F9;
-            --bg-nav: #FFFFFF;
-            --bg-card: #FFFFFF;
-            --bg-card-hover: #F8FAFC;
+            --bg-nav: rgba(255, 255, 255, 0.5);
+            --bg-card: rgba(255, 255, 255, 0.7);
+            --bg-card-hover: rgba(255, 255, 255, 0.95);
             --text-main: #0F172A;
             --text-muted: #64748B;
-            --border-color: #E2E8F0;
-            --border-hover: #CBD5E1;
-            --modal-bg: #FFFFFF;
-            --input-bg: #F8FAFC;
-            --pattern-color: rgba(0, 0, 0, 0.03);
-            --glow-color: rgba(37, 99, 235, 0.05);
+            --border-color: rgba(0, 0, 0, 0.08);
+            --border-hover: rgba(37, 99, 235, 0.3);
+            --modal-bg: rgba(255, 255, 255, 0.98);
+            --input-bg: rgba(255, 255, 255, 0.6);
         }
         
         body { 
-            background-color: var(--bg-main); 
-            background-image: 
-                radial-gradient(circle at 50% 0%, var(--glow-color) 0%, transparent 60%),
-                linear-gradient(var(--pattern-color) 1px, transparent 1px),
-                linear-gradient(90deg, var(--pattern-color) 1px, transparent 1px);
-            background-size: 100% 100%, 32px 32px, 32px 32px;
-            background-position: center top;
-            background-attachment: fixed;
+            background-color: transparent; 
             color: var(--text-main); 
-            font-family: -apple-system, sans-serif; 
-            transition: background-color 0.3s, color 0.3s; 
+            font-family: 'Geist', -apple-system, sans-serif; 
+            transition: color 0.3s; 
+            overflow-x: hidden;
         }
 
-        .navbar { background: var(--bg-nav); border-bottom: 1px solid var(--border-color); padding: 16px 32px; transition: 0.3s; }
+        h1, h2, h3, h4, h5, h6, .brand-text {
+            font-family: 'Clash Grotesk', sans-serif;
+        }
+
+        .cinematic-bg {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: -1;
+            background-image: 
+                linear-gradient(to bottom, rgba(11, 15, 25, 0.93), rgba(11, 15, 25, 0.93)),
+                url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            pointer-events: none;
+            transition: 0.3s ease;
+        }
+
+        body.light-theme .cinematic-bg {
+            background-image: 
+                linear-gradient(to bottom, rgba(241, 245, 249, 0.93), rgba(241, 245, 249, 0.93)),
+                url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop');
+        }
+
+        .navbar { 
+            background: var(--bg-nav); 
+            backdrop-filter: var(--blur-val);
+            -webkit-backdrop-filter: var(--blur-val);
+            border-bottom: 1px solid var(--border-color); 
+            padding: 16px 32px; 
+            transition: 0.3s; 
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
         
-        .list-row { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px 24px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; transition: 0.2s; text-decoration: none; color: var(--text-main); }
-        .list-row:hover { border-color: var(--border-hover); background: var(--bg-card-hover); color: var(--text-main); transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .list-row { 
+            background: var(--bg-card); 
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color); 
+            border-radius: 16px; 
+            padding: 20px 24px; 
+            margin-bottom: 16px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            transition: all 0.2s ease; 
+            text-decoration: none; 
+            color: var(--text-main); 
+        }
+        .list-row:hover { 
+            border-color: var(--border-hover); 
+            background: var(--bg-card-hover); 
+            color: var(--text-main); 
+            transform: translateY(-2px); 
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2); 
+        }
         
-        .nav-tabs { border-bottom: 1px solid var(--border-color); margin-bottom: 32px; gap: 32px; border: none; }
-        .nav-tabs .nav-link { color: var(--text-muted); border: none; padding: 12px 0; font-weight: 600; font-size: 15px; background: transparent; transition: 0.2s; }
+        .nav-tabs { border-bottom: 1px solid var(--border-color); margin-bottom: 24px; gap: 32px; border: none; }
+        .nav-tabs .nav-link { color: var(--text-muted); border: none; padding: 12px 0; font-weight: 500; font-size: 15px; background: transparent; transition: 0.2s; }
         .nav-tabs .nav-link:hover { color: var(--text-main); background: transparent; border: none; }
-        .nav-tabs .nav-link.active { color: var(--text-main) !important; background: transparent !important; border: none !important; border-bottom: 2px solid #2563EB !important; }
+        .nav-tabs .nav-link.active { color: var(--text-main) !important; background: transparent !important; border: none !important; border-bottom: 2px solid var(--accent-blue) !important; font-weight: 600; }
 
-        .profile-avatar { width: 40px; height: 40px; background: linear-gradient(135deg, #2563EB, #1D4ED8); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; border: 2px solid var(--border-color); box-shadow: 0 0 15px rgba(37,99,235,0.4); color: white; cursor: pointer; text-transform: uppercase; }
+        .tab-pane.fade {
+            transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateY(10px);
+        }
+        .tab-pane.fade.show {
+            transform: translateY(0);
+        }
+
+        .profile-avatar { width: 40px; height: 40px; background: linear-gradient(135deg, #2563EB, #1D4ED8); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; border: 2px solid var(--border-color); color: white; cursor: pointer; text-transform: uppercase; font-family: 'Geist', sans-serif;}
+        .profile-avatar::after { display: none !important; }
         
-        .status-badge { font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 100px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .status-draft { background: rgba(148, 163, 184, 0.1); color: #94A3B8; }
-        .status-sent { background: rgba(59, 130, 246, 0.1); color: #3B82F6; }
-        .status-accepted { background: rgba(16, 185, 129, 0.1); color: #10B981; }
-        .status-awaiting { background: rgba(245, 158, 11, 0.1); color: #F59E0B; }
+        .status-badge { font-size: 11px; font-weight: 600; padding: 6px 14px; border-radius: 100px; text-transform: uppercase; letter-spacing: 0.5px; font-family: 'Geist', sans-serif;}
+        .status-draft { background: rgba(148, 163, 184, 0.1); color: #94A3B8; border: 1px solid rgba(148, 163, 184, 0.2); }
+        .status-sent { background: rgba(59, 130, 246, 0.1); color: #3B82F6; border: 1px solid rgba(59, 130, 246, 0.2); }
+        .status-accepted { background: rgba(16, 185, 129, 0.1); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.2); }
+        .status-awaiting { background: rgba(245, 158, 11, 0.1); color: #F59E0B; border: 1px solid rgba(245, 158, 11, 0.2); }
 
-        .modal-content { background-color: var(--modal-bg) !important; color: var(--text-main); border: 1px solid var(--border-color); }
-        .form-control { background-color: var(--input-bg) !important; color: var(--text-main) !important; border: 1px solid var(--border-color); }
+        .modal-content { 
+            background-color: var(--modal-bg) !important; 
+            backdrop-filter: var(--blur-val);
+            color: var(--text-main); 
+            border: 1px solid var(--border-color); 
+            border-radius: 24px;
+        }
+        .form-control { background-color: var(--input-bg) !important; color: var(--text-main) !important; border: 1px solid var(--border-color); padding: 12px 16px; border-radius: 12px; transition: 0.3s; }
+        .form-control:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 4px rgba(37,99,235,0.1); }
         
-        .dropdown-menu-custom { background-color: var(--bg-card); border: 1px solid var(--border-color); box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-        .dropdown-menu-custom .dropdown-item { color: var(--text-main); font-size: 14px; padding: 10px 20px; font-weight: 500; }
-        .dropdown-menu-custom .dropdown-item:hover { background-color: var(--bg-card-hover); color: var(--text-main); }
-        .dropdown-divider-custom { border-top: 1px solid var(--border-color); }
+        body:not(.light-theme) .form-control::placeholder { color: #CBD5E1 !important; opacity: 1; }
+        body:not(.light-theme) .form-control::-webkit-input-placeholder { color: #CBD5E1 !important; opacity: 1; }
+        body.light-theme .form-control::placeholder { color: #64748B !important; opacity: 1; }
+        body.light-theme .form-control::-webkit-input-placeholder { color: #64748B !important; opacity: 1; }
 
-        /* Custom Chat UI */
-        .chat-container { display: flex; height: 600px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
-        .chat-sidebar { width: 320px; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; background: var(--bg-nav); }
-        .chat-user-item { padding: 16px; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: 0.2s; }
-        .chat-user-item:hover { background: var(--bg-card-hover); }
-        .chat-user-item.active { background: rgba(37,99,235,0.1); border-left: 3px solid #2563EB; }
-        .chat-main { flex-grow: 1; display: flex; flex-direction: column; background: var(--bg-main); }
-        .chat-bubble { padding: 10px 16px; border-radius: 16px; font-size: 14px; max-width: 75%; line-height: 1.4; }
-        .chat-bubble.me { background: #2563EB; color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+        .dropdown-menu-custom { 
+            background-color: var(--modal-bg); 
+            backdrop-filter: blur(24px);
+            border: 1px solid var(--border-color); 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3); 
+            border-radius: 16px;
+            padding: 8px;
+        }
+        .dropdown-menu-custom .dropdown-item { color: var(--text-main); font-size: 14px; padding: 10px 16px; font-weight: 500; border-radius: 8px; transition: 0.2s;}
+        .dropdown-menu-custom .dropdown-item:hover { background-color: var(--border-color); color: var(--text-main); }
+        .dropdown-divider-custom { border-top: 1px solid var(--border-color); margin: 8px 0; }
+
+        .btn-primary { background-color: var(--accent-blue); border: none; font-weight: 600; padding: 10px 24px; transition: 0.2s; }
+        .btn-primary:hover { background-color: #1D4ED8; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+
+        .chat-container { display: flex; height: 600px; background: var(--bg-card); backdrop-filter: blur(12px); border: 1px solid var(--border-color); border-radius: 20px; overflow: hidden; box-shadow: 0 30px 60px -15px rgba(0,0,0,0.3); }
+        .chat-sidebar { width: 320px; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; background: rgba(0,0,0,0.1); }
+        .chat-user-item { padding: 16px 20px; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: 0.2s; }
+        .chat-user-item:hover { background: rgba(255,255,255,0.05); }
+        .chat-user-item.active { background: rgba(37,99,235,0.15); border-left: 3px solid var(--accent-blue); }
+        .chat-main { flex-grow: 1; display: flex; flex-direction: column; background: var(--input-bg); }
+        .chat-bubble { padding: 12px 18px; border-radius: 20px; font-size: 14.5px; max-width: 75%; line-height: 1.5; font-weight: 400;}
+        .chat-bubble.me { background: var(--accent-blue); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
         .chat-bubble.them { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); align-self: flex-start; border-bottom-left-radius: 4px; }
+        
+        .delete-btn { color: #ef4444; background: transparent; border: none; cursor: pointer; padding: 6px; border-radius: 8px; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+        .delete-btn:hover { background: rgba(239, 68, 68, 0.15); transform: scale(1.1); }
     </style>
 </head>
 <body>
+    <div class="cinematic-bg"></div>
+
     <nav class="navbar d-flex justify-content-between align-items-center">
         <a href="/" class="d-flex align-items-center gap-3 text-decoration-none" style="color: var(--text-main);">
-            <div style="width: 24px; height: 24px; background: #2563EB; color: white; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px;">Q</div>
+            <div style="width: 28px; height: 28px; background: var(--accent-blue); color: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; font-family: 'Clash Grotesk', sans-serif;">Q</div>
             <div class="d-flex align-items-center gap-2">
-                <strong class="fs-5" style="letter-spacing: -0.5px;">QuoStudio</strong>
-                <span class="badge" style="background: rgba(37, 99, 235, 0.1); color: #3B82F6; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 4px 8px; border-radius: 100px;">Dashboard</span>
+                <strong class="fs-5 brand-text" style="letter-spacing: -0.02em;">QuoStudio</strong>
+                <span class="badge" style="background: rgba(37, 99, 235, 0.15); color: #3B82F6; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; padding: 4px 8px; border-radius: 100px; font-family: 'Geist', sans-serif;">Dashboard</span>
             </div>
         </a>
         
         <div class="dropdown">
-            <div class="profile-avatar dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <div class="profile-avatar dropdown-toggle hide-arrow" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="caret-color: transparent;">
                 {{ initials }}
             </div>
-            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-custom mt-2">
-                <li class="px-4 py-2 mb-1">
-                    <div class="fw-bold" style="color: var(--text-main);">{{ profile.username }}</div>
+            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-custom mt-3">
+                <li class="px-3 py-2 mb-1">
+                    <div class="fw-bold" style="color: var(--text-main); font-family: 'Geist', sans-serif;">{{ profile.username }}</div>
                     <div style="font-size: 12px; color: var(--text-muted);">{{ profile.email }}</div>
                 </li>
                 <li><hr class="dropdown-divider dropdown-divider-custom"></li>
-                <li><a class="dropdown-item d-flex align-items-center gap-3" href="/"><span style="font-size: 16px;">🌐</span> Back to Website</a></li>
-                <li><a class="dropdown-item d-flex align-items-center gap-3" href="#"><span style="font-size: 16px;">⚙️</span> Settings</a></li>
-                <li><a class="dropdown-item d-flex align-items-center gap-3" href="#" onclick="toggleTheme()"><span style="font-size: 16px;" id="themeIcon">🌓</span> Toggle Theme</a></li>
+                <li><a class="dropdown-item d-flex align-items-center gap-3" href="/"><i data-lucide="globe" style="width: 16px; height: 16px;"></i> Back to Website</a></li>
+                <li><a class="dropdown-item d-flex align-items-center gap-3" href="/settings"><i data-lucide="settings" style="width: 16px; height: 16px;"></i> Settings</a></li>
+                <li><a class="dropdown-item d-flex align-items-center gap-3" href="#" onclick="toggleTheme()"><span id="themeIconWrapper" class="d-flex align-items-center"><i data-lucide="moon" style="width: 16px; height: 16px;"></i></span> Toggle Theme</a></li>
                 <li><hr class="dropdown-divider dropdown-divider-custom"></li>
-                <li><a class="dropdown-item d-flex align-items-center gap-3 text-danger fw-bold" href="/logout"><span style="font-size: 16px;">🚪</span> Log Out</a></li>
+                <li><a class="dropdown-item d-flex align-items-center gap-3 text-danger fw-bold" href="/logout"><i data-lucide="log-out" style="width: 16px; height: 16px;"></i> Log Out</a></li>
             </ul>
         </div>
     </nav>
 
-    <div class="container mt-5" style="max-width: 1100px;">
-        <!-- Pre-calculate Filters -->
+    <div class="container mt-3" style="max-width: 1320px; padding-bottom: 80px;">
         {% set my_drafts = [] %}{% set my_sent = [] %}{% set my_signed = [] %}
         {% for q in my_quotes %}
             {% if q.status == 'draft' %}{% set _ = my_drafts.append(q) %}
@@ -132,170 +216,193 @@
         {% endfor %}
         
         <ul class="nav nav-tabs" id="myTab" role="tablist">
-            <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#drafts">My Workspace</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#sent">Sent Quotes</button></li>
+            <li class="nav-item"><button class="nav-link active d-flex align-items-center gap-2" data-bs-toggle="tab" data-bs-target="#drafts"><i data-lucide="briefcase" style="width: 16px; height: 16px;"></i> My Workspace</button></li>
+            <li class="nav-item"><button class="nav-link d-flex align-items-center gap-2" data-bs-toggle="tab" data-bs-target="#sent"><i data-lucide="send" style="width: 16px; height: 16px;"></i> Sent Quotes</button></li>
             <li class="nav-item">
-                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#inbox">
-                    Incoming Requests 
-                    {% if inbox_active|length > 0 %}<span class="badge bg-primary ms-2">{{ inbox_active|length }}</span>{% endif %}
+                <button class="nav-link d-flex align-items-center gap-2" data-bs-toggle="tab" data-bs-target="#inbox">
+                    <i data-lucide="inbox" style="width: 16px; height: 16px;"></i> Incoming Requests 
+                    {% if inbox_active|length > 0 %}<span class="badge" style="background: var(--accent-blue); color: white; border-radius: 100px;">{{ inbox_active|length }}</span>{% endif %}
                 </button>
             </li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#messages" onclick="initChatSystem()">Messages</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#signed">Signed Quotes</button></li>
+            <li class="nav-item"><button class="nav-link d-flex align-items-center gap-2" data-bs-toggle="tab" data-bs-target="#messages" onclick="initChatSystem()"><i data-lucide="message-square" style="width: 16px; height: 16px;"></i> Messages</button></li>
+            <li class="nav-item"><button class="nav-link d-flex align-items-center gap-2" data-bs-toggle="tab" data-bs-target="#signed"><i data-lucide="lock" style="width: 16px; height: 16px;"></i> Signed Quotes</button></li>
         </ul>
 
         <div class="tab-content">
-            <!-- 1. Workspace / Drafts -->
+            <!-- 1. Workspace / Drafts & Databases -->
             <div class="tab-pane fade show active" id="drafts">
-                <div class="row">
-                    <div class="col-lg-8">
+                <div class="row gx-4">
+                    <div class="col-lg-7 mb-4 mb-lg-0">
                         <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h4 class="m-0 fw-bold">Active Drafts</h4>
-                            <button class="btn btn-primary fw-bold px-4 rounded-pill" data-bs-toggle="modal" data-bs-target="#newQuoteModal">+ New Quote</button>
+                            <h4 class="m-0 fw-semibold" style="color: var(--text-main);">Active Drafts</h4>
+                            <button class="btn btn-primary rounded-pill d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#newQuoteModal"><i data-lucide="plus" style="width: 16px; height: 16px;"></i> New Quote</button>
                         </div>
                         
-                        {% for quote in my_drafts %}
-                        <a href="/editor/{{ quote.id }}" class="list-row position-relative">
-                            <div class="d-flex align-items-center gap-4">
-                                <div style="width: 48px; height: 48px; background: rgba(37,99,235,0.1); color: #2563EB; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px;">📄</div>
-                                <div>
-                                    <h6 class="fw-bold m-0 fs-5">{{ quote.client_name }}</h6>
-                                    <small style="color: var(--text-muted);">Quote #QS-{{ quote.id }} • Editing</small>
+                        <div>
+                            {% for quote in my_drafts %}
+                            <div class="list-row">
+                                <a href="/editor/{{ quote.id }}" class="d-flex align-items-center gap-4 text-decoration-none flex-grow-1" style="color: var(--text-main);">
+                                    <div style="width: 48px; height: 48px; background: rgba(37,99,235,0.1); color: var(--accent-blue); border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+                                        <i data-lucide="file-edit" style="width: 24px; height: 24px;"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="fw-semibold m-0 fs-5 brand-text" style="letter-spacing: -0.01em; color: var(--text-main);">{{ quote.client_name }}</h6>
+                                        <small style="color: var(--text-muted);">Quote #QS-{{ quote.id }} • Editing</small>
+                                    </div>
+                                </a>
+                                <div class="d-flex align-items-center gap-3">
+                                    <span class="status-badge status-draft">Draft</span>
+                                    <button class="delete-btn" onclick="deleteDraft(event, '{{ quote.id }}')" title="Delete Draft"><i data-lucide="trash-2" style="width: 18px; height: 18px;"></i></button>
                                 </div>
                             </div>
-                            <div class="d-flex align-items-center gap-3">
-                                <span class="status-badge status-draft">Draft</span>
-                            </div>
-                        </a>
-                        {% else %}
-                        <div class="text-center py-5 text-muted border border-secondary border-opacity-25 rounded-4">No active drafts. Create one to get started.</div>
-                        {% endfor %}
+                            {% else %}
+                            <div class="text-center py-5 border rounded-4" style="color: var(--text-main); border-color: var(--border-color) !important; background: var(--bg-card); backdrop-filter: blur(12px);">No active drafts. Create one to get started.</div>
+                            {% endfor %}
+                        </div>
                     </div>
                     
-                    <!-- Right Column: Inventory Database -->
-                    <div class="col-lg-4">
+                    <div class="col-lg-5">
                         <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h4 class="m-0 fw-bold">Databases</h4>
-                            <button class="btn btn-sm btn-outline-secondary rounded-pill" data-bs-toggle="modal" data-bs-target="#newDbModal">+ Load</button>
+                            <h4 class="m-0 fw-semibold" style="color: var(--text-main);">Databases</h4>
+                            <button class="btn btn-sm btn-outline-secondary rounded-pill fw-semibold d-flex align-items-center gap-1" style="color: var(--text-main); border-color: var(--border-color);" data-bs-toggle="modal" data-bs-target="#newDbModal"><i data-lucide="upload" style="width: 14px; height: 14px;"></i> Load</button>
                         </div>
-                        {% for cat in catalogs %}
-                        <div class="list-row px-3 py-3">
-                            <div class="d-flex align-items-center gap-3">
-                                <div style="font-size: 18px;">🗃️</div>
-                                <div class="fw-bold">{{ cat.name }}</div>
+                        <div>
+                            {% for cat in catalogs %}
+                            <div class="list-row px-4 py-3">
+                                <div class="d-flex align-items-center gap-3 flex-grow-1">
+                                    <div class="d-flex align-items-center justify-content: center;" style="color: var(--accent-blue);">
+                                        <i data-lucide="archive" style="width: 20px; height: 20px;"></i>
+                                    </div>
+                                    <div class="fw-semibold" style="color: var(--text-main);">{{ cat.name }}</div>
+                                </div>
+                                <button class="delete-btn" onclick="deleteDatabase('{{ cat.id }}')" title="Delete Database"><i data-lucide="trash-2" style="width: 18px; height: 18px;"></i></button>
                             </div>
+                            {% else %}
+                            <div class="text-center py-5 small border rounded-4" style="color: var(--text-main); border-color: var(--border-color) !important; background: var(--bg-card); backdrop-filter: blur(12px);">No inventory loaded.</div>
+                            {% endfor %}
                         </div>
-                        {% else %}
-                        <div class="text-center py-4 text-muted small border border-secondary border-opacity-25 rounded-4">No inventory loaded.</div>
-                        {% endfor %}
                     </div>
                 </div>
             </div>
 
             <!-- 2. Sent Quotes -->
             <div class="tab-pane fade" id="sent">
-                <div class="mb-4"><h4 class="m-0 fw-bold">Pending Signatures</h4></div>
-                {% for quote in my_sent %}
-                <a href="/editor/{{ quote.id }}" class="list-row">
-                    <div class="d-flex align-items-center gap-4">
-                        <div style="width: 48px; height: 48px; background: rgba(245, 158, 11, 0.1); color: #F59E0B; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px;">📤</div>
-                        <div>
-                            <h6 class="fw-bold m-0 fs-5">{{ quote.client_name }}</h6>
-                            <small style="color: var(--text-muted);">Locked • Sent to @{{ quote.recipient_name }}</small>
+                <div class="mb-4"><h4 class="m-0 fw-semibold" style="color: var(--text-main);">Pending Signatures</h4></div>
+                <div>
+                    {% for quote in my_sent %}
+                    <div class="list-row">
+                        <a href="/editor/{{ quote.id }}" class="d-flex align-items-center gap-4 text-decoration-none flex-grow-1" style="color: var(--text-main);">
+                            <div style="width: 48px; height: 48px; background: rgba(245, 158, 11, 0.1); color: #F59E0B; border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="send" style="width: 24px; height: 24px;"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-semibold m-0 fs-5 brand-text" style="letter-spacing: -0.01em; color: var(--text-main);">{{ quote.client_name }}</h6>
+                                <small style="color: var(--text-muted);">Locked • Sent to @{{ quote.recipient_name }}</small>
+                            </div>
+                        </a>
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="status-badge status-awaiting">Awaiting Sign</span>
+                            <button class="delete-btn" onclick="deleteDraft(event, '{{ quote.id }}')" title="Delete History Item"><i data-lucide="trash-2" style="width: 18px; height: 18px;"></i></button>
                         </div>
                     </div>
-                    <div><span class="status-badge status-awaiting">Awaiting Sign</span></div>
-                </a>
-                {% else %}
-                <div class="text-center py-5 text-muted border border-secondary border-opacity-25 rounded-4">No pending sent quotes.</div>
-                {% endfor %}
+                    {% else %}
+                    <div class="text-center py-5 border rounded-4" style="color: var(--text-main); border-color: var(--border-color) !important; background: var(--bg-card); backdrop-filter: blur(12px);">No pending sent quotes.</div>
+                    {% endfor %}
+                </div>
             </div>
 
             <!-- 3. Incoming Requests -->
             <div class="tab-pane fade" id="inbox">
-                <div class="mb-4"><h4 class="m-0 fw-bold">Incoming Requests</h4></div>
-                {% for quote in inbox_active %}
-                <a href="/editor/{{ quote.id }}" class="list-row">
-                    <div class="d-flex align-items-center gap-4">
-                        <div style="width: 48px; height: 48px; background: rgba(16,185,129,0.1); color: #10B981; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px;">📥</div>
-                        <div>
-                            <h6 class="fw-bold m-0 fs-5">{{ quote.client_name }}</h6>
-                            <small style="color: var(--text-muted);">From: {{ quote.sender_company }} (@{{ quote.sender_name }})</small>
+                <div class="mb-4"><h4 class="m-0 fw-semibold" style="color: var(--text-main);">Incoming Requests</h4></div>
+                <div>
+                    {% for quote in inbox_active %}
+                    <a href="/editor/{{ quote.id }}" class="list-row">
+                        <div class="d-flex align-items-center gap-4">
+                            <div style="width: 48px; height: 48px; background: rgba(16,185,129,0.1); color: #10B981; border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="inbox" style="width: 24px; height: 24px;"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-semibold m-0 fs-5 brand-text" style="letter-spacing: -0.01em; color: var(--text-main);">{{ quote.client_name }}</h6>
+                                <small style="color: var(--text-muted);">From: {{ quote.sender_company }} (@{{ quote.sender_name }})</small>
+                            </div>
                         </div>
-                    </div>
-                    <div><span class="status-badge status-sent">Action Required</span></div>
-                </a>
-                {% else %}
-                <div class="text-center py-5 text-muted border border-secondary border-opacity-25 rounded-4">Your inbox is clear.</div>
-                {% endfor %}
+                        <div><span class="status-badge status-sent">Action Required</span></div>
+                    </a>
+                    {% else %}
+                    <div class="text-center py-5 border rounded-4" style="color: var(--text-main); border-color: var(--border-color) !important; background: var(--bg-card); backdrop-filter: blur(12px);">Your inbox is clear.</div>
+                    {% endfor %}
+                </div>
             </div>
 
             <!-- 4. Web Messaging Interface -->
             <div class="tab-pane fade" id="messages">
                 <div class="chat-container">
-                    
-                    <!-- Chat Sidebar / Search -->
                     <div class="chat-sidebar">
-                        <div class="p-3 border-bottom" style="border-color: var(--border-color) !important;">
-                            <input type="text" id="chatSearch" class="form-control form-control-sm bg-dark text-white border-secondary" placeholder="Search users to message..." onkeyup="searchChatUsers()">
+                        <div class="p-4 border-bottom" style="border-color: var(--border-color) !important;">
+                            <input type="text" id="chatSearch" class="form-control" placeholder="Search users..." onkeyup="searchChatUsers()">
                         </div>
-                        <div id="chatUserList" style="flex-grow: 1; overflow-y: auto;">
-                            <!-- JS Injects Conversation List Here -->
-                        </div>
+                        <div id="chatUserList" style="flex-grow: 1; overflow-y: auto;"></div>
                     </div>
                     
-                    <!-- Chat Window -->
                     <div class="chat-main">
-                        <div id="chatHeader" class="p-3 border-bottom d-flex align-items-center gap-3" style="border-color: var(--border-color) !important; background: var(--bg-card); min-height: 65px;">
-                            <div class="fw-bold text-muted">Select a conversation to start messaging</div>
+                        <div id="chatHeader" class="p-4 border-bottom d-flex align-items-center gap-3" style="border-color: var(--border-color) !important; background: rgba(0,0,0,0.1); min-height: 75px;">
+                            <div class="fw-semibold" style="color: var(--text-muted);">Select a conversation to start messaging</div>
                         </div>
-                        <div id="chatMessages" class="p-4" style="flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 16px;">
-                            <!-- JS Injects Messages Here -->
-                        </div>
-                        <div id="chatInputArea" class="p-3 border-top" style="border-color: var(--border-color) !important; background: var(--bg-card); display: none;">
+                        <div id="chatMessages" class="p-4" style="flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 16px;"></div>
+                        <div id="chatInputArea" class="p-3 border-top" style="border-color: var(--border-color) !important; background: rgba(0,0,0,0.1); display: none;">
                             <form onsubmit="sendChatMessage(event)" class="d-flex gap-2">
-                                <input type="text" id="chatInput" class="form-control bg-dark text-white border-secondary" placeholder="Type a message..." required autocomplete="off">
-                                <button type="submit" class="btn btn-primary fw-bold px-4">Send</button>
+                                <input type="text" id="chatInput" class="form-control" placeholder="Type a message..." required autocomplete="off">
+                                <button type="submit" class="btn btn-primary rounded-pill px-4 d-flex align-items-center gap-2">Send <i data-lucide="send" style="width: 14px; height: 14px;"></i></button>
                             </form>
                         </div>
                     </div>
-
                 </div>
             </div>
 
             <!-- 5. Signed Quotes -->
             <div class="tab-pane fade" id="signed">
-                <div class="mb-4"><h4 class="m-0 fw-bold">Locked & Completed Documents</h4></div>
-                
-                {% for quote in my_signed %}
-                <a href="/editor/{{ quote.id }}" class="list-row">
-                    <div class="d-flex align-items-center gap-4">
-                        <div style="width: 48px; height: 48px; background: rgba(16,185,129,0.1); color: #10B981; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px;">🔒</div>
-                        <div>
-                            <h6 class="fw-bold m-0 fs-5">{{ quote.client_name }}</h6>
-                            <small style="color: var(--text-muted);">Locked • Signed by @{{ quote.recipient_name }}</small>
+                <div class="mb-4"><h4 class="m-0 fw-semibold" style="color: var(--text-main);">Locked & Completed Documents</h4></div>
+                <div>
+                    {% for quote in my_signed %}
+                    <div class="list-row">
+                        <a href="/editor/{{ quote.id }}" class="d-flex align-items-center gap-4 text-decoration-none flex-grow-1" style="color: var(--text-main);">
+                            <div style="width: 48px; height: 48px; background: rgba(16,185,129,0.1); color: #10B981; border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="lock" style="width: 24px; height: 24px;"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-semibold m-0 fs-5 brand-text" style="letter-spacing: -0.01em; color: var(--text-main);">{{ quote.client_name }}</h6>
+                                <small style="color: var(--text-muted);">Locked • Signed by @{{ quote.recipient_name }}</small>
+                            </div>
+                        </a>
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="status-badge status-accepted">Accepted</span>
+                            <button class="delete-btn" onclick="deleteDraft(event, '{{ quote.id }}')" title="Delete History Item"><i data-lucide="trash-2" style="width: 18px; height: 18px;"></i></button>
                         </div>
                     </div>
-                    <div><span class="status-badge status-accepted">Accepted</span></div>
-                </a>
-                {% endfor %}
+                    {% endfor %}
 
-                {% for quote in inbox_signed %}
-                <a href="/editor/{{ quote.id }}" class="list-row">
-                    <div class="d-flex align-items-center gap-4">
-                        <div style="width: 48px; height: 48px; background: rgba(16,185,129,0.1); color: #10B981; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px;">🔒</div>
-                        <div>
-                            <h6 class="fw-bold m-0 fs-5">{{ quote.client_name }}</h6>
-                            <small style="color: var(--text-muted);">Locked • Signed by You (Sent by @{{ quote.sender_name }})</small>
+                    {% for quote in inbox_signed %}
+                    <div class="list-row">
+                        <a href="/editor/{{ quote.id }}" class="d-flex align-items-center gap-4 text-decoration-none flex-grow-1" style="color: var(--text-main);">
+                            <div style="width: 48px; height: 48px; background: rgba(16,185,129,0.1); color: #10B981; border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="lock" style="width: 24px; height: 24px;"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-semibold m-0 fs-5 brand-text" style="letter-spacing: -0.01em; color: var(--text-main);">{{ quote.client_name }}</h6>
+                                <small style="color: var(--text-muted);">Locked • Signed by You (Sent by @{{ quote.sender_name }})</small>
+                            </div>
+                        </a>
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="status-badge status-accepted">Accepted</span>
+                            <button class="delete-btn" onclick="deleteDraft(event, '{{ quote.id }}')" title="Delete History Item"><i data-lucide="trash-2" style="width: 18px; height: 18px;"></i></button>
                         </div>
                     </div>
-                    <div><span class="status-badge status-accepted">Accepted</span></div>
-                </a>
-                {% endfor %}
-                
-                {% if my_signed|length == 0 and inbox_signed|length == 0 %}
-                <div class="text-center py-5 text-muted border border-secondary border-opacity-25 rounded-4">No signed documents yet.</div>
-                {% endif %}
+                    {% endfor %}
+                    
+                    {% if my_signed|length == 0 and inbox_signed|length == 0 %}
+                    <div class="text-center py-5 border rounded-4" style="color: var(--text-main); border-color: var(--border-color) !important; background: var(--bg-card); backdrop-filter: blur(12px);">No signed documents yet.</div>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
@@ -303,18 +410,18 @@
     <!-- Modals -->
     <div class="modal fade" id="newQuoteModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content rounded-4 border-secondary border-opacity-25">
+            <div class="modal-content">
                 <form action="/new_quotation" method="POST">
-                    <div class="modal-header border-0 pb-0">
-                        <h5 class="modal-title fw-bold">Create Quote</h5>
+                    <div class="modal-header border-0 pb-0 mt-2">
+                        <h5 class="modal-title fw-semibold brand-text fs-4" style="color: var(--text-main);">Create Quote</h5>
                         <button type="button" class="btn-close" style="filter: var(--invert-close, invert(1));" data-bs-dismiss="modal"></button>
                     </div>
-                    <div class="modal-body">
-                        <label class="small text-muted mb-2">Project Name</label>
-                        <input type="text" name="client_name" class="form-control border-secondary border-opacity-50" required>
+                    <div class="modal-body py-4">
+                        <label class="small fw-semibold mb-2 text-uppercase" style="letter-spacing: 0.5px; color: var(--text-main);">Project Name</label>
+                        <input type="text" name="client_name" class="form-control" required placeholder="e.g. Acme Corp Migration">
                     </div>
-                    <div class="modal-footer border-0 pt-0">
-                        <button type="submit" class="btn btn-primary w-100 fw-bold py-2 rounded-pill">Create Document</button>
+                    <div class="modal-footer border-0 pt-0 mb-2">
+                        <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fs-6">Create Document</button>
                     </div>
                 </form>
             </div>
@@ -323,20 +430,22 @@
 
     <div class="modal fade" id="newDbModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content rounded-4 border-secondary border-opacity-25">
+            <div class="modal-content">
                 <form action="/upload_catalog" method="POST" enctype="multipart/form-data">
-                    <div class="modal-header border-0 pb-0">
-                        <h5 class="modal-title fw-bold">Load Database</h5>
+                    <div class="modal-header border-0 pb-0 mt-2">
+                        <h5 class="modal-title fw-semibold brand-text fs-4" style="color: var(--text-main);">Load Database</h5>
                         <button type="button" class="btn-close" style="filter: var(--invert-close, invert(1));" data-bs-dismiss="modal"></button>
                     </div>
-                    <div class="modal-body">
-                        <label class="small text-muted mb-2">Database Name</label>
-                        <input type="text" name="catalog_name" class="form-control mb-3 border-secondary border-opacity-50" required>
-                        <label class="small text-muted mb-2">CSV File</label>
-                        <input type="file" name="csv_file" class="form-control border-secondary border-opacity-50" accept=".csv" required>
+                    <div class="modal-body py-4">
+                        <label class="small fw-semibold mb-2 text-uppercase" style="letter-spacing: 0.5px; color: var(--text-main);">Database Name</label>
+                        <input type="text" name="catalog_name" class="form-control mb-4" required placeholder="e.g. Q3 Hardware Pricing">
+                        
+                        <label class="small fw-semibold mb-2 text-uppercase" style="letter-spacing: 0.5px; color: var(--text-main);">CSV File</label>
+                        <input type="file" name="csv_file" class="form-control p-2 mb-1" accept=".csv" required>
+                        <div class="mb-2 fw-semibold" style="font-size: 11px; color: #EF4444;">* only supports csv</div>
                     </div>
-                    <div class="modal-footer border-0 pt-0">
-                        <button type="submit" class="btn btn-primary w-100 fw-bold py-2 rounded-pill">Upload</button>
+                    <div class="modal-footer border-0 pt-0 mb-2">
+                        <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fs-6">Upload Database</button>
                     </div>
                 </form>
             </div>
@@ -345,6 +454,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        lucide.createIcons();
+
         const currentTheme = localStorage.getItem('theme') || 'dark';
         if (currentTheme === 'light') enableLightMode();
 
@@ -353,7 +464,9 @@
                 document.body.classList.remove('light-theme');
                 localStorage.setItem('theme', 'dark');
                 document.documentElement.style.setProperty('--invert-close', 'invert(1)');
-                document.getElementById('themeIcon').innerText = '🌓';
+                
+                document.getElementById('themeIconWrapper').innerHTML = '<i data-lucide="moon" style="width: 16px; height: 16px;"></i>';
+                lucide.createIcons();
             } else {
                 enableLightMode();
             }
@@ -363,13 +476,30 @@
             document.body.classList.add('light-theme');
             localStorage.setItem('theme', 'light');
             document.documentElement.style.setProperty('--invert-close', 'invert(0)');
-            const icon = document.getElementById('themeIcon');
-            if(icon) icon.innerText = '🌙';
+            
+            const wrapper = document.getElementById('themeIconWrapper');
+            if(wrapper) {
+                wrapper.innerHTML = '<i data-lucide="sun" style="width: 16px; height: 16px;"></i>';
+                lucide.createIcons();
+            }
         }
 
-        // ==========================================
-        // IN-APP MESSAGING JAVASCRIPT
-        // ==========================================
+        function deleteDraft(event, quoteId) {
+            event.preventDefault();
+            event.stopPropagation();
+            if (confirm("Are you sure you want to permanently delete this document/history item from the database?")) {
+                fetch(`/delete_quote/${quoteId}`, { method: 'POST' }).then(() => {
+                    window.location.reload();
+                });
+            }
+        }
+
+        function deleteDatabase(catalogId) {
+            if (confirm("Are you sure you want to permanently delete this inventory database?")) {
+                window.location.href = `/delete_catalog/${catalogId}`;
+            }
+        }
+
         let currentChatUserId = null;
         let chatPollInterval = null;
 
@@ -386,26 +516,24 @@
                     const isActive = currentChatUserId === u.id ? 'active' : '';
                     list.innerHTML += `
                         <div class="chat-user-item ${isActive}" onclick="openChat(${u.id}, '${u.username}')">
-                            <div class="fw-bold" style="color: var(--text-main);">@${u.username}</div>
-                            <div class="small text-muted">${u.company_name || 'QuoStudio User'}</div>
+                            <div class="fw-semibold" style="color: var(--text-main);">@${u.username}</div>
+                            <div class="small" style="color: var(--text-muted);">${u.company_name || ''}</div>
                         </div>`;
                 });
-                if(data.length === 0) list.innerHTML = '<div class="p-4 text-center text-muted small">No users found.</div>';
+                if(data.length === 0) list.innerHTML = '<div class="p-5 text-center text-muted small">No users found.</div>';
             });
         }
 
         function openChat(userId, username) {
             currentChatUserId = userId;
-            document.getElementById('chatHeader').innerHTML = `<div class="fw-bold fs-5" style="color: var(--text-main);">@${username}</div>`;
+            document.getElementById('chatHeader').innerHTML = `<div class="fw-semibold fs-5 brand-text" style="color: var(--text-main);">@${username}</div>`;
             document.getElementById('chatInputArea').style.display = 'block';
             
-            // Highlight active user in sidebar
             document.querySelectorAll('.chat-user-item').forEach(el => el.classList.remove('active'));
             event.currentTarget.classList.add('active');
 
             loadMessages();
             
-            // Setup polling for live updates every 3 seconds
             if(chatPollInterval) clearInterval(chatPollInterval);
             chatPollInterval = setInterval(loadMessages, 3000);
         }
@@ -414,8 +542,6 @@
             if(!currentChatUserId) return;
             fetch('/api/messages/' + currentChatUserId).then(res => res.json()).then(msgs => {
                 const box = document.getElementById('chatMessages');
-                
-                // Only update DOM if new messages arrived to prevent scrolling jumping
                 if (box.dataset.msgCount == msgs.length) return; 
                 box.dataset.msgCount = msgs.length;
 
@@ -428,7 +554,7 @@
                     box.innerHTML += `
                         <div class="chat-bubble ${typeClass}">
                             ${m.content}
-                            <div style="font-size: 10px; opacity: 0.7; margin-top: 4px; text-align: right;">${timeString}</div>
+                            <div style="font-size: 10px; opacity: 0.7; margin-top: 6px; text-align: right; font-family: 'Geist', sans-serif;">${timeString}</div>
                         </div>`;
                 });
                 box.scrollTop = box.scrollHeight;

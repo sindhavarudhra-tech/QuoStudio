@@ -4,670 +4,504 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QuoStudio | Next-Gen Quotations</title>
+    
+    <!-- Premium Fonts: Clash Grotesk (Headings) & Geist (Body) -->
+    <link href="https://api.fontshare.com/v2/css?f[]=clash-grotesk@400,500,600,700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
-            --bg-dark: #0F172A;
+            --bg-dark: #0B0F19; 
             --canvas-light: #FAFAFA;
             --accent-blue: #2563EB;
+            --accent-violet: #6D28D9;
             --glass: rgba(255, 255, 255, 0.03);
             --glass-border: rgba(255, 255, 255, 0.08);
             --text-muted: #94A3B8;
+            --max-width: 1400px; 
+            --section-padding: 180px 40px;
         }
 
         body {
             background-color: var(--bg-dark);
             color: #ffffff;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
             overflow-x: hidden;
             margin: 0;
             -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            cursor: default;
+        }
+
+        /* Custom Cursor Styles */
+        .cursor-dot {
+            width: 10px;
+            height: 10px;
+            background-color: var(--accent-blue);
+            border-radius: 50%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 10000;
+            box-shadow: 0 0 12px var(--accent-blue);
+            transition: transform 0.1s ease-out, background-color 0.2s ease;
+        }
+
+        .cursor-ring {
+            width: 36px;
+            height: 36px;
+            border: 1px solid rgba(37, 99, 235, 0.5);
+            border-radius: 50%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), width 0.2s ease, height 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+        }
+
+        body.cursor-hover .cursor-ring {
+            width: 56px;
+            height: 56px;
+            border-color: rgba(96, 165, 250, 0.8);
+            background-color: rgba(37, 99, 235, 0.08);
+        }
+
+        body.cursor-click .cursor-dot {
+            transform: scale(0.6);
+        }
+
+        body.cursor-click .cursor-ring {
+            transform: scale(0.85);
+        }
+
+        @media (max-width: 1024px) {
+            .cursor-dot, .cursor-ring { display: none; }
+            body { cursor: auto; }
+        }
+
+        h1, h2, h3, h4, h5, h6, .brand-container strong {
+            font-family: 'Clash Grotesk', sans-serif;
+        }
+
+        .cinematic-bg {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: -1;
+            background-image: 
+                linear-gradient(to bottom, rgba(11, 15, 25, 0.93), rgba(11, 15, 25, 0.93)),
+                url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            pointer-events: none;
         }
 
         /* Glassmorphic Pill Menu */
         .pill-nav {
             position: fixed;
-            top: 24px;
+            top: 32px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(15, 23, 42, 0.75);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border);
+            background: rgba(11, 15, 25, 0.25); 
+            backdrop-filter: blur(30px) saturate(150%);
+            -webkit-backdrop-filter: blur(30px) saturate(150%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 100px;
-            padding: 8px 12px 8px 24px;
+            padding: 10px 14px 10px 28px;
             display: flex;
             align-items: center;
-            gap: 32px;
+            gap: 40px;
             z-index: 1000;
-            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
-            white-space: nowrap; /* Added to prevent main wrapping */
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.3);
+            white-space: nowrap; 
         }
 
-        .brand-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-right: 10px;
-            text-decoration: none;
-            white-space: nowrap; /* Fix wrapping */
-        }
+        .brand-container { display: flex; align-items: center; gap: 12px; margin-right: 20px; text-decoration: none; }
+        .nav-logo-img { height: 26px; width: auto; border-radius: 6px; }
+
+        .pill-nav a.nav-link { color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.3s ease; opacity: 0.9; }
+        .pill-nav a.nav-link:hover { opacity: 1; text-shadow: 0 0 10px rgba(255,255,255,0.3); }
         
-        .nav-logo-img {
-            height: 24px;
-            width: auto;
-            border-radius: 6px;
-        }
-
-        .pill-nav a.nav-link {
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 600;
-            transition: color 0.2s;
-            white-space: nowrap; /* Fix wrapping */
-        }
-
-        .pill-nav a.nav-link:hover { color: #fff; }
-        
-        .btn-accent {
-            background-color: var(--accent-blue) !important;
-            color: white !important;
+        .btn-login {
+            background-color: #ffffff;
+            color: var(--accent-blue) !important;
             border-radius: 100px;
-            padding: 10px 24px !important;
-            font-weight: 600 !important;
-            transition: 0.2s;
-            border: none;
-            cursor: pointer;
+            padding: 12px 24px;
+            font-weight: 600;
             text-decoration: none;
-            white-space: nowrap; /* Fix wrapping */
+            transition: 0.3s ease;
+            font-family: 'Geist', sans-serif;
+            font-size: 14px;
+            display: inline-block;
+        }
+        .btn-login:hover { transform: scale(1.04); box-shadow: 0 10px 25px rgba(255,255,255,0.2); }
+
+        .btn-accent {
+            background-color: var(--accent-blue) !important; color: white !important; border-radius: 100px;
+            padding: 12px 28px !important; font-weight: 600 !important; transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            border: none; cursor: pointer; text-decoration: none; font-size: 14px;
+        }
+        .btn-accent:hover { background-color: #1D4ED8 !important; transform: scale(1.04); box-shadow: 0 0 30px rgba(37, 99, 235, 0.4); }
+
+        .profile-icon {
+            width: 42px; height: 42px; background-color: var(--accent-blue); color: white !important; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 15px; text-decoration: none;
+            border: 2px solid rgba(255,255,255,0.2); transition: 0.3s ease; text-transform: uppercase;
+        }
+        .profile-icon:hover { transform: scale(1.05); border-color: white; box-shadow: 0 0 20px rgba(37, 99, 235, 0.5); }
+
+        .nav-actions { display: flex; align-items: center; gap: 16px; border-left: 1px solid rgba(255,255,255,0.15); padding-left: 20px; margin-left: 12px; }
+
+        /* -------------------------------------------
+           GLOBAL SCROLL ANIMATIONS (Fade & Roll)
+        ------------------------------------------- */
+        .scroll-section {
+            transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
         }
         
-        .btn-accent:hover {
-            background-color: #1D4ED8 !important;
-            transform: scale(1.02);
-            box-shadow: 0 0 20px rgba(37, 99, 235, 0.4);
+        .scroll-section.hidden-bottom {
+            opacity: 0;
+            transform: translateY(120px);
+        }
+        
+        .scroll-section.hidden-top {
+            opacity: 0;
+            transform: scale(0.95) translateY(-60px);
+        }
+        
+        .scroll-section.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
         }
 
-        /* Dynamic Profile Avatar in Nav */
-        .profile-icon {
-            width: 38px;
-            height: 38px;
-            background-color: var(--accent-blue);
-            color: white !important;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 14px;
-            text-decoration: none;
-            border: 2px solid rgba(255,255,255,0.2);
-            transition: 0.2s;
-            padding: 0 !important;
-            text-transform: uppercase;
+        /* -------------------------------------------
+           HERO SECTION
+        ------------------------------------------- */
+        .hero-scroll-container { height: 250vh; position: relative; }
+        .hero-sticky-viewport { position: sticky; top: 0; height: 100vh; width: 100%; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+
+        .hero-text-layer {
+            position: absolute; width: 100%; max-width: var(--max-width); padding: 0 40px; text-align: center;
+            will-change: transform, opacity; z-index: 10; display: flex; flex-direction: column; align-items: center;
+            padding-top: 40px;
         }
 
-        .profile-icon:hover {
-            transform: scale(1.05);
-            border-color: white;
-            box-shadow: 0 0 15px rgba(37, 99, 235, 0.5);
+        .hero-mockup-layer {
+            position: absolute; width: 100%; max-width: 1100px; will-change: transform, opacity; z-index: 20;
+            opacity: 0; pointer-events: none; transform: translateY(40vh) scale(0.9);
         }
-
-        .nav-actions {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            border-left: 1px solid var(--glass-border);
-            padding-left: 20px;
-            margin-left: 8px;
-        }
-
-        /* MASSIVE HERO SECTION */
-        .hero-wrapper {
-            position: relative;
-            background-color: var(--bg-dark);
-            background-image: 
-                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-            background-size: 48px 48px;
-            background-position: center top;
-            padding-top: 150px;
-            padding-bottom: 80px;
-            text-align: center;
-        }
+        .hero-mockup-layer.interactive { pointer-events: auto; }
 
         .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 16px;
-            border: 1px solid var(--glass-border);
-            border-radius: 100px;
-            background: rgba(255, 255, 255, 0.05);
-            font-size: 0.7rem;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            margin-bottom: 40px;
+            display: inline-flex; align-items: center; gap: 10px; padding: 8px 20px; border: 1px solid var(--glass-border);
+            border-radius: 100px; background: rgba(255, 255, 255, 0.03); font-size: 0.75rem; font-weight: 600;
+            letter-spacing: 1.5px; color: #FFFFFF; text-transform: uppercase; margin-bottom: 28px;
         }
-        
-        .hero-badge .dot {
-            width: 6px;
-            height: 6px;
-            background-color: #10B981;
-            border-radius: 50%;
-            box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
-        }
+        .hero-badge .dot { width: 6px; height: 6px; background-color: #10B981; border-radius: 50%; box-shadow: 0 0 10px rgba(16, 185, 129, 0.6); }
 
-        .hero-title-massive {
-            font-size: clamp(3.5rem, 9vw, 8rem);
-            font-weight: 800;
-            letter-spacing: -0.05em;
-            line-height: 0.95;
-            color: #FFFFFF;
-            margin: 0;
-            padding: 0 20px;
-        }
+        .hero-title-massive { font-size: clamp(4rem, 9vw, 10.5rem); font-weight: 600; letter-spacing: -0.02em; line-height: 1.05; color: #FFFFFF; margin: 0; width: 100%; }
+        .hero-title-massive .highlight-blue { color: var(--accent-blue); display: block; }
 
-        .hero-title-massive .highlight-blue {
-            color: var(--accent-blue);
-            display: block;
-        }
+        .hero-subtitle-new { font-size: 1.25rem; color: var(--text-muted); max-width: 900px; margin: 24px auto 36px; line-height: 1.7; font-weight: 400; letter-spacing: 0.5px; }
 
-        .hero-subtitle-new {
-            font-size: 1.25rem;
-            color: var(--text-muted);
-            max-width: 800px;
-            margin: 32px auto 48px;
-            line-height: 1.6;
-            font-weight: 400;
-            padding: 0 20px;
-        }
-
-        /* Multi-Platform Buttons */
+        /* Platform Single-Line Flex Layout */
         .platform-btns {
-            display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 24px; margin-bottom: 80px; flex-wrap: wrap;
-        }
-        
-        .btn-platform {
-            background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); border-radius: 12px;
-            padding: 16px 24px; display: flex; align-items: center; gap: 12px;
-            color: #FFFFFF; font-weight: 600; text-decoration: none;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2); transition: 0.2s;
-        }
-        
-        .btn-platform:hover { 
-            transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); 
-            border-color: rgba(255,255,255,0.2); color: #FFFFFF; background: rgba(255, 255, 255, 0.1);
-        }
-        
-        .btn-platform svg { width: 24px; height: 24px; color: var(--text-muted); transition: 0.2s; }
-        .btn-platform:hover svg { color: #FFFFFF; }
-
-        .btn-web { 
-            background: var(--accent-blue); color: white; border: none; 
-            box-shadow: 0 15px 35px -5px rgba(37,99,235,0.4); 
-        }
-        
-        .btn-web:hover { 
-            background: #1D4ED8; color: white; transform: translateY(-3px); 
-            box-shadow: 0 20px 40px -5px rgba(37,99,235,0.5); border-color: transparent;
-        }
-        
-        .btn-web svg { color: white; }
-        .btn-web:hover svg { color: white; }
-
-        /* Animated Interactive Mockup */
-        .mockup-wrapper {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: var(--bg-dark);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 35px 60px -15px rgba(0,0,0,0.7);
             display: flex;
-            height: 600px;
-            position: relative;
+            align-items: flex-end;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 10px;
         }
-
-        .mockup-sidebar {
-            width: 260px;
-            border-right: 1px solid var(--glass-border);
-            padding: 24px;
-            background: rgba(0,0,0,0.2);
-        }
-
-        .mockup-canvas {
-            flex-grow: 1;
-            background-color: var(--canvas-light);
-            padding: 40px;
-            position: relative;
-        }
-
-        /* Mockup UI Elements */
-        .ui-skeleton-title { width: 40%; height: 24px; background: #E2E8F0; border-radius: 4px; margin-bottom: 30px; }
-        .ui-block { background: white; border: 1px solid #E2E8F0; border-radius: 8px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .ui-block-line { height: 12px; background: #F1F5F9; border-radius: 4px; }
         
-        .mockup-db-item {
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 12px;
-            cursor: grab;
-            position: relative;
-        }
-
-        /* Sticky Financial Footer (App View) */
-        .sticky-app-footer {
-            position: absolute;
-            bottom: 24px;
-            left: 24px;
-            right: 24px;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid #E2E8F0;
-            border-radius: 12px;
-            padding: 16px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05), 0 4px 10px rgba(0,0,0,0.02);
-            z-index: 20;
-        }
-
-        .footer-metrics {
-            display: flex;
-            gap: 32px;
-        }
-
-        .metric {
+        .platform-group {
             display: flex;
             flex-direction: column;
-            gap: 4px;
-        }
-
-        .metric-label {
-            font-size: 11px;
-            color: #64748B;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .metric-value {
-            font-size: 18px;
-            font-weight: 800;
-            color: #0F172A;
-        }
-
-        .metric-value.highlight {
-            color: var(--accent-blue);
-        }
-
-        /* CSS Animations for Mockup */
-        .cursor {
-            width: 20px; height: 20px;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="%232563EB" stroke="white" stroke-width="2"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/></svg>') no-repeat;
-            position: absolute;
-            z-index: 30;
-            animation: dragAndDrop 6s infinite ease-in-out;
-        }
-
-        .drag-item {
-            position: absolute;
-            width: 200px;
-            background: var(--accent-blue);
-            color: white;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            opacity: 0;
-            animation: itemFollow 6s infinite ease-in-out;
-            box-shadow: 0 10px 15px rgba(37,99,235,0.3);
-            pointer-events: none;
-            z-index: 25;
-        }
-
-        .flyout-menu {
-            position: absolute;
-            left: 280px; top: 150px;
-            width: 220px;
-            background: #fff;
-            border: 1px solid #E2E8F0;
-            border-radius: 8px;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
-            padding: 12px;
-            opacity: 0;
-            transform: translateY(10px);
-            animation: flyoutReveal 6s infinite ease-in-out;
-            z-index: 15;
-        }
-
-        @keyframes dragAndDrop {
-            0% { top: 100px; left: 100px; }
-            15% { top: 150px; left: 150px; }
-            20% { top: 150px; left: 150px; transform: scale(0.9); }
-            40% { top: 300px; left: 400px; transform: scale(1); }
-            45% { top: 300px; left: 400px; transform: scale(1); }
-            60% { top: 150px; left: 280px; }
-            80% { top: 170px; left: 320px; }
-            100% { top: 100px; left: 100px; }
-        }
-
-        @keyframes itemFollow {
-            0%, 20% { opacity: 0; top: 150px; left: 150px; }
-            21% { opacity: 1; top: 150px; left: 150px; }
-            40% { opacity: 1; top: 300px; left: 400px; }
-            41%, 100% { opacity: 0; top: 300px; left: 400px; }
-        }
-
-        @keyframes flyoutReveal {
-            0%, 60% { opacity: 0; transform: translateY(10px); }
-            65%, 85% { opacity: 1; transform: translateY(0); }
-            90%, 100% { opacity: 0; transform: translateY(10px); }
-        }
-
-        /* Bento Box Grid */
-        .bento-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
-            max-width: 1000px;
-            margin: 120px auto;
-            padding: 0 20px;
-        }
-
-        .bento-card {
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 32px;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .bento-card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(37, 99, 235, 0.4);
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .bento-icon {
-            width: 48px; height: 48px;
-            background: rgba(37, 99, 235, 0.1);
-            color: var(--accent-blue);
-            border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 24px;
-            margin-bottom: 24px;
-        }
-
-        .bento-card h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: 12px; color: #FFFFFF; }
-        .bento-card p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin: 0; }
-        
-        .bento-hover-visual {
-            position: absolute;
-            bottom: -50px; right: -20px;
-            width: 150px; height: 100px;
-            background: linear-gradient(135deg, var(--accent-blue), transparent);
-            border-radius: 12px;
-            opacity: 0;
-            transition: 0.4s;
-            transform: rotate(10deg);
-        }
-        
-        .bento-card:hover .bento-hover-visual {
-            opacity: 0.2;
-            bottom: -20px;
-        }
-
-        /* Call to Action Section */
-        .cta-section {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 120px 20px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
             align-items: center;
         }
 
-        .cta-content .overline {
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--text-muted);
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            margin-bottom: 16px;
-            display: block;
-        }
-
-        .cta-content h2 {
-            font-size: 3.5rem;
-            font-weight: 800;
-            line-height: 1.1;
-            margin-bottom: 24px;
-            letter-spacing: -0.03em;
-            color: #FFFFFF;
-        }
-
-        .cta-content p {
-            font-size: 1.1rem;
-            color: var(--text-muted);
-            margin-bottom: 32px;
-            line-height: 1.6;
-        }
-
-        .btn-white {
-            background-color: #fff;
-            color: #0F172A;
-            border: none;
-            border-radius: 100px;
-            padding: 12px 28px;
+        .status-label {
+            font-size: 0.7rem;
             font-weight: 600;
-            text-decoration: none;
-            display: inline-flex;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+            height: 17px;
+            display: flex;
             align-items: center;
-            gap: 8px;
-            transition: 0.2s;
         }
 
-        .btn-white:hover {
-            background-color: #f8fafc;
-            transform: translateY(-2px);
+        .downloads-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        .cta-visual {
-            background: #fff;
-            border-radius: 16px;
-            padding: 48px;
-            color: #0F172A;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-            transform: rotate(2deg);
-            transition: transform 0.4s;
-            position: relative;
-            overflow: hidden;
+        .downloads-row {
+            display: flex;
+            gap: 16px;
         }
+
+        .btn-platform {
+            background: rgba(255, 255, 255, 0.03); border: 1px solid var(--glass-border); border-radius: 14px;
+            padding: 16px 28px; display: flex; align-items: center; gap: 12px; color: #FFFFFF; font-weight: 500;
+            text-decoration: none; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1); position: relative;
+        }
+        .btn-platform:hover { transform: translateY(-4px); box-shadow: 0 15px 30px rgba(0,0,0,0.4); border-color: rgba(255,255,255,0.2); background: rgba(255, 255, 255, 0.08); }
+        .btn-platform svg { width: 22px; height: 22px; fill: var(--text-muted); transition: 0.2s; }
+        .btn-platform:hover svg { fill: #FFFFFF; }
+
+        .btn-web { background: var(--accent-blue); color: white; border: none; box-shadow: 0 15px 35px -5px rgba(37,99,235,0.4); }
+        .btn-web:hover { background: #1D4ED8; color: white; transform: translateY(-4px); box-shadow: 0 25px 50px -5px rgba(37,99,235,0.5); border-color: transparent; }
+        .btn-web svg { stroke: white; fill: none; }
+        .btn-web:hover svg { stroke: white; }
+
+        /* Animated Interactive Mockup (Sidebar on Right with translucent background) */
+        .mockup-wrapper {
+            width: 100%; background: rgba(10, 15, 29, 0.85); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px;
+            overflow: hidden; box-shadow: 0 50px 100px -20px rgba(0,0,0,0.9); display: flex; height: 650px; position: relative; text-align: left;
+        }
+
+        .mockup-canvas { flex-grow: 1; background-color: var(--canvas-light); padding: 48px; position: relative; font-family: -apple-system, BlinkMacSystemFont, sans-serif;}
+        .mockup-sidebar { width: 280px; border-left: 1px solid var(--glass-border); padding: 32px; background: rgba(0,0,0,0.4); }
         
-        .cta-visual:hover {
-            transform: rotate(0deg) scale(1.02);
+        .ui-block { background: white; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px; margin-bottom: 16px; display: flex; justify-content: space-between; box-shadow: 0 4px 6px rgba(0,0,0,0.02); align-items: center; }
+        .mockup-db-item { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 10px; padding: 16px; margin-bottom: 16px; cursor: grab; position: relative; }
+
+        .sticky-app-footer {
+            position: absolute; bottom: 32px; left: 32px; right: 32px; background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid #E2E8F0;
+            border-radius: 16px; padding: 24px 32px; display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05), 0 5px 15px rgba(0,0,0,0.03); z-index: 20;
         }
 
-        .cta-visual .doc-logo {
-            width: 48px;
-            height: 48px;
-            background: var(--accent-blue);
-            color: #fff;
-            border-radius: 12px;
+        .footer-metrics { display: flex; gap: 40px; }
+        .metric { display: flex; flex-direction: column; gap: 6px; }
+        .metric-label { font-size: 12px; color: #64748B; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; font-family: 'Geist', sans-serif;}
+        .metric-value { font-size: 20px; font-weight: 700; color: #0F172A; font-family: 'Geist', sans-serif;}
+        .metric-value.highlight { color: var(--accent-blue); }
+
+        .cursor { width: 24px; height: 24px; background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="%232563EB" stroke="white" stroke-width="2"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/></svg>') no-repeat; position: absolute; z-index: 30; animation: dragAndDrop 6s infinite ease-in-out; }
+        .drag-item { position: absolute; width: 260px; background: var(--accent-blue); color: white; padding: 14px 20px; border-radius: 10px; font-weight: 600; font-size: 14px; opacity: 0; animation: itemFollow 6s infinite ease-in-out; box-shadow: 0 15px 35px rgba(37,99,235,0.5); pointer-events: none; z-index: 25; display: flex; justify-content: space-between; font-family: 'Geist', sans-serif; }
+
+        @keyframes dragAndDrop { 
+            0% { top: 140px; left: 860px; } 
+            15% { top: 220px; left: 860px; } 
+            20% { top: 220px; left: 860px; transform: scale(0.9); } 
+            40% { top: 380px; left: 380px; transform: scale(1); } 
+            45% { top: 380px; left: 380px; transform: scale(1); } 
+            60% { top: 220px; left: 750px; } 
+            80% { top: 240px; left: 800px; } 
+            100% { top: 140px; left: 860px; } 
+        }
+        @keyframes itemFollow { 
+            0%, 20% { opacity: 0; top: 220px; left: 860px; } 
+            21% { opacity: 1; top: 220px; left: 860px; } 
+            40% { opacity: 1; top: 380px; left: 380px; } 
+            41%, 100% { opacity: 0; top: 380px; left: 380px; } 
+        }
+
+        /* SECTION HEADERS */
+        .section-header { text-align: center; padding: var(--section-padding); padding-bottom: 80px; max-width: 900px; margin: 0 auto; }
+        .section-header h2 { font-size: clamp(3rem, 5vw, 4.5rem); font-weight: 600; letter-spacing: -0.02em; margin-bottom: 24px; line-height: 1.1; }
+        
+        .text-gradient { background: linear-gradient(135deg, #60A5FA, #8B5CF6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; padding-right: 0.1em; display: inline-block; }
+
+        /* FEATURES BENTO GRID */
+        .bento-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; max-width: var(--max-width); margin: 0 auto; padding: 0 40px 180px; }
+        .bento-card { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 28px; padding: 48px 40px; position: relative; overflow: hidden; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .bento-card:hover { transform: translateY(-8px); border-color: rgba(37, 99, 235, 0.5); background: rgba(255, 255, 255, 0.04); box-shadow: 0 30px 60px -15px rgba(0,0,0,0.6); }
+        .bento-icon { width: 56px; height: 56px; background: rgba(37, 99, 235, 0.15); color: var(--accent-blue); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 32px; }
+        .bento-card h3 { font-size: 1.75rem; font-weight: 500; margin-bottom: 16px; color: #FFFFFF; }
+        .bento-card p { color: var(--text-muted); font-size: 1.1rem; line-height: 1.7; margin: 0; }
+
+        /* USE CASES SECTION */
+        .use-cases-container { display: grid; grid-template-columns: 350px 1fr; gap: 80px; align-items: center; max-width: var(--max-width); margin: 0 auto; padding: 0 40px 180px; }
+        .uc-menu { display: flex; flex-direction: column; gap: 12px; }
+        .uc-item { padding: 24px 32px; font-size: 1.25rem; font-weight: 500; color: var(--text-muted); border-left: 2px solid transparent; background: transparent; cursor: pointer; transition: all 0.3s ease; border-radius: 0 16px 16px 0; }
+        .uc-item:hover { color: #fff; background: rgba(255,255,255,0.03); }
+        .uc-item.active { color: #fff; border-left-color: var(--accent-blue); background: rgba(255, 255, 255, 0.05); }
+
+        .uc-display-area { background: rgba(17, 24, 39, 0.8); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 32px; height: 450px; position: relative; overflow: hidden; box-shadow: 0 30px 60px -15px rgba(0,0,0,0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .uc-content { position: absolute; top: 0; left: 0; right: 0; bottom: 0; padding: 64px; opacity: 0; transform: translateY(20px); transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: none; display: flex; flex-direction: column; justify-content: flex-start; }
+        .uc-content.active { opacity: 1; transform: translateY(0); pointer-events: auto; }
+        .uc-content-icon { width: 56px; height: 56px; background: var(--accent-blue); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 32px; }
+        .uc-content-icon svg { width: 28px; height: 28px; }
+        .uc-content h3 { font-size: 2.5rem; font-weight: 600; margin-bottom: 24px; letter-spacing: -0.02em; }
+        .uc-content p { color: var(--text-muted); font-size: 1.25rem; line-height: 1.7; max-width: 650px; margin-bottom: 0; }
+        .uc-metric-container { margin-top: auto; }
+        .uc-metric { display: inline-flex; align-items: center; gap: 10px; background: rgba(16, 185, 129, 0.1); color: #10B981; padding: 10px 20px; border-radius: 100px; font-weight: 600; font-size: 1rem; }
+
+        /* CTA SECTION */
+        .cta-section { display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: center; max-width: var(--max-width); margin: 0 auto; padding: 0 40px 180px; }
+        .cta-content .overline { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 20px; display: block; }
+        .cta-content h2 { font-size: 4rem; font-weight: 600; line-height: 1.1; margin-bottom: 32px; letter-spacing: -0.02em; color: #FFFFFF; }
+        .cta-content p { font-size: 1.25rem; color: var(--text-muted); margin-bottom: 40px; line-height: 1.7; max-width: 500px; }
+        .btn-white { background-color: #fff; color: #0F172A; border: none; border-radius: 100px; padding: 18px 40px; font-size: 1.15rem; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 10px; transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1); font-family: 'Geist', sans-serif; }
+        .btn-white:hover { background-color: #f8fafc; transform: translateY(-4px) scale(1.03); box-shadow: 0 15px 35px rgba(255,255,255,0.25); }
+        .cta-visual { background: #fff; border-radius: 24px; padding: 64px; color: #0F172A; box-shadow: 0 40px 80px -20px rgba(0,0,0,0.6); transform: rotate(3deg); transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); position: relative; }
+        .cta-visual:hover { transform: rotate(0deg) scale(1.02); }
+        .cta-visual .doc-logo { width: 64px; height: 64px; background: var(--accent-blue); color: #fff; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 32px; margin-bottom: 40px; font-family: 'Clash Grotesk', sans-serif; }
+        .cta-visual h3 { font-size: 3rem; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 40px; line-height: 1.1; max-width: 400px;}
+        .cta-line { height: 12px; background: #E2E8F0; border-radius: 100px; margin-bottom: 16px; }
+
+        @media (max-width: 1024px) {
+            .bento-grid { grid-template-columns: 1fr; }
+            .bento-card { grid-column: span 1 !important; }
+            .use-cases-container { grid-template-columns: 1fr; gap: 40px; }
+            .uc-item { border-left: none; border-bottom: 2px solid transparent; border-radius: 16px 16px 0 0; text-align: center; }
+            .uc-item.active { border-bottom-color: var(--accent-blue); }
+            .uc-display-area { height: 500px; }
+            .cta-section { grid-template-columns: 1fr; gap: 80px; text-align: center; }
+            .cta-content p { margin: 0 auto 40px; }
+            .cta-visual { margin: 0 auto; max-width: 600px; }
+        }
+
+        /* Apple-Style Glass Footer */
+        .site-footer { background-color: rgba(11, 15, 25, 0.4); backdrop-filter: blur(40px) saturate(150%); -webkit-backdrop-filter: blur(40px) saturate(150%); border-top: 1px solid rgba(255, 255, 255, 0.05); padding: 100px 40px 60px; }
+        .footer-content { max-width: var(--max-width); margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1.5fr; gap: 60px; }
+        .footer-brand h2 { font-size: 1.75rem; font-weight: 600; margin-bottom: 20px; color: #fff; letter-spacing: -0.02em; }
+        .footer-col h4 { color: #fff; font-size: 1.1rem; font-weight: 500; margin-bottom: 24px; font-family: 'Clash Grotesk', sans-serif;}
+        .footer-col ul { list-style: none; padding: 0; margin: 0; }
+        .footer-col ul li { margin-bottom: 16px; }
+        .footer-col ul li a { color: var(--text-muted); text-decoration: none; font-size: 1rem; transition: color 0.2s; cursor: pointer; }
+        .footer-col ul li a:hover { color: var(--accent-blue); }
+        .contact-form { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+        .contact-form input, .contact-form textarea { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 12px; padding: 12px 16px; color: #fff; font-size: 0.95rem; font-family: 'Geist', sans-serif; }
+        .contact-form input:focus, .contact-form textarea:focus { outline: none; border-color: var(--accent-blue); }
+        .contact-form textarea { resize: none; height: 80px; }
+        .contact-form button { background: var(--accent-blue); color: #fff; border: none; border-radius: 12px; padding: 12px 20px; font-weight: 500; cursor: pointer; transition: 0.2s; }
+        .contact-form button:hover { background: #1D4ED8; }
+        .footer-bottom { max-width: var(--max-width); margin: 80px auto 0; padding-top: 32px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; color: var(--text-muted); font-size: 0.95rem; }
+
+        /* Footer Item Modals */
+        .footer-modal-backdrop {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(11, 15, 25, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 100000;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            font-size: 24px;
-            margin-bottom: 32px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
         }
-
-        .cta-visual h3 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            letter-spacing: -0.03em;
-            margin-bottom: 32px;
-            line-height: 1.1;
+        .footer-modal-backdrop.active {
+            opacity: 1;
+            pointer-events: auto;
         }
-
-        .cta-skeleton-line {
-            height: 12px;
-            background: #E2E8F0;
-            border-radius: 4px;
-            margin-bottom: 16px;
+        .footer-modal {
+            background: #111827;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 24px;
+            width: 90%;
+            max-width: 750px;
+            padding: 40px;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.8);
+            transform: translateY(20px) scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            text-align: left;
             position: relative;
-            overflow: hidden;
         }
-        
-        .cta-skeleton-line::after {
-            content: "";
-            position: absolute;
-            top: 0; left: -100%; right: 0; bottom: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
-            animation: skeletonLoading 2s infinite;
+        .footer-modal-backdrop.active .footer-modal {
+            transform: translateY(0) scale(1);
         }
-        
-        @keyframes skeletonLoading {
-            100% { left: 100%; }
-        }
-
-        @media (max-width: 768px) {
-            .cta-section {
-                grid-template-columns: 1fr;
-                gap: 40px;
-                text-align: center;
-            }
-            .cta-content h2 {
-                font-size: 2.5rem;
-            }
-        }
-
-        /* Website Footer */
-        .site-footer {
-            background-color: #0A0F1D;
-            border-top: 1px solid var(--glass-border);
-            padding: 80px 20px 40px;
-            margin-top: 80px;
-        }
-
-        .footer-content {
-            max-width: 1000px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1.5fr 1fr 1fr 1.5fr;
-            gap: 40px;
-        }
-
-        .footer-brand h2 {
-            font-size: 1.5rem;
-            font-weight: 800;
-            margin-bottom: 16px;
-            color: #fff;
-            letter-spacing: -0.02em;
-        }
-
-        .footer-col h4 {
-            color: #fff;
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 20px;
-        }
-
-        .footer-col ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .footer-col ul li {
-            margin-bottom: 12px;
-        }
-
-        .footer-col ul li a {
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: color 0.2s;
-        }
-
-        .footer-col ul li a:hover {
-            color: var(--accent-blue);
-        }
-
-        .email-capture {
-            display: flex;
-            gap: 8px;
-            margin-top: 16px;
-        }
-
-        .email-capture input {
-            flex-grow: 1;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--glass-border);
-            border-radius: 8px;
-            padding: 10px 16px;
-            color: #fff;
-            font-size: 0.9rem;
-        }
-
-        .email-capture input:focus {
-            outline: none;
-            border-color: var(--accent-blue);
-        }
-        
-        .email-capture button {
-            background: var(--accent-blue);
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            padding: 10px 20px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        
-        .email-capture button:hover {
-            background: #1D4ED8;
-        }
-
-        .footer-bottom {
-            max-width: 1000px;
-            margin: 60px auto 0;
-            padding-top: 24px;
-            border-top: 1px solid var(--glass-border);
+        .footer-modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding-bottom: 16px;
+        }
+        .footer-modal-header h3 {
+            font-family: 'Clash Grotesk', sans-serif;
+            font-size: 1.8rem;
+            color: #fff;
+            margin: 0;
+        }
+        .footer-modal-close {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #fff;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .footer-modal-close:hover {
+            background: rgba(255,255,255,0.15);
+        }
+        .footer-modal-body {
             color: var(--text-muted);
-            font-size: 0.85rem;
+            font-size: 1.05rem;
+            line-height: 1.7;
+            max-height: 65vh;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        .footer-modal-body h4 {
+            color: #fff;
+            font-size: 1.2rem;
+            margin-top: 20px;
+            margin-bottom: 8px;
+            font-family: 'Clash Grotesk', sans-serif;
+        }
+        .footer-modal-body ul {
+            padding-left: 20px;
+            margin-bottom: 16px;
+        }
+        .footer-modal-body li {
+            margin-bottom: 12px;
         }
     </style>
 </head>
 <body>
 
-    <!-- Glassmorphic Nav -->
+    <!-- Custom Cursor Elements -->
+    <div class="cursor-dot" id="cursorDot"></div>
+    <div class="cursor-ring" id="cursorRing"></div>
+
+    <!-- Footer Modal Overlay -->
+    <div class="footer-modal-backdrop" id="footerModalBackdrop">
+        <div class="footer-modal" id="footerModal">
+            <div class="footer-modal-header">
+                <h3 id="modalTitle">Title</h3>
+                <button class="footer-modal-close" id="modalClose">&times;</button>
+            </div>
+            <div class="footer-modal-body" id="modalBody">
+                Content goes here...
+            </div>
+        </div>
+    </div>
+
+    <div class="cinematic-bg"></div>
+
     <nav class="pill-nav">
         <a href="/" class="brand-container">
             <img src="/static/Screenshot 2026-10-09 at 23.50.14.png" alt="QS Logo" class="nav-logo-img">
-            <strong style="color: white; font-size: 1.1rem;">QuoStudio</strong>
+            <strong style="color: white; font-size: 1.15rem;">QuoStudio</strong>
         </a>
         <a href="#features" class="nav-link">Features</a>
         <a href="#use-cases" class="nav-link">Use Cases</a>
         
         {% if logged_in %}
-            <a href="/dashboard" class="nav-link" style="color: var(--accent-blue);">Dashboard</a>
+            <a href="/dashboard" class="nav-link" style="color: var(--accent-blue); border-left: 1px solid rgba(255,255,255,0.15); padding-left: 20px; margin-left: 10px;">Dashboard</a>
         {% endif %}
         
         <div class="nav-actions">
@@ -676,123 +510,168 @@
                     {{ initials }}
                 </a>
             {% else %}
-                <a href="/login" class="nav-link" style="color: #fff;">Log In</a>
+                <a href="/login" class="btn-login">Log In</a>
             {% endif %}
             <a href="/dashboard" class="btn-accent">Get Started</a>
         </div>
     </nav>
 
-    <!-- HERO SECTION -->
-    <div class="hero-wrapper">
-        <div class="hero-badge">
-            <span class="dot"></span>
-            THE NEW STANDARD FOR PROPOSALS
-        </div>
-        
-        <h1 class="hero-title-massive">
-            Craft winning bids,
-            <span class="highlight-blue">effortlessly.</span>
-        </h1>
-        
-        <p class="hero-subtitle-new">
-            Build precise, beautiful quotes at the speed of thought. Your inventory, pricing,<br class="d-none d-md-block"> and profit—all working in one fluid canvas.
-        </p>
-        
-        <div style="font-weight: 600; color: var(--text-muted); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px;">Available on all platforms</div>
-        
-        <div class="platform-btns">
-            <!-- Mac Download Mock -->
-            <a href="#" onclick="alert('Coming Soon! The native Mac application is currently in development. Please use the Web App.')" class="btn-platform">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 1.44C10 6.44 8.22 5 6 5a4.91 4.91 0 0 0-5 4.78C1 14 4 22 7 22c1.25 0 2.5-1.06 4-1.06Z"/><path d="M10 2c1 .5 2 2 2 5h-5c0-3 1.5-4.5 3-5Z"/></svg>
-                Download for macOS
-            </a>
-            
-            <!-- Windows Download Mock -->
-            <a href="#" onclick="alert('Coming Soon! The native Windows application is currently in development. Please use the Web App.')" class="btn-platform">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="8" height="8"/><rect x="13" y="3" width="8" height="8"/><rect x="3" y="13" width="8" height="8"/><rect x="13" y="13" width="8" height="8"/></svg>
-                Download for Windows
-            </a>
-
-            <!-- Web App Flow -->
-            <a href="/dashboard" class="btn-platform btn-web">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
-                Launch Web App
-            </a>
-        </div>
-
-        <!-- Interactive Mockup -->
-        <div class="mockup-wrapper">
-            <div class="cursor"></div>
-            <div class="drag-item">Premium Installation Service</div>
-            
-            <div class="mockup-sidebar">
-                <div style="width: 60%; height: 12px; background: rgba(255,255,255,0.2); border-radius: 4px; margin-bottom: 24px;"></div>
-                <div class="mockup-db-item"><div class="ui-block-line" style="width: 80%; background: rgba(255,255,255,0.1);"></div></div>
-                <div class="mockup-db-item"><div class="ui-block-line" style="width: 60%; background: rgba(255,255,255,0.1);"></div></div>
-                <div class="mockup-db-item"><div class="ui-block-line" style="width: 90%; background: rgba(255,255,255,0.1);"></div></div>
-            </div>
-            
-            <div class="mockup-canvas">
-                <div class="ui-skeleton-title"></div>
-                <div class="ui-block"><div class="ui-block-line" style="width: 30%;"></div><div class="ui-block-line" style="width: 10%;"></div></div>
-                <div class="ui-block"><div class="ui-block-line" style="width: 45%;"></div><div class="ui-block-line" style="width: 10%;"></div></div>
-                <div class="ui-block" style="border: 2px dashed #CBD5E1; background: transparent; display: flex; align-items: center; justify-content: center; color: #94A3B8; font-size: 12px; height: 60px;">Drop blocks here</div>
+    <!-- FIXED HERO SCROLL: Text holds ground and fades, Mockup slides over -->
+    <div class="hero-scroll-container">
+        <div class="hero-sticky-viewport">
+            <div class="hero-text-layer">
+                <div class="hero-badge">
+                    <span class="dot"></span>
+                    THE NEW STANDARD FOR PROPOSALS
+                </div>
                 
-                <!-- Sticky Financial Footer (App View) -->
-                <div class="sticky-app-footer">
-                    <div class="footer-metrics">
-                        <div class="metric">
-                            <span class="metric-label">Subtotal</span>
-                            <span class="metric-value">$8,450.00</span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-label">Tax (19%)</span>
-                            <span class="metric-value">$1,605.50</span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-label">Margin</span>
-                            <span class="metric-value highlight">42.8%</span>
+                <h1 class="hero-title-massive">
+                    Craft winning bids,
+                    <span class="highlight-blue">effortlessly.</span>
+                </h1>
+                
+                <p class="hero-subtitle-new">
+                    Build precise, beautiful quotes at the speed of thought. Your inventory, pricing,<br class="d-none d-md-block"> and profit—all working in one fluid canvas.
+                </p>
+                
+                <!-- Platform Buttons Single-Line Layout -->
+                <div class="platform-btns">
+                    <!-- Web App Group -->
+                    <div class="platform-group">
+                        <span class="status-label">Available Now</span>
+                        <a href="/dashboard" class="btn-platform btn-web">
+                            <svg viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
+                            Launch Web App
+                        </a>
+                    </div>
+
+                    <!-- Downloads Group with Coming Soon label centered above macOS & Windows -->
+                    <div class="downloads-container">
+                        <span class="status-label">Coming Soon</span>
+                        <div class="downloads-row">
+                            <a href="#" onclick="alert('Coming Soon!')" class="btn-platform">
+                                <svg viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.3 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.3zM242 98.4c21.5-26 31.7-60.5 27.6-98.4-32.6 1.5-70.5 22.3-93.1 48.4-18.2 20.9-30 47.9-26.3 75.7 35.8 2.5 70.3-25.7 91.8-25.7z"/></svg>
+                                Download for macOS
+                            </a>
+                            <a href="#" onclick="alert('Coming Soon!')" class="btn-platform">
+                                <svg viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M0 93.7l183.6-25.3v177.4H0V93.7zm0 324.6l183.6 25.3V268.4H0v149.9zm203.8 28L448 480V268.4H203.8v177.9zm0-380.6v180.1H448V32L203.8 65.7z"/></svg>
+                                Download for Windows
+                            </a>
                         </div>
                     </div>
-                    <button class="btn-accent" style="padding: 10px 24px; font-size: 14px;">Generate PDF</button>
                 </div>
             </div>
 
-            <div class="flyout-menu">
-                <div style="font-size: 11px; color: #64748B; margin-bottom: 8px; font-weight: bold;">SYNCED DATABASE</div>
-                <div style="height: 24px; background: #F1F5F9; border-radius: 4px; margin-bottom: 6px;"></div>
-                <div style="height: 24px; background: #F1F5F9; border-radius: 4px; margin-bottom: 6px;"></div>
-                <div style="height: 24px; background: #E0E7FF; border-radius: 4px; border-left: 2px solid var(--accent-blue);"></div>
+            <!-- Mockup with Inventory Catalog on the Right -->
+            <div class="hero-mockup-layer">
+                <div class="mockup-wrapper">
+                    <div class="cursor"></div>
+                    <div class="drag-item"><span>Enterprise SSL</span><span style="opacity: 0.8;">$450.00</span></div>
+                    
+                    <div class="mockup-canvas">
+                        <h3 style="color: #0F172A; font-weight: 700; font-size: 28px; margin-bottom: 32px; letter-spacing: -0.02em;">QS Corp Migration</h3>
+                        <div class="ui-block"><div><div style="font-size: 15px; font-weight: 600; color: #0F172A; margin-bottom: 6px;">Initial System Audit</div><div style="font-size: 13px; color: #64748B;">Comprehensive review of legacy infrastructure</div></div><div style="font-weight: 600; color: #0F172A; font-size: 15px;">€2,500.00</div></div>
+                        <div class="ui-block"><div><div style="font-size: 15px; font-weight: 600; color: #0F172A; margin-bottom: 6px;">Database Migration Services</div><div style="font-size: 13px; color: #64748B;">PostgreSQL data transfer & validation (40 hrs)</div></div><div style="font-weight: 600; color: #0F172A; font-size: 15px;">€5,950.00</div></div>
+                        <div class="ui-block" style="border: 2px dashed #CBD5E1; background-color: rgba(239, 246, 255, 0.4); justify-content: center; height: 80px;"><div style="color: var(--accent-blue); font-size: 14px; font-weight: 500;">Drop item here</div></div>
+                        
+                        <div class="sticky-app-footer">
+                            <div class="footer-metrics">
+                                <div class="metric"><span class="metric-label">Subtotal</span><span class="metric-value">€8,450.00</span></div>
+                                <div class="metric"><span class="metric-label">Tax (19%)</span><span class="metric-value">€1,605.50</span></div>
+                                <div class="metric"><span class="metric-label">Margin</span><span class="metric-value highlight">42.8%</span></div>
+                            </div>
+                            <button class="btn-accent" style="padding: 12px 28px; font-size: 14px; font-family: 'Geist', sans-serif;">Generate PDF</button>
+                        </div>
+                    </div>
+
+                    <div class="mockup-sidebar">
+                        <div style="font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.5); letter-spacing: 1px; margin-bottom: 24px; font-family: 'Geist', sans-serif;">INVENTORY CATALOG</div>
+                        <div class="mockup-db-item"><div style="font-size: 14px; color: white; font-weight: 500; margin-bottom: 6px;">Cloud Hosting (1TB)</div><div style="font-size: 12px; color: rgba(255,255,255,0.6);">€299.00 / mo</div></div>
+                        <div class="mockup-db-item"><div style="font-size: 14px; color: white; font-weight: 500; margin-bottom: 6px;">Premium Support SLA</div><div style="font-size: 12px; color: rgba(255,255,255,0.6);">€1,500.00 / yr</div></div>
+                        <div class="mockup-db-item"><div style="font-size: 14px; color: white; font-weight: 500; margin-bottom: 6px;">Enterprise SSL</div><div style="font-size: 12px; color: rgba(255,255,255,0.6);">€450.00 / yr</div></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Features Bento Box -->
-    <section id="features" class="bento-grid">
-        <div class="bento-card">
-            <div class="bento-hover-visual"></div>
-            <div class="bento-icon">🧱</div>
-            <h3>Block-based Editing</h3>
-            <p>Ditch the rigid tables. Construct quotes effortlessly by dragging and dropping rich text blocks and line items anywhere on the canvas.</p>
+    <!-- 1. Features Grid Section -->
+    <div id="features" class="section-header scroll-section">
+        <h2>Powerful alone.<br><span style="color: var(--accent-blue);">Unstoppable together.</span></h2>
+        <p style="color: var(--text-muted); font-size: 1.35rem; line-height: 1.7;">Everything you need to close deals faster, built seamlessly into one elegant platform.</p>
+    </div>
+
+    <section class="bento-grid">
+        <div class="bento-card scroll-section" style="grid-column: span 1;">
+            <div class="bento-icon"><i data-lucide="layout-grid"></i></div>
+            <h3>Block-based Design</h3>
+            <p>Construct complex quotes in seconds. Drag, drop, and reorder rich text blocks, tables, and variables directly on an A4 canvas.</p>
         </div>
         
-        <div class="bento-card" style="grid-column: span 2;">
-            <div class="bento-hover-visual" style="width: 100%; height: 100%; right: 0; bottom: 0;"></div>
-            <div class="bento-icon">⚡</div>
+        <div class="bento-card scroll-section" style="grid-column: span 2;">
+            <div class="bento-icon"><i data-lucide="database-zap"></i></div>
             <h3>Live Database Sync</h3>
-            <p>Directly map your product CSVs into the editor. Your inventory, specs, and pricing fly out in an intelligent side-menu, ready to be pulled into any proposal in real-time.</p>
+            <p>Upload your CSV inventory catalogs and let the engine do the work. Instantly search, filter, and inject products with their exact pricing, SKUs, and specifications straight into your proposals.</p>
         </div>
 
-        <div class="bento-card">
-            <div class="bento-hover-visual"></div>
-            <div class="bento-icon">📈</div>
-            <h3>Dynamic Margins</h3>
-            <p>Adjust tax rates, apply blanket discounts, and calculate complex profit margins automatically with our sidebar command center.</p>
+        <div class="bento-card scroll-section" style="grid-column: span 2;">
+            <div class="bento-icon"><i data-lucide="pie-chart"></i></div>
+            <h3>Dynamic Profit Margins</h3>
+            <p>Take control of your financials. Add custom multi-tier taxes, calculate automatic subtotals, and analyze your net profit margins in real-time before you ever hit send.</p>
+        </div>
+
+        <div class="bento-card scroll-section" style="grid-column: span 1;">
+            <div class="bento-icon"><i data-lucide="pen-tool"></i></div>
+            <h3>Legally Binding Signatures</h3>
+            <p>Send quotes securely through the platform. Clients can review, accept, and sign dynamically on any device to instantly lock the document.</p>
         </div>
     </section>
 
-    <!-- CTA Section -->
-    <section class="cta-section">
+    <!-- 2. Use Cases Section -->
+    <div id="use-cases" class="section-header scroll-section">
+        <h2>Built for every<br><span class="text-gradient">workflow.</span></h2>
+        <p style="color: var(--text-muted); font-size: 1.35rem; line-height: 1.7;">Whether you are an independent creator or a scaling enterprise, QuoStudio adapts to your exact quoting needs.</p>
+    </div>
+
+    <section class="use-cases-container scroll-section">
+        <div class="uc-menu">
+            <div class="uc-item active" data-target="uc-freelance">Freelancers & Creators</div>
+            <div class="uc-item" data-target="uc-agency">Digital Agencies</div>
+            <div class="uc-item" data-target="uc-contractor">Contractors & Trades</div>
+        </div>
+        
+        <div class="uc-display-area">
+            <div id="uc-freelance" class="uc-content active">
+                <div class="uc-content-icon"><i data-lucide="user" style="color: white;"></i></div>
+                <h3>Freelancers & Creators</h3>
+                <p>Stop wrestling with Word templates. Generate stunning, professional proposals that reflect your personal brand in minutes. Automatically calculate milestone payments and secure project sign-offs instantly.</p>
+                <div class="uc-metric-container">
+                    <div class="uc-metric"><i data-lucide="trending-up"></i> Closes deals 40% faster</div>
+                </div>
+            </div>
+            
+            <div id="uc-agency" class="uc-content">
+                <div class="uc-content-icon"><i data-lucide="users" style="color: white;"></i></div>
+                <h3>Digital Agencies</h3>
+                <p>Standardize your pitch process across the entire sales team. Sync your SaaS pricing models, hourly retainer rates, and custom service tiers directly into the editor for error-free quoting at scale.</p>
+                <div class="uc-metric-container">
+                    <div class="uc-metric"><i data-lucide="check-circle-2"></i> 100% pricing accuracy</div>
+                </div>
+            </div>
+
+            <div id="uc-contractor" class="uc-content">
+                <div class="uc-content-icon"><i data-lucide="hard-hat" style="color: white;"></i></div>
+                <h3>Contractors & Trades</h3>
+                <p>Build comprehensive estimates on-site. Drag in materials, labor costs, and complex tax layers from your synced database. Adjust profit margins dynamically to ensure every job is profitable.</p>
+                <div class="uc-metric-container">
+                    <div class="uc-metric"><i data-lucide="calculator"></i> Real-time margin tracking</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. CTA Section -->
+    <section class="cta-section scroll-section">
         <div class="cta-content">
             <span class="overline">Make the next big client</span>
             <h2>From blank page to signed deal.</h2>
@@ -807,19 +686,19 @@
         <div class="cta-visual">
             <div class="doc-logo">Q</div>
             <h3>Your best work deserves a better proposal.</h3>
-            <div class="cta-skeleton-line" style="width: 100%;"></div>
-            <div class="cta-skeleton-line" style="width: 85%;"></div>
-            <div class="cta-skeleton-line" style="width: 90%;"></div>
-            <div class="cta-skeleton-line" style="width: 60%; margin-top: 32px;"></div>
+            <div class="cta-line" style="width: 90%;"></div>
+            <div class="cta-line" style="width: 75%; background: rgba(226, 232, 240, 0.6);"></div>
+            <div class="cta-line" style="width: 85%; margin-bottom: 24px;"></div>
+            <div class="cta-line" style="width: 40%; background: rgba(226, 232, 240, 0.6);"></div>
         </div>
     </section>
 
-    <!-- Website Footer -->
-    <footer class="site-footer">
-        <div class="footer-content">
+    <!-- Footer -->
+    <footer class="site-footer scroll-section">
+        <div class="footer-content" style="grid-template-columns: 2fr 1fr 1.5fr;">
             <div class="footer-brand">
                 <h2>QuoStudio</h2>
-                <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 12px; line-height: 1.6;">
+                <p style="color: var(--text-muted); font-size: 1.05rem; margin-top: 16px; line-height: 1.7;">
                     The next-generation quotation and invoice builder designed for modern professionals and fast-moving teams.
                 </p>
             </div>
@@ -827,40 +706,232 @@
             <div class="footer-col">
                 <h4>Product</h4>
                 <ul>
-                    <li><a href="#">Features</a></li>
-                    <li><a href="#">Integrations</a></li>
-                    <li><a href="#">Changelog</a></li>
+                    <li><a data-modal="features">Features</a></li>
+                    <li><a data-modal="business">Business Solutions</a></li>
+                    <li><a data-modal="changelog">Changelog</a></li>
                 </ul>
             </div>
 
             <div class="footer-col">
-                <h4>Resources</h4>
-                <ul>
-                    <li><a href="#">Documentation</a></li>
-                    <li><a href="#">API Reference</a></li>
-                    <li><a href="#">Community</a></li>
-                    <li><a href="#">Templates</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-col">
-                <h4>Stay Updated</h4>
-                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 12px;">Get the latest updates and release notes.</p>
-                <div class="email-capture">
-                    <input type="email" placeholder="Enter your email" />
-                    <button>Subscribe</button>
-                </div>
+                <h4>Contact Us</h4>
+                <form class="contact-form" onsubmit="event.preventDefault(); alert('Message sent successfully! We will get back to you shortly.'); this.reset();">
+                    <input type="text" placeholder="Your Name" required />
+                    <input type="email" placeholder="Your Email" required />
+                    <textarea placeholder="Your Message" required></textarea>
+                    <button type="submit">Send Message</button>
+                </form>
             </div>
         </div>
         
         <div class="footer-bottom">
             <div>&copy; 2026 QuoStudio. All rights reserved.</div>
-            <div style="display: flex; gap: 24px;">
-                <a href="#" style="color: var(--text-muted); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--text-muted)'">Privacy Policy</a>
-                <a href="#" style="color: var(--text-muted); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--text-muted)'">Terms of Service</a>
+            <div style="display: flex; gap: 32px; align-items: center;">
+                <a data-modal="privacy" style="cursor: pointer;">Privacy Policy</a>
+                <a data-modal="terms" style="cursor: pointer;">Terms of Service</a>
             </div>
         </div>
     </footer>
 
+    <script>
+        lucide.createIcons();
+
+        // Custom Cursor Logic
+        const dot = document.getElementById('cursorDot');
+        const ring = document.getElementById('cursorRing');
+
+        let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+        let ringX = mouseX, ringY = mouseY;
+
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            dot.style.transform = `translate3d(${mouseX - 5}px, ${mouseY - 5}px, 0)`;
+        });
+
+        function renderCursor() {
+            ringX += (mouseX - ringX) * 0.15;
+            ringY += (mouseY - ringY) * 0.15;
+            ring.style.transform = `translate3d(${ringX - 18}px, ${ringY - 18}px, 0)`;
+            requestAnimationFrame(renderCursor);
+        }
+        requestAnimationFrame(renderCursor);
+
+        window.addEventListener('mousedown', () => document.body.classList.add('cursor-click'));
+        window.addEventListener('mouseup', () => document.body.classList.remove('cursor-click'));
+
+        // Interactive hover states
+        const interactiveEls = document.querySelectorAll('a, button, .bento-card, .uc-item, .mockup-db-item, input, textarea');
+        interactiveEls.forEach(el => {
+            el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+            el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+        });
+
+        // Modal Content Database (Comprehensive Multi-Point Detailed Breakdown including v0.0.3 & v0.0.2)
+        const modalData = {
+            features: {
+                title: "Platform Features & Capabilities",
+                content: `
+                    <p>QuoStudio is engineered from the ground up for high-velocity teams and professionals who demand absolute precision, security, and elegance.</p>
+                    <ul>
+                        <li><strong>Block-Based A4 Canvas:</strong> Fluidly drag, drop, and structure rich-text blocks, dynamic variables, and custom line items directly onto a publication-grade A4 layout.</li>
+                        <li><strong>Live Database Integration:</strong> Seamlessly connect external inventory catalogs or CSV uploads to instantly inject verified SKUs, wholesale pricing, and tax specifications into proposals.</li>
+                        <li><strong>Dynamic Margin Analysis:</strong> Real-time calculation of multi-tier taxes, subtotals, and net profit margins before sealing deals.</li>
+                        <li><strong>Client-Side Zero-Knowledge Encryption:</strong> Complete AES-GCM encryption on the client side ensures your catalog data is unreadable to anyone else.</li>
+                        <li><strong>Legally Binding E-Signatures:</strong> Send proposals securely with dynamic multi-device client sign-off capabilities that instantly lock documents.</li>
+                        <li><strong>Cross-Platform Desktop Apps:</strong> Dedicated native application support optimized for both macOS and Windows workflows.</li>
+                    </ul>
+                `
+            },
+            business: {
+                title: "Enterprise Business Solutions",
+                content: `
+                    <p>Scale your agency or enterprise quoting workflows with robust multi-tenant security, custom branding, and centralized management.</p>
+                    <ul>
+                        <li><strong>Granular Multi-Tenant Access:</strong> Enforce precise administrative privileges, role-based controls, and secure multi-user review workflows for growing corporate teams.</li>
+                        <li><strong>Zero-Knowledge Architecture:</strong> Leverage client-side end-to-end encryption and isolated cloud data structures ensuring proprietary business metrics remain exclusively yours.</li>
+                        <li><strong>White-Label PDF Exports:</strong> Customize exported proposals with your organization's unique insignia, color palettes, and typographic styling.</li>
+                        <li><strong>Supabase Backend Integration:</strong> Direct PostgreSQL database connectivity leveraging Row-Level Security (RLS) policies.</li>
+                        <li><strong>Dedicated Enterprise SLAs:</strong> 99.9% uptime guarantees backed by 24/7 priority support and infrastructure monitoring.</li>
+                        <li><strong>Centralized Team Management:</strong> Oversee team activity logs, quotation statuses, and pipeline metrics effortlessly.</li>
+                    </ul>
+                `
+            },
+            changelog: {
+                title: "Changelog & System Updates",
+                content: `
+                    <p>Stay up to date with the latest architectural improvements, security enhancements, and feature releases across QuoStudio.</p>
+                    <ul>
+                        <li><strong>v0.0.3 (In Development / Current):</strong> Implementing client-side AES-GCM zero-knowledge encryption, enhanced footer modal breakdowns with multi-point accuracy, and streamlined single-line cross-platform desktop download actions.</li>
+                        <li><strong>v0.0.2 (Live in Production):</strong> Successfully deployed initial core quoting engine, Supabase authentication integration, dynamic profit margin calculators, and glassmorphic user interface components.</li>
+                        <li><strong>v0.0.1 (Alpha):</strong> Initial prototype featuring block-based canvas layout and foundational database architecture.</li>
+                    </ul>
+                `
+            },
+            privacy: {
+                title: "Privacy Policy & Security",
+                content: `
+                    <p>Last updated: October 14, 2026</p>
+                    <p>At QuoStudio, we enforce absolute data privacy and zero-knowledge architecture so that your business data remains exclusively yours.</p>
+                    <ul>
+                        <li><strong>Client-Side Zero-Knowledge Encryption:</strong> All inventory catalogs, pricing matrices, and financial quotes are encrypted locally in your browser using AES-GCM; our servers hold only unreadable ciphertext with zero decryption capability.</li>
+                        <li><strong>Minimal Data Collection:</strong> We strictly collect only your account credentials (name, email, and organization) necessary to maintain your secure session and authentication.</li>
+                        <li><strong>Absolute Data Isolation:</strong> Your inventory catalogs and quotations reside entirely within your private database schema, protected by rigorous Row-Level Security (RLS).</li>
+                        <li><strong>Zero Third-Party Tracking:</strong> We do not sell, rent, or monetize your user telemetry or business records to advertisers or external analytics networks.</li>
+                        <li><strong>Transport Layer Security (TLS):</strong> All network communications between your browser and our servers are secured using industry-standard modern TLS protocols.</li>
+                        <li><strong>User Data Control:</strong> You maintain full authority to export, modify, or permanently purge your account data at any time directly from your dashboard settings.</li>
+                    </ul>
+                `
+            },
+            terms: {
+                title: "Terms of Service",
+                content: `
+                    <p>Last updated: October 14, 2026</p>
+                    <p>By accessing or using QuoStudio, you agree to be bound by these Terms of Service.</p>
+                    <ul>
+                        <li><strong>Data Ownership & Portability:</strong> You retain 100% intellectual property rights and full ownership over all quotation records, pricing matrices, and inventory catalogs created on the platform.</li>
+                        <li><strong>Service Availability & Support:</strong> We guarantee 99.9% uptime reliability across web and desktop applications, supported by dedicated infrastructure monitoring and security compliance.</li>
+                        <li><strong>Acceptable Use Policy:</strong> Users agree not to misuse the platform for unlawful activities, unauthorized data harvesting, or attempting to breach platform security barriers.</li>
+                        <li><strong>Account Responsibility:</strong> You are solely responsible for maintaining the confidentiality of your account credentials and local encryption passphrases.</li>
+                        <li><strong>Modifications to Service:</strong> QuoStudio reserves the right to update features, desktop client binaries, and pricing tiers with advance notice to active subscribers.</li>
+                        <li><strong>Limitation of Liability:</strong> QuoStudio is provided on an "as is" and "as available" basis without warranties of any kind beyond our guaranteed SLAs.</li>
+                    </ul>
+                `
+            }
+        };
+
+        // Modal Logic
+        const modalBackdrop = document.getElementById('footerModalBackdrop');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+        const modalClose = document.getElementById('modalClose');
+
+        document.querySelectorAll('a[data-modal]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const modalKey = link.getAttribute('data-modal');
+                const data = modalData[modalKey];
+                if (data) {
+                    modalTitle.textContent = data.title;
+                    modalBody.innerHTML = data.content;
+                    modalBackdrop.classList.add('active');
+                }
+            });
+        });
+
+        const closeModal = () => {
+            modalBackdrop.classList.remove('active');
+        };
+
+        modalClose.addEventListener('click', closeModal);
+        modalBackdrop.addEventListener('click', (e) => {
+            if (e.target === modalBackdrop) closeModal();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // Hero Scroll Animation
+        document.addEventListener('DOMContentLoaded', () => {
+            const seqContainer = document.querySelector('.hero-scroll-container');
+            const textLayer = document.querySelector('.hero-text-layer');
+            const mockupLayer = document.querySelector('.hero-mockup-layer');
+
+            window.addEventListener('scroll', () => {
+                if(!seqContainer || !textLayer || !mockupLayer) return;
+                
+                const rect = seqContainer.getBoundingClientRect();
+                const maxScroll = seqContainer.offsetHeight - window.innerHeight;
+                let progress = Math.max(0, Math.min(1, -rect.top / maxScroll));
+
+                let textOpacity = 1 - (progress * 3);
+                textLayer.style.opacity = Math.max(0, textOpacity);
+                textLayer.style.transform = `scale(${1 - (progress * 0.05)})`;
+                textLayer.style.pointerEvents = textOpacity > 0.1 ? 'auto' : 'none';
+
+                let mockProgress = Math.max(0, Math.min(1, (progress - 0.1) * 2));
+                mockupLayer.style.opacity = mockProgress;
+                mockupLayer.style.transform = `translateY(${40 - (mockProgress * 40)}vh) scale(${0.9 + (mockProgress * 0.1)})`;
+                mockProgress > 0.95 ? mockupLayer.classList.add('interactive') : mockupLayer.classList.remove('interactive');
+            });
+        });
+
+        // Global Bi-Directional Scroll Animations (Fade out top, Roll up bottom)
+        const scrollObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const rect = entry.boundingClientRect;
+                if (entry.isIntersecting) {
+                    entry.target.classList.remove('hidden-bottom', 'hidden-top');
+                    entry.target.classList.add('visible');
+                } else {
+                    entry.target.classList.remove('visible');
+                    if (rect.top < 0) {
+                        entry.target.classList.add('hidden-top');
+                    } else {
+                        entry.target.classList.add('hidden-bottom');
+                    }
+                }
+            });
+        }, { threshold: 0.15 });
+
+        document.querySelectorAll('.scroll-section').forEach(sec => {
+            sec.classList.add('hidden-bottom');
+            scrollObserver.observe(sec);
+        });
+
+        // Interactive Use Cases Menu
+        const ucItems = document.querySelectorAll('.uc-item');
+        const ucContents = document.querySelectorAll('.uc-content');
+
+        ucItems.forEach(item => {
+            ['mouseenter', 'click'].forEach(evt => {
+                item.addEventListener(evt, () => {
+                    ucItems.forEach(i => i.classList.remove('active'));
+                    ucContents.forEach(c => c.classList.remove('active'));
+                    item.classList.add('active');
+                    document.getElementById(item.getAttribute('data-target')).classList.add('active');
+                });
+            });
+        });
+    </script>
 </body>
 </html>

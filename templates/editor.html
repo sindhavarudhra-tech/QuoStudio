@@ -4,62 +4,229 @@
 <head>
     <meta charset="UTF-8">
     <title>Editor - {{ quote.client_name }}</title>
+    
+    <!-- Premium Fonts: Clash Grotesk (Headings) & Geist (Body) -->
+    <link href="https://api.fontshare.com/v2/css?f[]=clash-grotesk@400,500,600,700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- html2pdf Library for direct PDF downloading -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
     <style>
         :root {
-            --bg-main: #050810;
-            --bg-nav: #0A0F1D;
-            --bg-panel: #0A0F1D;
-            --bg-card: #111827;
-            --bg-card-hover: #1E293B;
+            --bg-nav: rgba(11, 15, 25, 0.4);
+            --bg-panel: rgba(11, 15, 25, 0.4);
+            --bg-card: rgba(17, 24, 39, 0.6);
+            --bg-card-hover: rgba(30, 41, 59, 0.8);
             --text-main: #ffffff;
             --text-muted: #94A3B8;
-            --border-color: #1F2937;
-            --border-hover: #374151;
-            --modal-bg: #111827;
-            --input-bg: #0A0F1D;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(37, 99, 235, 0.4);
+            --modal-bg: rgba(15, 23, 42, 0.98);
+            --input-bg: rgba(11, 15, 25, 0.8);
+            --blur-val: blur(30px) saturate(150%);
+            --accent-blue: #2563EB;
         }
 
         body.light-theme {
-            --bg-main: #F1F5F9;
-            --bg-nav: #FFFFFF;
-            --bg-panel: #FFFFFF;
-            --bg-card: #FFFFFF;
-            --bg-card-hover: #F8FAFC;
+            --bg-nav: rgba(255, 255, 255, 0.5);
+            --bg-panel: rgba(255, 255, 255, 0.5);
+            --bg-card: rgba(255, 255, 255, 0.7);
+            --bg-card-hover: rgba(255, 255, 255, 0.95);
             --text-main: #0F172A;
             --text-muted: #64748B;
-            --border-color: #E2E8F0;
-            --border-hover: #CBD5E1;
-            --modal-bg: #FFFFFF;
-            --input-bg: #F8FAFC;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --border-hover: rgba(37, 99, 235, 0.3);
+            --modal-bg: rgba(255, 255, 255, 0.98);
+            --input-bg: rgba(255, 255, 255, 0.8);
         }
 
-        body { background-color: var(--bg-main); margin: 0; padding: 0; font-family: -apple-system, sans-serif; overflow: hidden; color: var(--text-main); transition: 0.3s; }
+        body { 
+            background-color: transparent; 
+            margin: 0; padding: 0; 
+            font-family: 'Geist', -apple-system, sans-serif; 
+            overflow: hidden; 
+            color: var(--text-main); 
+            transition: color 0.3s; 
+        }
+
+        h1:not(.page *), h2:not(.page *), h3:not(.page *), h4:not(.page *), h5:not(.page *), h6:not(.page *), .brand-text, .doc-h1 {
+            font-family: 'Clash Grotesk', sans-serif;
+        }
+
+        /* Cinematic Background */
+        .cinematic-bg {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -1;
+            background-image: linear-gradient(to bottom, rgba(11, 15, 25, 0.93), rgba(11, 15, 25, 0.93)), url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop');
+            background-size: cover; background-position: center; background-repeat: no-repeat; pointer-events: none; transition: 0.3s ease;
+        }
+
+        body.light-theme .cinematic-bg {
+            background-image: linear-gradient(to bottom, rgba(241, 245, 249, 0.93), rgba(241, 245, 249, 0.93)), url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop');
+        }
+
         .app-layout { display: flex; height: 100vh; width: 100vw; }
         .main-area { flex-grow: 1; display: flex; flex-direction: column; position: relative; }
 
-        .top-header { min-height: 80px; background-color: var(--bg-nav); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 20px 32px; z-index: 40; transition: 0.3s; }
-        .breadcrumb-title { font-weight: 600; color: var(--text-muted); font-size: 14px; display: flex; align-items: center; gap: 12px; }
-        .doc-title { color: var(--text-main); }
-        .status-dot { width: 6px; height: 6px; background: #10B981; border-radius: 50%; display: inline-block; }
-        .status-dot.locked { background: #F59E0B; }
+        /* Glassmorphic Navbar */
+        .top-header { 
+            min-height: 80px; 
+            background-color: var(--bg-nav); 
+            backdrop-filter: var(--blur-val); -webkit-backdrop-filter: var(--blur-val);
+            border-bottom: 1px solid var(--border-color); 
+            display: flex; align-items: center; justify-content: space-between; padding: 20px 32px; z-index: 40; transition: 0.3s; 
+        }
+        .breadcrumb-title { font-weight: 500; color: var(--text-muted); font-size: 14px; display: flex; align-items: center; gap: 12px; }
+        .doc-title { color: var(--text-main); font-weight: 600; }
+        .status-dot { width: 6px; height: 6px; background: #10B981; border-radius: 50%; display: inline-block; box-shadow: 0 0 8px rgba(16,185,129,0.6); }
+        .status-dot.locked { background: #F59E0B; box-shadow: 0 0 8px rgba(245,158,11,0.6); }
         
         .header-actions { display: flex; align-items: center; gap: 12px; }
-        .btn-outline-darker { background: var(--bg-card); border: 1px solid var(--border-hover); color: var(--text-main); padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; transition: 0.2s; border: none; cursor: pointer;}
-        .btn-outline-darker:hover { background: var(--bg-card-hover); }
-        .btn-primary-custom { background: #2563EB; border: none; color: white; padding: 8px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; }
-        .btn-primary-custom:hover { background: #1D4ED8; }
-        .btn-success-custom { background: #10B981; border: none; color: white; padding: 8px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; }
-        .btn-warning-custom { background: #F59E0B; border: none; color: white; padding: 8px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; }
-        .avatar { width: 32px; height: 32px; background: #2563EB; border-radius: 50%; border: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: white; margin-left: 12px; cursor: pointer; text-transform: uppercase; }
+        .btn-outline-darker { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 16px; border-radius: 100px; font-size: 13px; font-weight: 600; transition: 0.2s; cursor: pointer;}
+        .btn-outline-darker:hover { background: var(--bg-card-hover); border-color: var(--border-hover); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .btn-primary-custom { background: var(--accent-blue); border: none; color: white; padding: 8px 20px; border-radius: 100px; font-size: 13px; font-weight: 600; transition: 0.2s;}
+        .btn-primary-custom:hover { background: #1D4ED8; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+        .btn-success-custom { background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #10B981; padding: 8px 20px; border-radius: 100px; font-size: 13px; font-weight: 600; }
+        .btn-warning-custom { background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); color: #F59E0B; padding: 8px 20px; border-radius: 100px; font-size: 13px; font-weight: 600; }
+        
+        .avatar { width: 34px; height: 34px; background: var(--accent-blue); border-radius: 50%; border: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: white; margin-left: 12px; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .avatar:hover { transform: scale(1.05); border-color: rgba(255,255,255,0.3); }
+        .avatar::after { display: none !important; }
 
-        .workspace { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 60px 0; background-color: var(--bg-main); transition: 0.3s; }
+        /* Fixed Profile Dropdown Hover Text Visibility */
+        .dropdown-menu .dropdown-item {
+            color: var(--text-main) !important;
+            font-weight: 500;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .dropdown-menu .dropdown-item:hover {
+            background-color: var(--bg-card-hover) !important;
+            color: var(--text-main) !important;
+        }
+        .dropdown-menu .dropdown-item.text-danger:hover {
+            color: #EF4444 !important;
+        }
 
-        .page { width: 210mm; height: 297mm !important; max-height: 297mm !important; background-color: white; color: #0F172A; position: relative; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); border-radius: 4px; box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden; flex-shrink: 0; margin-bottom: 40px; }
+        .workspace { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 60px 0 100px 0; background-color: transparent; transition: 0.3s; perspective: 1000px; position: relative; }
+        
+        /* Zoom Container Wrapper */
+        #zoomWrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            transition: transform 0.2s ease;
+            transform-origin: top center;
+        }
+
+        #documentContainer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        /* Fixed Screen-Centered Bottom Zoom Pill - Centered to the page area accounting for right panel */
+        .zoom-floating-pill {
+            position: fixed;
+            bottom: 24px;
+            left: calc(50% - 180px);
+            transform: translateX(-50%);
+            background: var(--modal-bg);
+            backdrop-filter: var(--blur-val);
+            -webkit-backdrop-filter: var(--blur-val);
+            border: 1px solid var(--border-color);
+            padding: 6px 14px;
+            border-radius: 100px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        .zoom-floating-pill button {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+            outline: none;
+            padding: 0;
+            line-height: 1;
+        }
+        .zoom-floating-pill button:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--accent-blue);
+            transform: scale(1.05);
+        }
+        #zoomLevelDisplay {
+            color: var(--text-main);
+            font-size: 13px;
+            font-weight: 600;
+            min-width: 48px;
+            text-align: center;
+        }
+
+        /* Ensure number input spinners (arrows) adapt correctly to theme */
+        input[type="number"] {
+            color-scheme: dark;
+        }
+        body.light-theme input[type="number"] {
+            color-scheme: light;
+        }
+
+        /* Fix modal backdrop overlay clipping/cut-off issue */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #000;
+        }
+        .modal-backdrop.show {
+            opacity: 0.6;
+        }
+
+        /* The Document Page (Stays white for PDF export fidelity - Normal fonts for print) */
+        .page { 
+            width: 210mm; 
+            height: 297mm !important; 
+            max-height: 297mm !important; 
+            min-height: 297mm !important;
+            background-color: white; 
+            color: #0F172A; 
+            position: relative; 
+            box-shadow: 0 30px 60px -15px rgba(0,0,0,0.6); 
+            border-radius: 8px; 
+            box-sizing: border-box; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden; 
+            flex-shrink: 0; 
+            margin-bottom: 20mm; 
+            font-family: Arial, Helvetica, "Segoe UI", -apple-system, sans-serif !important;
+        }
+        .page h1, .page h2, .page h3, .page h4, .page h5, .page h6, 
+        .page div, .page span, .page td, .page th, .page .doc-h1, .page .meta-label, .page p, .page ul, .page li { 
+            font-family: inherit !important; 
+        }
+
         .bg-layer { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-size: cover; background-position: center; z-index: 0; pointer-events: none; }
-        .content-layer { position: relative; z-index: 1; display: flex; flex-direction: column; height: 100%; padding: 20mm; }
+        .content-layer { position: relative; z-index: 1; display: flex; flex-direction: column; height: 100%; padding: 20mm; box-sizing: border-box; }
 
         {% if is_editable %}
         [contenteditable="true"] { outline: none; border-bottom: 1px dashed transparent; transition: 0.2s; }
@@ -69,13 +236,13 @@
         {% endif %}
         .no-wrap[contenteditable="true"] { white-space: nowrap; overflow: hidden; }
 
-        .doc-h1 { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; margin: 0; color: #0F172A; padding: 4px; }
+        .doc-h1 { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.02em; margin: 0; color: #0F172A; padding: 4px; }
         .meta-row { display: flex; padding: 12px 0; margin-bottom: 16px; gap: 32px; }
         .meta-col { flex: 1; }
-        .meta-label { font-size: 9px; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+        .meta-label { font-size: 9px; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; font-family: inherit; }
         .meta-value { font-size: 13px; font-weight: 600; color: #0F172A; }
 
-        .quote-table { width: 100%; font-size: 12px; border-collapse: collapse; color: #0F172A; }
+        .quote-table { width: 100%; font-size: 12.5px; border-collapse: collapse; color: #0F172A; }
         .quote-table th { padding: 12px 8px; font-weight: 600; text-transform: uppercase; font-size: 10px; color: #94A3B8; border-bottom: 1px solid rgba(226, 232, 240, 0.8); }
         .quote-table td { padding: 14px 8px; vertical-align: top; border-bottom: 1px solid rgba(241, 245, 249, 0.5); transition: background-color 0.2s; word-break: break-word; }
         
@@ -90,7 +257,7 @@
         .delete-btn { display: none !important; }
         {% endif %}
         
-        .item-name { font-weight: 700; color: #0F172A; font-size: 13px; margin-bottom: 4px; white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word; }
+        .item-name { font-weight: 600; color: #0F172A; font-size: 13.5px; margin-bottom: 4px; white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word; }
         
         .dragging { opacity: 0.4; background-color: rgba(248, 250, 252, 0.8); }
         .drag-over { border-top: 2px solid #2563EB !important; background-color: rgba(239, 246, 255, 0.8) !important; }
@@ -101,59 +268,141 @@
         .signature-section { width: 30%; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
         .totals-section { width: 35%; color: #0F172A; }
         .totals-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; color: #64748B; }
-        .totals-row.grand { font-size: 16px; font-weight: 800; color: #0F172A; margin-top: 16px; border-top: 2px solid rgba(226, 232, 240, 0.8); padding-top: 16px; }
+        .totals-row.grand { font-size: 16px; font-weight: 700; color: #0F172A; margin-top: 16px; border-top: 2px solid rgba(226, 232, 240, 0.8); padding-top: 16px; }
 
-        .right-panel { width: 340px; background-color: var(--bg-panel); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; overflow: hidden; z-index: 40; transition: 0.3s; }
+        /* Glassmorphic Right Panel */
+        .right-panel { 
+            width: 360px; 
+            background-color: var(--bg-panel); 
+            backdrop-filter: var(--blur-val); -webkit-backdrop-filter: var(--blur-val);
+            border-left: 1px solid var(--border-color); 
+            display: flex; flex-direction: column; overflow: hidden; z-index: 40; transition: 0.3s; 
+        }
         
-        .tab-btn { background: transparent; border: none; color: var(--text-muted); padding: 16px 0; font-size: 13px; font-weight: 600; border-bottom: 2px solid transparent; cursor: pointer; transition: 0.2s; outline: none; }
+        .tab-btn { background: transparent; border: none; color: var(--text-muted); padding: 16px 0; font-size: 13.5px; font-weight: 600; border-bottom: 2px solid transparent; cursor: pointer; transition: 0.2s; outline: none; }
         .tab-btn:hover { color: var(--text-main); background: rgba(255,255,255,0.02); }
-        .tab-btn.active { color: #2563EB; border-bottom-color: #2563EB; }
+        .tab-btn.active { color: var(--text-main); border-bottom-color: var(--accent-blue); }
 
-        .db-select { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-main); padding: 10px; border-radius: 8px; width: 100%; margin-bottom: 20px; font-size: 13px; }
-        .db-select:focus { outline: none; border-color: #2563EB; }
+        /* Guaranteed High Contrast Label matching "Choose a loaded catalog..." color */
+        .ui-label { font-size: 12px; font-weight: 700; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; display: block; opacity: 1; }
+
+        /* Shifted arrow to the left with right padding */
+        .db-select { 
+            background: var(--input-bg); 
+            border: 1px solid var(--border-color); 
+            color: var(--text-main); 
+            padding: 12px 36px 12px 14px; 
+            border-radius: 12px; 
+            width: 100%; 
+            margin-bottom: 20px; 
+            font-size: 13px; 
+            transition: 0.3s; 
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            background-size: 16px;
+        }
+        .db-select:focus { outline: none; border-color: var(--accent-blue); box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
         
-        .inventory-item { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; }
-        .inventory-item:hover { border-color: var(--border-hover); background: var(--bg-card-hover); }
-        .inventory-item.selected { border-color: #2563EB; background: rgba(37, 99, 235, 0.1); }
-        .inventory-item.selected .inv-name { color: #2563EB; }
+        /* High contrast placeholder color matching dropdown text */
+        .form-control::placeholder {
+            color: var(--text-muted) !important;
+            opacity: 1;
+        }
+        .form-control::-webkit-input-placeholder {
+            color: var(--text-muted) !important;
+            opacity: 1;
+        }
+        .form-control::-moz-placeholder {
+            color: var(--text-muted) !important;
+            opacity: 1;
+        }
+        .form-control:-ms-input-placeholder {
+            color: var(--text-muted) !important;
+            opacity: 1;
+        }
+
+        .inventory-item { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 12px; padding: 14px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: all 0.2s ease; }
+        .inventory-item:hover { border-color: var(--border-hover); background: var(--bg-card-hover); transform: translateY(-2px); }
+        .inventory-item.selected { border-color: var(--accent-blue); background: rgba(37, 99, 235, 0.15); }
+        .inventory-item.selected .inv-name { color: #60A5FA; font-weight: 600; }
         
-        .modal-content { background-color: var(--modal-bg) !important; color: var(--text-main); border: 1px solid var(--border-color); }
-        .form-control { background-color: var(--input-bg) !important; color: var(--text-main) !important; border: 1px solid var(--border-color); }
-        .client-search-result { padding: 12px; border: 1px solid var(--border-color); background: var(--bg-card); border-radius: 8px; margin-bottom: 8px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-        .client-search-result:hover { border-color: #2563EB; background: rgba(37,99,235,0.1); }
-        .signature-box { border: 2px dashed #CBD5E1; border-radius: 8px; height: 100px; display: flex; align-items: center; justify-content: center; font-family: 'Brush Script MT', cursive; font-size: 32px; color: #0F172A; margin-top: 16px; cursor: pointer; background: white; }
+        /* Glassmorphic Modals */
+        .modal-content { 
+            background-color: var(--modal-bg) !important; 
+            backdrop-filter: var(--blur-val); -webkit-backdrop-filter: var(--blur-val);
+            color: var(--text-main); border: 1px solid var(--border-color); border-radius: 24px;
+        }
+        .form-control { background-color: var(--input-bg) !important; color: var(--text-main) !important; border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 16px; transition: 0.3s; }
+        .form-control:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 4px rgba(37,99,235,0.15); }
+        
+        /* Fixed Search Result Padding & Outline Cut-off */
+        .client-search-result { 
+            padding: 12px 16px; 
+            border: 1px solid var(--border-color); 
+            background: var(--bg-card); 
+            border-radius: 12px; 
+            margin: 0 4px 8px 4px; 
+            cursor: pointer; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            transition: 0.2s;
+            box-sizing: border-box;
+        }
+        .client-search-result:hover { border-color: var(--accent-blue); background: rgba(37,99,235,0.15); transform: translateY(-1px); }
+        
+        .signature-box { border: 2px dashed #CBD5E1; border-radius: 12px; height: 100px; display: flex; align-items: center; justify-content: center; font-family: 'Brush Script MT', cursive; font-size: 32px; color: #0F172A; margin-top: 16px; cursor: pointer; background: white; transition: 0.2s; }
+        .signature-box:hover { border-color: var(--accent-blue); background: #F8FAFC; }
+
+        /* Fade & Roll Scroll Animation specifically for pages */
+        .scroll-section {
+            will-change: opacity, transform;
+        }
+        .scroll-section.hidden-bottom { opacity: 0; transform: translateY(40px) scale(0.98); }
+        .scroll-section.hidden-top { opacity: 0; transform: translateY(-20px) scale(0.98); }
+        .scroll-section.visible { opacity: 1; transform: translateY(0) scale(1); }
 
         @media print {
-            @page { margin: 0; size: auto; }
+            @page { size: A4 portrait; margin: 0; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            body, .app-layout, .main-area, .workspace { display: block; height: auto; width: 100%; overflow: visible; background: none; padding: 0; margin: 0; }
-            .page { box-shadow: none; margin: 0; width: 210mm !important; height: 297mm !important; max-height: 297mm !important; page-break-after: always; position: relative; }
+            .cinematic-bg, .zoom-floating-pill, .d-print-none { display: none !important; }
+            html, body { background: #ffffff !important; width: 210mm; height: 297mm; margin: 0; padding: 0; overflow: visible; }
+            .app-layout, .main-area, .workspace { display: block; height: auto; width: 100%; overflow: visible; background: none; padding: 0; margin: 0; }
+            #zoomWrapper, #documentContainer { transform: none !important; width: 100% !important; display: block !important; margin: 0 !important; padding: 0 !important; }
+            .page { box-shadow: none !important; margin: 0 !important; width: 210mm !important; height: 297mm !important; max-height: 297mm !important; min-height: 297mm !important; page-break-after: always !important; page-break-inside: avoid !important; break-after: page !important; break-inside: avoid !important; position: relative !important; opacity: 1 !important; transform: none !important; }
             .bg-layer { display: block !important; position: absolute !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important; z-index: 0 !important; }
         }
     </style>
 </head>
 <body>
 
+<!-- Persistent Cinematic Texture -->
+<div class="cinematic-bg d-print-none"></div>
+
 <div class="app-layout">
     <div class="main-area">
         <div class="top-header d-print-none">
             <div class="d-flex align-items-center gap-4">
-                <a href="/dashboard"><div style="width: 24px; height: 24px; background: #2563EB; color: white; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px;">Q</div></a>
+                <a href="/dashboard" class="text-decoration-none"><div style="width: 28px; height: 28px; background: var(--accent-blue); color: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; font-family: 'Clash Grotesk', sans-serif;">Q</div></a>
                 <div class="breadcrumb-title">
                     QuoStudio / <span class="doc-title">{{ quote.client_name }}</span> 
                     
                     {% if quote.status == 'draft' %}
-                        <span class="status-dot"></span> <span style="color: #10B981; font-size: 12px;">Saved Draft</span>
+                        <span class="status-dot"></span> <span style="color: #10B981; font-size: 12px; font-weight: 600;">Saved Draft</span>
                     {% elif quote.status == 'sent' %}
-                        <span class="status-dot locked"></span> <span style="color: #F59E0B; font-size: 12px;">Locked • Sent</span>
+                        <span class="status-dot locked"></span> <span style="color: #F59E0B; font-size: 12px; font-weight: 600;">Locked • Sent</span>
                     {% elif quote.status == 'accepted' %}
-                        <span class="status-dot"></span> <span style="color: #10B981; font-size: 12px;">Locked • Signed</span>
+                        <span class="status-dot"></span> <span style="color: #10B981; font-size: 12px; font-weight: 600;">Locked • Signed</span>
                     {% endif %}
                 </div>
             </div>
             
             <div class="header-actions">
-                <button class="btn-outline-darker" onclick="downloadQuotation()">Download PDF</button>
+                <button class="btn-outline-darker" onclick="window.print()">Print / Download</button>
                 
                 {% if is_owner %}
                     {% if quote.status == 'draft' %}
@@ -167,7 +416,7 @@
                 
                 {% if is_recipient %}
                     {% if quote.status == 'sent' %}
-                        <button class="btn-success-custom" data-bs-toggle="modal" data-bs-target="#acceptModal">Review & Accept</button>
+                        <button class="btn-primary-custom" data-bs-toggle="modal" data-bs-target="#acceptModal" style="background: #10B981;">Review & Accept</button>
                     {% elif quote.status == 'accepted' %}
                         <span class="btn-success-custom">You Accepted This</span>
                     {% endif %}
@@ -175,96 +424,112 @@
                 
                 <div class="dropdown">
                     <div class="avatar dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{ initials }}</div>
-                    <ul class="dropdown-menu dropdown-menu-end shadow-lg" style="background-color: var(--bg-card); border-color: var(--border-color);">
-                        <li><a class="dropdown-item" style="color: var(--text-main);" href="/dashboard">🏠 Back to Dashboard</a></li>
-                        <li><a class="dropdown-item" style="color: var(--text-main);" href="#" onclick="toggleTheme()">🌓 Toggle Theme</a></li>
-                        <li><hr class="dropdown-divider" style="border-color: var(--border-color);"></li>
-                        <li><a class="dropdown-item text-danger" href="/logout">🚪 Log Out</a></li>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-lg" style="background-color: var(--modal-bg); backdrop-filter: blur(24px); border-color: var(--border-color); border-radius: 16px; padding: 8px;">
+                        <li><a class="dropdown-item d-flex align-items-center rounded" href="/dashboard"><i data-lucide="home" class="me-3" style="width: 16px; height: 16px;"></i> Dashboard</a></li>
+                        <li><a class="dropdown-item d-flex align-items-center rounded" href="#" onclick="toggleTheme()"><i data-lucide="moon" class="me-3" style="width: 16px; height: 16px;"></i> Toggle Theme</a></li>
+                        <li><hr class="dropdown-divider" style="border-color: var(--border-color); margin: 8px 0;"></li>
+                        <li><a class="dropdown-item text-danger d-flex align-items-center rounded fw-bold" href="/logout"><i data-lucide="log-out" class="me-3" style="width: 16px; height: 16px;"></i> Log Out</a></li>
                     </ul>
                 </div>
             </div>
         </div>
 
-        <div class="workspace" id="documentContainer"></div>
+        <div class="workspace" id="workspaceContainer">
+            <div id="zoomWrapper">
+                <div id="documentContainer"></div>
+            </div>
+        </div>
+
+        <!-- Fixed Screen-Centered Bottom Zoom Pill centered specifically to the document viewing area -->
+        <div class="zoom-floating-pill d-print-none">
+            <button onclick="adjustZoom(-0.1)" title="Zoom Out">−</button>
+            <span id="zoomLevelDisplay">100%</span>
+            <button onclick="adjustZoom(0.1)" title="Zoom In">+</button>
+        </div>
     </div>
 
     {% if is_editable %}
     <div class="right-panel d-print-none">
         
         <div class="tabs-header d-flex border-bottom" style="border-color: var(--border-color) !important; flex-shrink: 0;">
-            <button class="tab-btn active flex-fill" onclick="switchTab('inventory')">🗃️ Inventory</button>
-            <button class="tab-btn flex-fill" onclick="switchTab('setup')">⚙️ Page</button>
+            <button class="tab-btn active flex-fill d-flex align-items-center justify-content-center" onclick="switchTab('inventory')"><i data-lucide="archive" class="me-2" style="width: 16px; height: 16px;"></i> Inventory</button>
+            <button class="tab-btn flex-fill d-flex align-items-center justify-content-center" onclick="switchTab('setup')"><i data-lucide="settings" class="me-2" style="width: 16px; height: 16px;"></i> Setup</button>
         </div>
         
         <div class="tab-content-container" style="flex-grow: 1; overflow-y: auto;">
             
+            <!-- INVENTORY TAB -->
             <div id="tab-inventory" class="tab-pane" style="display: block; padding: 24px;">
-                <label class="meta-label">Select Database</label>
-                <select id="dbSelect" class="db-select mb-2" onchange="fetchDatabase(this.value)">
+                <label class="ui-label">Select a database to view items</label>
+                <select id="dbSelect" class="db-select mb-3" onchange="fetchDatabase(this.value)">
                     <option value="" disabled selected>Choose a loaded catalog...</option>
                     {% for cat in catalogs %}
                     <option value="{{ cat.id }}">{{ cat.name }}</option>
                     {% endfor %}
                 </select>
 
-                <div class="mb-3 p-3 rounded" style="background: rgba(255, 255, 255, 0.03); border: 1px dashed var(--border-color);">
-                    <label class="meta-label">Quick Upload CSV</label>
+                <div class="mb-4 p-3 rounded-4" style="background: rgba(255, 255, 255, 0.03); border: 1px dashed var(--border-color);">
+                    <label class="ui-label">Dataset Name</label>
                     <form action="/upload_catalog" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="quote_id" value="{{ quote.id }}">
-                        <input type="text" name="catalog_name" class="form-control form-control-sm mb-2" style="background: var(--input-bg); color: var(--text-main); border: 1px solid var(--border-color);" placeholder="Dataset Name" required>
-                        <input type="file" name="csv_file" accept=".csv" class="form-control form-control-sm mb-2" style="background: var(--input-bg); color: var(--text-main); border: 1px solid var(--border-color);" required>
-                        <button type="submit" class="btn btn-sm w-100 fw-bold" style="background: var(--bg-card-hover); color: var(--text-main); border: 1px solid var(--border-hover);">Upload & Reload</button>
+                        <input type="text" name="catalog_name" class="form-control mb-2" placeholder="Dataset Name" required>
+                        <input type="file" name="csv_file" accept=".csv" class="form-control p-2 mb-1" required>
+                        <div class="mb-2 fw-semibold" style="font-size: 11px; color: #EF4444;">* only supports csv</div>
+                        <button type="submit" class="btn w-100 fw-bold rounded-pill mt-1" style="background: var(--bg-card-hover); color: var(--text-main); border: 1px solid var(--border-hover); font-size: 13px;">Upload & Reload</button>
                     </form>
                 </div>
 
-                <label class="meta-label">Dynamic Columns</label>
-                <div class="d-flex align-items-center gap-2 mt-1 p-2 rounded mb-2" style="background: var(--bg-card); border: 1px solid var(--border-color);">
-                    <button class="btn btn-sm border-0 px-3 fw-bold" style="color: var(--text-main); font-size: 16px; background: var(--bg-main);" onclick="changeColCount(-1)">-</button>
-                    <span id="colCountDisplay" style="color: var(--text-main);" class="small fw-bold flex-grow-1 text-center">2 Columns</span>
-                    <button class="btn btn-sm border-0 px-3 fw-bold" style="color: var(--text-main); font-size: 16px; background: var(--bg-main);" onclick="changeColCount(1)">+</button>
+                <label class="ui-label">Dynamic Columns</label>
+                <div class="d-flex align-items-center gap-2 mt-1 p-1 rounded-pill mb-3" style="background: var(--bg-card); border: 1px solid var(--border-color);">
+                    <button class="btn border-0 px-3 fw-bold rounded-pill" style="color: var(--text-main); font-size: 16px; background: rgba(255,255,255,0.05);" onclick="changeColCount(-1)">-</button>
+                    <span id="colCountDisplay" style="color: var(--text-main);" class="small fw-semibold flex-grow-1 text-center">2 Columns</span>
+                    <button class="btn border-0 px-3 fw-bold rounded-pill" style="color: var(--text-main); font-size: 16px; background: rgba(255,255,255,0.05);" onclick="changeColCount(1)">+</button>
                 </div>
                 
                 <div id="colMappingContainer" class="mb-4"></div>
 
-                <label class="meta-label">Drag or Click to Add</label>
+                <label class="ui-label">Drag or Click to Add</label>
                 <div id="inventoryList" style="padding-right: 4px;">
-                    <div class="text-muted small">Select a database to view items.</div>
+                    <div class="small p-3 text-center border rounded-4" style="color: var(--text-main); border-color: var(--border-color) !important; background: rgba(0,0,0,0.2);">Select a database to view items and columns.</div>
                 </div>
             </div>
 
+            <!-- SETUP TAB -->
             <div id="tab-setup" class="tab-pane" style="display: none; padding: 24px;">
                 <div class="mb-4 pb-4 border-bottom" style="border-color: var(--border-color) !important;">
-                    <label class="meta-label mb-2 text-primary">PAGE CONFIGURATION</label>
-                    <div class="d-flex align-items-center gap-2 mb-4 small" style="color: var(--text-main);">
-                        <input type="checkbox" id="pageNumberToggle" onchange="togglePageNumbers(this.checked)"> Print Page Numbers on PDF
+                    <label class="ui-label mb-3" style="color: #60A5FA;">PAGE CONFIGURATION</label>
+                    <div class="d-flex align-items-center gap-2 mb-3 small fw-medium" style="color: var(--text-main);">
+                        <input type="checkbox" id="pageNumberToggle" onchange="togglePageNumbers(this.checked)" style="accent-color: var(--accent-blue);"> Print Page Numbers on PDF
                     </div>
-
-                    <label class="meta-label mb-2 text-primary">TERMS & CONDITIONS PAGE</label>
-                    <div class="d-flex align-items-center gap-2 mb-3 small" style="color: var(--text-main);">
-                        <input type="checkbox" id="termsToggle" onchange="toggleTerms(this.checked)"> Enable T&C Page
-                    </div>
-                    <div id="termsConfig" style="display: none;">
-                        <label class="text-muted small mb-1">Insert at Page #</label>
-                        <input type="number" id="termsPageNum" class="db-select mb-0" min="1" onchange="updateTermsPage(this.value)">
-                    </div>
+                    <label class="ui-label mb-2">Document Currency</label>
+                    <select id="currencySelect" class="db-select mb-0 py-2" onchange="updateCurrency(this.value)">
+                        <option value="EUR">EUR (€)</option>
+                        <option value="USD">USD ($)</option>
+                        <option value="GBP">GBP (£)</option>
+                        <option value="INR">INR (₹)</option>
+                        <option value="CAD">CAD ($)</option>
+                        <option value="AUD">AUD ($)</option>
+                        <option value="CHF">CHF (CHF)</option>
+                        <option value="JPY">JPY (¥)</option>
+                    </select>
                 </div>
 
                 <div id="taxesConfigContainer"></div>
 
                 <div class="d-flex justify-content-between align-items-center mt-4 mb-2">
-                    <label class="meta-label mb-0">Brand Logo</label>
-                    <button class="btn btn-link text-danger p-0 text-decoration-none" style="font-size: 10px; font-weight: bold;" onclick="clearBase64('logo')">REMOVE</button>
+                    <label class="ui-label mb-0">Brand Logo</label>
+                    <button class="btn btn-link text-danger p-0 text-decoration-none" style="font-size: 10px; font-weight: bold; letter-spacing: 0.5px;" onclick="clearBase64('logo')">REMOVE</button>
                 </div>
-                <input type="file" id="logoUpload" class="db-select" accept="image/*" onchange="loadBase64(this, 'logo')">
+                <input type="file" id="logoUpload" class="db-select py-2" accept="image/*" onchange="loadBase64(this, 'logo')">
                 
-                <div class="d-flex justify-content-between align-items-center mt-2 mb-2">
-                    <label class="meta-label mb-0">Background Artwork</label>
-                    <button class="btn btn-link text-danger p-0 text-decoration-none" style="font-size: 10px; font-weight: bold;" onclick="clearBase64('bg')">REMOVE</button>
+                <div class="d-flex justify-content-between align-items-center mt-3 mb-2">
+                    <label class="ui-label mb-0">Background Artwork</label>
+                    <button class="btn btn-link text-danger p-0 text-decoration-none" style="font-size: 10px; font-weight: bold; letter-spacing: 0.5px;" onclick="clearBase64('bg')">REMOVE</button>
                 </div>
-                <input type="file" id="bgUpload" class="db-select" accept="image/*" onchange="loadBase64(this, 'bg')">
+                <input type="file" id="bgUpload" class="db-select py-2" accept="image/*" onchange="loadBase64(this, 'bg')">
                 
-                <label class="meta-label mt-2">Background Opacity</label>
-                <input type="range" id="bgOpacity" class="db-select p-0 border-0 bg-transparent" min="0.1" max="1" step="0.05" value="1" onchange="updateBgOpacity(this.value)">
+                <label class="ui-label mt-2">Background Opacity</label>
+                <input type="range" id="bgOpacity" class="w-100 mt-2" style="accent-color: var(--accent-blue);" min="0.1" max="1" step="0.05" value="1" onchange="updateBgOpacity(this.value)">
             </div>
 
         </div>
@@ -275,15 +540,15 @@
 <!-- Send Quote Modal -->
 <div class="modal fade d-print-none" id="sendModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold">Send to Client</h5>
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0 mt-2">
+                <h5 class="modal-title fw-bold brand-text fs-4" style="color: var(--text-main);">Send to Client</h5>
                 <button type="button" class="btn-close" style="filter: var(--invert-close, invert(1));" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">
-                <input type="text" id="clientSearch" class="form-control mb-3" placeholder="Search by @username or email..." onkeyup="searchClients()">
-                <div class="meta-label">Directory Results</div>
-                <div id="searchResults" style="max-height: 250px; overflow-y: auto;"></div>
+            <div class="modal-body py-4">
+                <input type="text" id="clientSearch" class="form-control mb-4" placeholder="Search by @username or email..." onkeyup="searchClients()">
+                <div class="ui-label mb-2" style="color: var(--text-main);">Directory Results</div>
+                <div id="searchResults" style="max-height: 250px; overflow-y: auto; padding: 2px;"></div>
             </div>
         </div>
     </div>
@@ -292,17 +557,17 @@
 <!-- Accept & Sign Modal -->
 <div class="modal fade d-print-none" id="acceptModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold">Review & Sign</h5>
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0 mt-2">
+                <h5 class="modal-title fw-bold brand-text fs-4" style="color: var(--text-main);">Review & Sign</h5>
                 <button type="button" class="btn-close" style="filter: var(--invert-close, invert(1));" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body text-center">
-                <p class="text-muted small mb-4">By signing, you officially accept the terms and totals of this document.</p>
+            <div class="modal-body text-center py-4">
+                <p class="small mb-4 fw-medium" style="color: var(--text-muted);">By signing, you officially accept the terms and totals of this document.</p>
                 
-                <div class="d-flex justify-content-center gap-2 mb-3">
-                    <button class="btn btn-sm btn-secondary text-white fw-bold" onclick="document.getElementById('typeSigBox').style.display='block'; document.getElementById('uploadSigBox').style.display='none'; sigType='text';">Type Name</button>
-                    <button class="btn btn-sm btn-outline-secondary text-white fw-bold" onclick="document.getElementById('typeSigBox').style.display='none'; document.getElementById('uploadSigBox').style.display='block'; sigType='image';">Upload Image</button>
+                <div class="d-flex justify-content-center gap-2 mb-4">
+                    <button class="btn btn-sm fw-bold px-4 rounded-pill" style="background: var(--bg-card-hover); color: var(--text-main); border: 1px solid var(--border-hover);" onclick="document.getElementById('typeSigBox').style.display='block'; document.getElementById('uploadSigBox').style.display='none'; sigType='text';">Type Name</button>
+                    <button class="btn btn-sm fw-bold px-4 rounded-pill" style="background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color);" onclick="document.getElementById('typeSigBox').style.display='none'; document.getElementById('uploadSigBox').style.display='block'; sigType='image';">Upload Image</button>
                 </div>
 
                 <div id="typeSigBox">
@@ -311,12 +576,12 @@
                 </div>
 
                 <div id="uploadSigBox" style="display: none;">
-                    <input type="file" id="sigFileInput" accept="image/*" class="form-control mb-2" onchange="previewSignature(this)">
-                    <img id="sigPreview" style="max-height: 100px; display: none; margin: 0 auto; border-radius: 4px; background: white; padding: 4px;">
+                    <input type="file" id="sigFileInput" accept="image/*" class="form-control p-2 mb-2" onchange="previewSignature(this)">
+                    <img id="sigPreview" style="max-height: 100px; display: none; margin: 0 auto; border-radius: 8px; background: white; padding: 4px;">
                 </div>
             </div>
-            <div class="modal-footer border-0 pt-0 mt-3">
-                <button type="button" class="btn btn-success w-100 fw-bold py-2 rounded-pill" onclick="submitSignature()">Confirm Acceptance</button>
+            <div class="modal-footer border-0 pt-0 mb-2 mt-2">
+                <button type="button" class="btn w-100 fw-bold py-3 rounded-pill text-white" style="background: #10B981; font-size: 15px;" onclick="submitSignature()">Confirm Acceptance</button>
             </div>
         </div>
     </div>
@@ -329,60 +594,56 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    function downloadQuotation() {
-        const container = document.getElementById('documentContainer');
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // Currency symbol mapping
+    const currencySymbols = {
+        'EUR': '€',
+        'USD': '$',
+        'GBP': '£',
+        'INR': '₹',
+        'CAD': '$',
+        'AUD': '$',
+        'CHF': 'CHF',
+        'JPY': '¥'
+    };
+
+    function getCurrencySymbol(code) {
+        return currencySymbols[code] || code;
+    }
+
+    // User Selected Currency from Settings or Document state
+    let userCurrency = "{{ user_settings.currency if user_settings and user_settings.currency else 'EUR' }}";
+
+    // Zoom Level Management
+    let currentZoom = 1.0;
+    function adjustZoom(delta) {
+        currentZoom = Math.round((currentZoom + delta) * 10) / 10;
+        if (currentZoom < 0.5) currentZoom = 0.5;
+        if (currentZoom > 2.0) currentZoom = 2.0;
         
-        const oldPadding = container.style.padding;
-        const oldBg = container.style.backgroundColor;
-        
-        container.style.padding = '0';
-        container.style.backgroundColor = '#ffffff';
+        document.getElementById('zoomWrapper').style.transform = `scale(${currentZoom})`;
+        document.getElementById('zoomLevelDisplay').innerText = Math.round(currentZoom * 100) + '%';
+    }
 
-        const noPrintElements = container.querySelectorAll('.d-print-none');
-        noPrintElements.forEach(el => el.style.display = 'none');
-
-        const pages = container.querySelectorAll('.page');
-        const expectedPagesCount = pages.length; // We know exactly how many pages SHOULD exist
-
-        pages.forEach((p, index) => {
-            p.style.marginBottom = '0';
-            p.style.boxShadow = 'none';
-            p.style.borderRadius = '0';
-            p.style.pageBreakAfter = (index === pages.length - 1) ? 'auto' : 'always';
-        });
-
-        const opt = {
-            margin:       0,
-            filename:     '{{ quote.client_name }}_Quotation.pdf',
-            image:        { type: 'jpeg', quality: 1.0 },
-            html2canvas:  { scale: 2, useCORS: true, logging: false, scrollY: 0 },
-            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-
-        // We use the PDF instance directly to delete any trailing empty pages caused by render bleeding
-        html2pdf().set(opt).from(container).toPdf().get('pdf').then((pdf) => {
-            const totalPagesGenerated = pdf.internal.getNumberOfPages();
-            
-            if (totalPagesGenerated > expectedPagesCount) {
-                // Loop backwards and delete all extra empty pages
-                for (let i = totalPagesGenerated; i > expectedPagesCount; i--) {
-                    pdf.deletePage(i);
+    // Fade & Roll Scroll Animation specifically for pages in the workspace
+    const scrollObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            const rect = entry.boundingClientRect;
+            if (entry.isIntersecting) {
+                entry.target.classList.remove('hidden-bottom', 'hidden-top');
+                entry.target.classList.add('visible');
+            } else {
+                entry.target.classList.remove('visible');
+                if (rect.top < 0) {
+                    entry.target.classList.add('hidden-top'); 
+                } else {
+                    entry.target.classList.add('hidden-bottom'); 
                 }
             }
-        }).save().then(() => {
-            // Restore UI Elements
-            container.style.padding = oldPadding;
-            container.style.backgroundColor = oldBg;
-            noPrintElements.forEach(el => el.style.display = '');
-            
-            pages.forEach(p => {
-                p.style.marginBottom = '';
-                p.style.boxShadow = '';
-                p.style.borderRadius = '';
-                p.style.pageBreakAfter = '';
-            });
         });
-    }
+    }, { threshold: 0.05 });
 
     window.switchTab = function(tabId) {
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -433,12 +694,6 @@
     let priceIdx = -1;
     let currentCatalogItems = [];
 
-    let termsState = { 
-        active: false, 
-        content: "<h3 style='margin-bottom: 24px;'>Terms & Conditions</h3><p>Enter your standard operating procedures, liability, and terms here...</p>", 
-        pageNum: 2 
-    };
-
     let headerState = {
         company_details: "Your Company Name<br>123 Business Rd<br>City, State ZIP",
         issued: "", 
@@ -451,25 +706,49 @@
     function renderTaxesSetup() {
         if(!isEditable) return;
         const container = document.getElementById('taxesConfigContainer');
-        let html = '<label class="meta-label mt-3 mb-2 text-primary">TAXES & FEES</label>';
+        let html = '<label class="ui-label mt-4 mb-3" style="color: #60A5FA;">TAXES & FEES</label>';
         documentTaxes.forEach((tax, idx) => {
             html += `
                 <div class="d-flex align-items-center gap-2 mb-2">
-                    <input type="text" class="form-control bg-dark text-white border-secondary border-opacity-50 form-control-sm" value="${tax.name}" onblur="updateTaxName(${idx}, this.value)">
-                    <input type="number" class="form-control bg-dark text-white border-secondary border-opacity-50 form-control-sm" value="${tax.rate}" step="0.1" style="width: 80px;" onblur="updateTaxRate(${idx}, this.value)">
-                    <span class="text-muted" style="font-size: 13px;">%</span>
-                    <button class="btn btn-sm text-danger border-0 px-2 shadow-none" onclick="removeTax(${idx})">×</button>
+                    <input type="text" id="taxName_${idx}" class="form-control form-control-sm py-2" value="${tax.name}" onblur="updateTaxName(${idx}, this.value)" onkeydown="handleTaxKeydown(event, ${idx})">
+                    <input type="number" id="taxRate_${idx}" class="form-control form-control-sm py-2" value="${tax.rate}" step="0.1" style="width: 80px;" onblur="updateTaxRate(${idx}, this.value)" onkeydown="handleTaxKeydown(event, ${idx})">
+                    <span class="fw-bold" style="font-size: 13px; color: var(--text-main);">%</span>
+                    <button class="btn btn-sm text-danger border-0 px-2 shadow-none fs-5 fw-bold" onclick="removeTax(${idx})">&times;</button>
                 </div>
             `;
         });
-        html += `<button class="btn btn-sm btn-outline-secondary w-100 mt-1 mb-3 text-white border-secondary border-opacity-50" onclick="addTax()">+ Add Tax Option</button>`;
+        html += `<button class="btn btn-sm w-100 mt-2 mb-3 fw-bold rounded-pill" style="background: var(--bg-card-hover); color: var(--text-main); border: 1px solid var(--border-hover);" onclick="addTax()">+ Add Tax Option</button>`;
         container.innerHTML = html;
     }
+
+    window.handleTaxKeydown = function(event, idx) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            const nameInput = document.getElementById(`taxName_${idx}`);
+            const rateInput = document.getElementById(`taxRate_${idx}`);
+            if (nameInput && rateInput) {
+                documentTaxes[idx].name = nameInput.value;
+                documentTaxes[idx].rate = parseFloat(rateInput.value) || 0;
+            }
+            nameInput.blur();
+            rateInput.blur();
+            renderWorkspace();
+            triggerSave();
+        }
+    };
 
     window.addTax = function() { if(isEditable) { documentTaxes.push({ name: 'New Tax', rate: 0 }); renderTaxesSetup(); renderWorkspace(); triggerSave(); } };
     window.updateTaxName = function(idx, val) { if(isEditable) { documentTaxes[idx].name = val; renderWorkspace(); triggerSave(); } };
     window.updateTaxRate = function(idx, val) { if(isEditable) { documentTaxes[idx].rate = parseFloat(val) || 0; renderWorkspace(); triggerSave(); } };
     window.removeTax = function(idx) { if(isEditable) { documentTaxes.splice(idx, 1); renderTaxesSetup(); renderWorkspace(); triggerSave(); } };
+
+    window.updateCurrency = function(val) {
+        if(isEditable) {
+            userCurrency = val;
+            renderWorkspace();
+            triggerSave();
+        }
+    };
 
     window.addBlankRow = function() {
         if(isEditable) {
@@ -489,12 +768,12 @@
                     <div class="client-search-result" onclick="dispatchQuote(${u.id})">
                         <div>
                             <div class="fw-bold" style="color: var(--text-main);">@${u.username}</div>
-                            <div class="small text-muted">${u.company_name || u.email}</div>
+                            <div class="small" style="color: var(--text-muted);">${u.company_name || u.email}</div>
                         </div>
-                        <div class="btn btn-sm btn-primary">Send</div>
+                        <div class="btn btn-sm rounded-pill fw-bold" style="background: var(--accent-blue); color: white;">Send</div>
                     </div>`;
             });
-            if(data.length === 0) box.innerHTML = '<div class="text-muted small">No users found.</div>';
+            if(data.length === 0) box.innerHTML = '<div class="small text-center p-3 border rounded-4" style="color: var(--text-muted); border-color: var(--border-color)!important; background: var(--input-bg);">No users found.</div>';
         });
     }
 
@@ -531,10 +810,6 @@
         .then(() => window.location.reload());
     }
 
-    function toggleTerms(isActive) { termsState.active = isActive; document.getElementById('termsConfig').style.display = isActive ? 'block' : 'none'; renderWorkspace(); triggerSave(); }
-    function updateTermsPage(val) { termsState.pageNum = parseInt(val) || 2; renderWorkspace(); triggerSave(); }
-    function updateTermsContent(html) { termsState.content = html; triggerSave(); }
-
     window.togglePageNumbers = function(isActive) { if(isEditable) { pageNumbersActive = isActive; renderWorkspace(); triggerSave(); } };
 
     function fetchDatabase(id) {
@@ -546,18 +821,21 @@
         availableCsvHeaders = headers;
         rawCatalogRows = rows;
         
-        nameIdx = headers.findIndex(h => {
+        nameIdx = headers.findIndex((h, idx) => {
+            if (idx === 0) return false;
             const hLow = h.toLowerCase();
-            return hLow.includes('name') || hLow.includes('title') || hLow.includes('item') || hLow.includes('desc');
+            return hLow.includes('name') || hLow.includes('title') || hLow.includes('desc');
         });
-        if (nameIdx === -1) nameIdx = 0; 
+        if (nameIdx === -1) {
+            nameIdx = headers.length > 1 ? 1 : 0;
+        }
 
         priceIdx = headers.findIndex(h => h.toLowerCase().includes('price') || h.toLowerCase().includes('cost'));
         if (priceIdx === -1) priceIdx = headers.length - 1;
 
         let availableForDynamic = [];
         for (let i = 0; i < headers.length; i++) {
-            if (i !== nameIdx && i !== priceIdx && !headers[i].toLowerCase().includes('sr')) availableForDynamic.push(i);
+            if (i !== nameIdx && i !== priceIdx && i !== 0 && !headers[i].toLowerCase().includes('sr')) availableForDynamic.push(i);
         }
 
         for(let i=0; i<4; i++) {
@@ -577,7 +855,7 @@
         if(!availableCsvHeaders.length) { container.innerHTML = ''; return; }
         let html = '';
         for(let i=0; i<numDynamicCols; i++) {
-            html += `<select class="db-select mb-2 py-2" style="font-size: 11px; background: var(--bg-card);" onchange="updateColMapping(${i}, this.value)">`;
+            html += `<select class="db-select mb-2 py-2" onchange="updateColMapping(${i}, this.value)">`;
             html += `<option value="-1">-- Manual Entry (Col ${i+1}) --</option>`;
             availableCsvHeaders.forEach((h, idx) => {
                 let sel = (csvColMapping[i] == idx) ? 'selected' : '';
@@ -622,11 +900,12 @@
 
         const list = document.getElementById('inventoryList');
         list.innerHTML = '';
+        const symbol = getCurrencySymbol(userCurrency);
         currentCatalogItems.forEach((item, index) => {
             list.innerHTML += `
                 <div class="inventory-item" draggable="true" ondragstart="onDragStartPanel(event, ${index})" onclick="toggleItemInQuote(${index})">
-                    <div class="inv-name" title="${item.name}">${item.name}</div>
-                    <div class="inv-price">$${item.price.toFixed(2)}</div>
+                    <div class="inv-name fw-semibold" title="${item.name}">${item.name}</div>
+                    <div class="inv-price fw-bold" style="color: var(--text-muted);">${symbol} ${item.price.toFixed(2)}</div>
                 </div>
             `;
         });
@@ -722,11 +1001,11 @@
             if(parsed.header) headerState = { ...headerState, ...parsed.header };
             if(parsed.headers) dynamicHeaders = parsed.headers;
             if(parsed.numCols !== undefined) numDynamicCols = parsed.numCols;
-            if(parsed.termsState) termsState = parsed.termsState;
             
             logoDataUrl = parsed.logo || ''; bgDataUrl = parsed.bg || '';
             bgOpacityVal = parsed.bgOpacity || 1;
             
+            if(parsed.currency) userCurrency = parsed.currency;
             if(parsed.pageNumbersActive !== undefined) pageNumbersActive = parsed.pageNumbersActive;
 
             if(parsed.taxes !== undefined) {
@@ -738,10 +1017,9 @@
             if(isEditable) {
                 document.getElementById('bgOpacity').value = bgOpacityVal;
                 document.getElementById('colCountDisplay').innerText = numDynamicCols + ' Columns';
-                document.getElementById('termsToggle').checked = termsState.active;
-                document.getElementById('termsConfig').style.display = termsState.active ? 'block' : 'none';
-                document.getElementById('termsPageNum').value = termsState.pageNum;
                 document.getElementById('pageNumberToggle').checked = pageNumbersActive;
+                const currSel = document.getElementById('currencySelect');
+                if(currSel) currSel.value = userCurrency;
             }
         } else {
             documentPages.push({ id: 'page-1', items: [] });
@@ -812,9 +1090,9 @@
         if(!isEditable) return;
         const payload = {
             pages: documentPages, header: headerState, headers: dynamicHeaders,
-            numCols: numDynamicCols, termsState: termsState, logo: logoDataUrl, 
+            numCols: numDynamicCols, logo: logoDataUrl, 
             bg: bgDataUrl, bgOpacity: bgOpacityVal, taxes: documentTaxes,
-            pageNumbersActive: pageNumbersActive
+            currency: userCurrency, pageNumbersActive: pageNumbersActive
         };
         fetch(`/save_quote/{{ quote.id }}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ document_data: JSON.stringify(payload) }) });
     }
@@ -848,9 +1126,10 @@
         const items = documentPages[0].items;
         
         let ce = isEditable ? 'contenteditable="true"' : '';
+        const symbol = getCurrencySymbol(userCurrency);
         
         const ITEMS_FIRST_PAGE = 7; 
-        const ITEMS_PER_PAGE = 13;
+        const ITEMS_PER_PAGE = 10;
 
         let totalTablePages = 1;
         if (items.length > ITEMS_FIRST_PAGE) {
@@ -885,15 +1164,15 @@
                         <td><div class="item-name" ${ce} onblur="updateRowField(${item.originalIndex}, 'name', this.innerText)">${item.name}</div></td>
                         ${dynamicTds}
                         <td class="text-center" style="padding-left: 12px;" ${ce} onblur="updateItemQty(${item.originalIndex}, this.innerText)">${item.qty}</td>
-                        <td class="text-end" style="padding-left: 12px;" ${ce} onblur="updateItemPrice(${item.originalIndex}, this.innerText)">$${item.price.toFixed(2)}</td>
-                        <td class="text-end fw-bold" style="padding-left: 12px;">$${total.toFixed(2)}</td>
+                        <td class="text-end" style="padding-left: 12px;" ${ce} onblur="updateItemPrice(${item.originalIndex}, this.innerText)">${symbol} ${item.price.toFixed(2)}</td>
+                        <td class="text-end fw-bold" style="padding-left: 12px;">${symbol} ${total.toFixed(2)}</td>
                         <td class="d-print-none text-center align-middle" style="width: 32px; padding: 0;"><button class="delete-btn" title="Delete Row" onclick="deleteRow(${item.originalIndex})">&times;</button></td>
                     </tr>
                 `;
             });
 
             if (p === totalTablePages - 1 && isEditable) {
-                rowsHtml += `<tr class="d-print-none"><td colspan="100%" style="padding: 16px 0;" ondragover="onDragOverTable(event)" ondragleave="onDragLeaveTable(event)" ondrop="onDropTableZone(event)"><div id="mainDropZone" style="border: 1px dashed #CBD5E1; color: #64748B; border-radius: 8px; text-align: center; padding: 12px; font-weight: 600; font-size: 11px; cursor: pointer; transition: 0.2s;" onclick="addBlankRow()">+ Drop item here or click to add a blank row</div></td></tr>`;
+                rowsHtml += `<tr class="d-print-none"><td colspan="100%" style="padding: 16px 0;" ondragover="onDragOverTable(event)" ondragleave="onDragLeaveTable(event)" ondrop="onDropTableZone(event)"><div id="mainDropZone" style="border: 1px dashed #CBD5E1; color: #64748B; border-radius: 8px; text-align: center; padding: 12px; font-weight: 600; font-size: 12px; cursor: pointer; transition: 0.2s;" onclick="addBlankRow()">+ Drop item here or click to add a blank row</div></td></tr>`;
             }
 
             let dynamicThs = '';
@@ -907,8 +1186,8 @@
                         <th style="width: auto;">ITEM</th>
                         ${dynamicThs}
                         <th class="text-center" style="width: 8%; padding-left: 12px; white-space: nowrap;">QTY</th>
-                        <th class="text-end" style="width: 14%; padding-left: 12px; white-space: nowrap;">RATE</th>
-                        <th class="text-end" style="width: 14%; padding-left: 12px; white-space: nowrap;">TOTAL</th>
+                        <th class="text-end" style="width: 14%; padding-left: 12px; white-space: nowrap;">RATE (${symbol})</th>
+                        <th class="text-end" style="width: 14%; padding-left: 12px; white-space: nowrap;">TOTAL (${symbol})</th>
                         <th class="d-print-none" style="width: 32px;"></th>
                     </tr>
                 </thead>
@@ -916,13 +1195,6 @@
             </table>`;
             
             pagesContent.push({ type: 'table', content: tableHtml, pageTotal: pageTotal });
-        }
-
-        if (termsState.active) {
-            let termsHtml = `<div style="flex-grow: 1; outline: none; color: #0F172A; font-size: 13px; line-height: 1.6;" ${ce} onblur="updateTermsContent(this.innerHTML)">${termsState.content}</div>`;
-            let targetIndex = Math.max(0, termsState.pageNum - 1);
-            if (targetIndex >= pagesContent.length) pagesContent.push({ type: 'terms', content: termsHtml, pageTotal: 0 });
-            else pagesContent.splice(targetIndex, 0, { type: 'terms', content: termsHtml, pageTotal: 0 });
         }
 
         let finalHtml = '';
@@ -943,22 +1215,21 @@
             let block = pagesContent[i];
             
             let headerHtml = '';
-            let isFullHeader = (i === 0 || block.type === 'terms' || i === firstTableIdx);
+            let isFullHeader = (i === 0 || i === firstTableIdx);
 
-            let editorPageBadge = `<div class="d-print-none" style="position: absolute; top: 16px; right: 16px; background: #F8FAFC; color: #64748B; border: 1px solid #E2E8F0; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; z-index: 50; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">Page ${i + 1} of ${finalTotalPages}</div>`;
+            let editorPageBadge = `<div class="d-print-none" style="position: absolute; top: 16px; right: 16px; background: #F8FAFC; color: #64748B; border: 1px solid #E2E8F0; padding: 6px 12px; border-radius: 100px; font-size: 11px; font-weight: 700; z-index: 50; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">Page ${i + 1} of ${finalTotalPages}</div>`;
             
-            // Render only the numeral for printed page numbers
             let printPageBadge = pageNumbersActive ? `<div style="position: absolute; bottom: 10mm; left: 0; right: 0; text-align: center; font-size: 10px; color: #94A3B8; font-weight: 600;">${i + 1}</div>` : '';
 
             if (isFullHeader) {
-                const logoHtml = logoDataUrl ? `<img src="${logoDataUrl}" style="max-height: 150px; max-width: 250px; width: auto; border-radius: 2px; object-fit: contain;">` : `<div style="width: 56px; height: 56px; background: #0F172A; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold;">Q</div>`;
+                const logoHtml = logoDataUrl ? `<img src="${logoDataUrl}" style="max-height: 150px; max-width: 250px; width: auto; border-radius: 2px; object-fit: contain;">` : `<div style="width: 56px; height: 56px; background: #0F172A; color: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 700; font-family: inherit;">Q</div>`;
                 
                 headerHtml = `
                     <div class="d-flex justify-content-between align-items-start mb-3">
                         <div>${logoHtml}</div>
                         <div class="text-end">
                             <div style="font-size: 10px; font-weight: 700; color: #94A3B8; letter-spacing: 1px;">QUOTATION</div>
-                            <div style="font-size: 18px; font-weight: 800; color: #0F172A;" ${ce} onblur="updateHeader('quote_id', this.innerText)">${headerState.quote_id}</div>
+                            <div style="font-size: 18px; font-weight: 700; color: #0F172A;" ${ce} onblur="updateHeader('quote_id', this.innerText)">${headerState.quote_id}</div>
                             <div class="mt-2 text-end" ${ce} style="font-size: 12px; color: #64748B; line-height: 1.4; border: 1px dashed transparent; padding: 2px; min-width: 200px;" onblur="updateHeader('company_details', this.innerHTML)">
                                 ${headerState.company_details}
                             </div>
@@ -971,7 +1242,7 @@
                              <div class="doc-h1" ${ce} style="border: 1px dashed transparent; overflow-wrap: break-word; word-wrap: break-word; line-height: 1.1; padding-bottom: 8px;" onblur="updateHeader('project_name', this.innerText)">
                                  {{ quote.client_name }}
                              </div>
-                             <div class="mt-2 text-muted" ${ce} style="font-size: 13px; font-weight: 500;" onblur="updateHeader('client_details', this.innerHTML)">${headerState.client_details}</div>
+                             <div class="mt-2 text-muted" ${ce} style="font-size: 13.5px; font-weight: 500;" onblur="updateHeader('client_details', this.innerHTML)">${headerState.client_details}</div>
                         </div>
                         <div class="d-flex gap-4 flex-shrink-0 align-items-end" style="padding-top: 10px;">
                              <div class="meta-col text-end"><div class="meta-label">ISSUED</div><div class="meta-value no-wrap" ${ce} onblur="updateHeader('issued', this.innerText)">${headerState.issued}</div></div>
@@ -984,7 +1255,7 @@
                 headerHtml = `
                     <div class="d-flex justify-content-between align-items-end mb-4 pb-3" style="border-bottom: 2px solid #E2E8F0;">
                         <div>
-                            <div style="font-size: 16px; font-weight: 800; color: #0F172A;">{{ quote.client_name }}</div>
+                            <div style="font-size: 16px; font-weight: 700; color: #0F172A;">{{ quote.client_name }}</div>
                             <div style="font-size: 12px; font-weight: 600; color: #64748B; margin-top: 4px;">${subtext}</div>
                         </div>
                     </div>
@@ -996,22 +1267,22 @@
             
             if (!isLastFinancialPage) {
                 if (block.type === 'table') {
-                    dynamicTotalsHtml += `<div class="totals-row"><span>Page Subtotal</span><span class="text-dark fw-bold">$${block.pageTotal.toFixed(2)}</span></div>`;
+                    dynamicTotalsHtml += `<div class="totals-row"><span>Page Subtotal</span><span class="text-dark fw-bold">${symbol} ${block.pageTotal.toFixed(2)}</span></div>`;
                 }
             } else {
                 if (block.type === 'table' && finalTotalPages > 1) {
-                    dynamicTotalsHtml += `<div class="totals-row"><span>Page Subtotal</span><span class="text-dark fw-bold">$${block.pageTotal.toFixed(2)}</span></div>`;
-                    dynamicTotalsHtml += `<div class="totals-row mt-2 pt-2" style="border-top: 1px solid rgba(226, 232, 240, 0.8);"><span>Subtotal (All Pages)</span><span class="text-dark fw-bold">$${documentSubtotal.toFixed(2)}</span></div>`;
+                    dynamicTotalsHtml += `<div class="totals-row"><span>Page Subtotal</span><span class="text-dark fw-bold">${symbol} ${block.pageTotal.toFixed(2)}</span></div>`;
+                    dynamicTotalsHtml += `<div class="totals-row mt-2 pt-2" style="border-top: 1px solid rgba(226, 232, 240, 0.8);"><span>Subtotal</span><span class="text-dark fw-bold">${symbol} ${documentSubtotal.toFixed(2)}</span></div>`;
                 } else {
-                    dynamicTotalsHtml += `<div class="totals-row"><span>Subtotal</span><span class="text-dark fw-bold">$${documentSubtotal.toFixed(2)}</span></div>`;
+                    dynamicTotalsHtml += `<div class="totals-row"><span>Subtotal</span><span class="text-dark fw-bold">${symbol} ${documentSubtotal.toFixed(2)}</span></div>`;
                 }
 
                 documentTaxes.forEach(t => {
                     let amt = documentSubtotal * (t.rate / 100);
-                    dynamicTotalsHtml += `<div class="totals-row"><span>${t.name} ${t.rate}%</span><span class="text-dark fw-bold">$${amt.toFixed(2)}</span></div>`;
+                    dynamicTotalsHtml += `<div class="totals-row"><span>${t.name} ${t.rate}%</span><span class="text-dark fw-bold">${symbol} ${amt.toFixed(2)}</span></div>`;
                 });
                 
-                dynamicTotalsHtml += `<div class="totals-row grand"><span>Grand Total</span><span>$${documentGrandTotal.toFixed(2)}</span></div>`;
+                dynamicTotalsHtml += `<div class="totals-row grand"><span>Grand Total</span><span>${symbol} ${documentGrandTotal.toFixed(2)}</span></div>`;
             }
 
             let footerHtml = `
@@ -1031,7 +1302,7 @@
 
             const bgStyle = bgDataUrl ? `style="background-image: url('${bgDataUrl}'); opacity: ${bgOpacityVal};"` : '';
             finalHtml += `
-                <div class="page">
+                <div class="page scroll-section hidden-bottom">
                     <div class="bg-layer" ${bgStyle}></div>
                     <div class="content-layer">
                         ${editorPageBadge}
@@ -1045,8 +1316,17 @@
         }
 
         container.innerHTML = finalHtml;
+        
         if(isEditable) updateInventoryHighlights();
+        
+        document.querySelectorAll('.page').forEach(page => {
+            scrollObserver.observe(page);
+        });
+
+        lucide.createIcons();
     }
 </script>
+<!-- Include CryptoManager -->
+<script src="{{ url_for('static', filename='crypto.js') }}"></script>
 </body>
 </html>

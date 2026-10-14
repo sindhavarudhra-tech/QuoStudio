@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Settings & Privacy - QuoStudio</title>
+    
+    <link href="https://api.fontshare.com/v2/css?f[]=clash-grotesk@400,500,600,700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        :root {
+            --bg-nav: rgba(11, 15, 25, 0.4);
+            --bg-card: rgba(17, 24, 39, 0.6);
+            --bg-card-hover: rgba(30, 41, 59, 0.8);
+            --text-main: #ffffff;
+            --text-muted: #94A3B8;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(37, 99, 235, 0.4);
+            --modal-bg: rgba(17, 24, 39, 0.95);
+            --input-bg: rgba(11, 15, 25, 0.5);
+            --blur-val: blur(30px) saturate(150%);
+            --accent-blue: #2563EB;
+        }
+
+        body.light-theme {
+            --bg-nav: rgba(255, 255, 255, 0.5);
+            --bg-card: rgba(255, 255, 255, 0.7);
+            --bg-card-hover: rgba(255, 255, 255, 0.95);
+            --text-main: #0F172A;
+            --text-muted: #64748B;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --border-hover: rgba(37, 99, 235, 0.3);
+            --modal-bg: rgba(255, 255, 255, 0.98);
+            --input-bg: rgba(255, 255, 255, 0.6);
+        }
+
+        body { 
+            background-color: transparent; 
+            color: var(--text-main); 
+            font-family: 'Geist', -apple-system, sans-serif; 
+            overflow-x: hidden;
+            transition: color 0.3s ease;
+        }
+
+        h1, h2, h3, h4, h5, h6, .brand-text { font-family: 'Clash Grotesk', sans-serif; }
+
+        .cinematic-bg {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -1;
+            background-image: linear-gradient(to bottom, rgba(11, 15, 25, 0.93), rgba(11, 15, 25, 0.93)), url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop');
+            background-size: cover; background-position: center; pointer-events: none; transition: 0.3s ease;
+        }
+
+        body.light-theme .cinematic-bg {
+            background-image: linear-gradient(to bottom, rgba(241, 245, 249, 0.93), rgba(241, 245, 249, 0.93)), url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop');
+        }
+
+        .navbar { 
+            background: var(--bg-nav); 
+            backdrop-filter: var(--blur-val); 
+            -webkit-backdrop-filter: var(--blur-val);
+            border-bottom: 1px solid var(--border-color); 
+            padding: 16px 32px; 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+        }
+
+        .settings-sidebar {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 24px;
+            height: fit-content;
+        }
+
+        .settings-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            color: var(--text-muted);
+            font-weight: 500;
+            border-radius: 14px;
+            text-decoration: none;
+            transition: 0.2s;
+            margin-bottom: 8px;
+            border: 1px solid transparent;
+        }
+        .settings-nav-link:hover {
+            color: var(--text-main);
+            background: rgba(255,255,255,0.04);
+        }
+        .settings-nav-link.active {
+            color: var(--text-main);
+            background: rgba(37,99,235,0.15);
+            border-color: rgba(37,99,235,0.3);
+            font-weight: 600;
+        }
+
+        .settings-card { 
+            background: var(--bg-card); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color); 
+            border-radius: 24px; 
+            padding: 40px; 
+            box-shadow: 0 20px 40px -15px rgba(0,0,0,0.3);
+        }
+        
+        .form-control, .form-select { 
+            background-color: var(--input-bg) !important; 
+            color: var(--text-main) !important; 
+            border: 1px solid var(--border-color); 
+            padding: 14px 18px; 
+            border-radius: 14px; 
+            font-size: 15px;
+            transition: 0.3s;
+        }
+        .form-control:focus, .form-select:focus { 
+            border-color: var(--accent-blue); 
+            box-shadow: 0 0 0 4px rgba(37,99,235,0.15); 
+        }
+        .form-control:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .ui-label { 
+            font-size: 11px; 
+            font-weight: 700; 
+            color: #60A5FA; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            margin-bottom: 8px; 
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .btn-primary-custom { 
+            background-color: var(--accent-blue); 
+            border: none; 
+            font-weight: 600; 
+            padding: 14px 28px; 
+            border-radius: 14px; 
+            color: white; 
+            transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1); 
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-primary-custom:hover { 
+            background-color: #1D4ED8; 
+            transform: translateY(-2px); 
+            box-shadow: 0 10px 25px rgba(37,99,235,0.4); 
+        }
+        
+        .btn-outline-danger-custom { 
+            background: rgba(239, 68, 68, 0.08); 
+            color: #EF4444; 
+            border: 1px solid rgba(239, 68, 68, 0.3); 
+            border-radius: 14px; 
+            font-weight: 600; 
+            padding: 12px 24px; 
+            transition: 0.2s ease; 
+        }
+        .btn-outline-danger-custom:hover { 
+            background: #EF4444; 
+            color: white; 
+            transform: translateY(-1px);
+        }
+
+        .action-row {
+            background: rgba(0,0,0,0.15);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            transition: 0.2s;
+        }
+        .action-row:hover {
+            border-color: rgba(255,255,255,0.15);
+            background: rgba(0,0,0,0.25);
+        }
+        
+        .modal-content {
+            background-color: var(--modal-bg) !important;
+            backdrop-filter: blur(30px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            color: var(--text-main);
+        }
+
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+    <div class="cinematic-bg"></div>
+
+    <nav class="navbar d-flex justify-content-between align-items-center">
+        <a href="/dashboard" class="d-flex align-items-center gap-3 text-decoration-none" style="color: var(--text-main);">
+            <div style="width: 32px; height: 32px; background: var(--accent-blue); color: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; font-family: 'Clash Grotesk', sans-serif;">Q</div>
+            <strong class="fs-5 brand-text" style="letter-spacing: -0.02em;">QuoStudio Settings</strong>
+        </a>
+        <a href="/dashboard" class="btn btn-sm btn-outline-secondary rounded-pill px-4" style="color: var(--text-main); border-color: var(--border-color); font-weight: 500;">&larr; Back to Dashboard</a>
+    </nav>
+
+    <div class="container mt-5" style="max-width: 1100px; padding-bottom: 120px;">
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} border-0 mb-4 rounded-4 shadow-sm" style="background: var(--bg-card); color: var(--text-main); border-left: 5px solid {{ '#EF4444' if category == 'error' else '#10B981' }} !important; backdrop-filter: blur(12px); padding: 20px;">
+                <div class="d-flex align-items-center gap-3">
+                    <i data-lucide="{{ 'alert-circle' if category == 'error' else 'check-circle-2' }}" style="width: 24px; height: 24px; color: {{ '#EF4444' if category == 'error' else '#10B981' }};"></i>
+                    <div>{{ message }}</div>
+                </div>
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <div class="row gx-4">
+            <!-- Sidebar Navigation -->
+            <div class="col-lg-3 mb-4 mb-lg-0">
+                <div class="settings-sidebar">
+                    <div class="small fw-bold text-uppercase px-3 mb-3" style="color: var(--text-muted); letter-spacing: 1px; font-size: 10px;">Account</div>
+                    <a href="#" class="settings-nav-link active" onclick="switchTab(event, 'profileTab')">
+                        <i data-lucide="user" style="width: 18px; height: 18px;"></i> Profile Details
+                    </a>
+                    
+                    <div class="small fw-bold text-uppercase px-3 mt-4 mb-3" style="color: var(--text-muted); letter-spacing: 1px; font-size: 10px;">Preferences</div>
+                    <a href="#" class="settings-nav-link" onclick="switchTab(event, 'appearanceTab')">
+                        <i data-lucide="palette" style="width: 18px; height: 18px;"></i> Appearance
+                    </a>
+                    <a href="#" class="settings-nav-link" onclick="switchTab(event, 'notificationsTab')">
+                        <i data-lucide="bell" style="width: 18px; height: 18px;"></i> Notifications
+                    </a>
+
+                    <div class="small fw-bold text-uppercase px-3 mt-4 mb-3" style="color: var(--text-muted); letter-spacing: 1px; font-size: 10px;">System & Security</div>
+                    <a href="#" class="settings-nav-link" onclick="switchTab(event, 'securityTab')">
+                        <i data-lucide="shield-check" style="width: 18px; height: 18px;"></i> Security & Password
+                    </a>
+                    <a href="#" class="settings-nav-link" onclick="switchTab(event, 'privacyTab')">
+                        <i data-lucide="lock" style="width: 18px; height: 18px;"></i> Data & Privacy
+                    </a>
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="col-lg-9">
+                
+                <!-- 1. Profile Details Tab -->
+                <div id="profileTab" class="tab-pane active settings-card">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <div class="d-flex align-items-center gap-3">
+                            <div style="width: 48px; height: 48px; background: rgba(37,99,235,0.15); color: var(--accent-blue); border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="user-cog" style="width: 24px; height: 24px;"></i>
+                            </div>
+                            <div>
+                                <h3 class="brand-text m-0 fs-3">Profile Details</h3>
+                                <p class="small m-0" style="color: var(--text-muted);">Manage your public account identity and credentials.</p>
+                            </div>
+                        </div>
+                        
+                        <button type="button" id="unlockBtn" class="btn btn-sm btn-outline-primary rounded-pill px-4 py-2 fw-semibold d-flex align-items-center gap-2" onclick="openPasswordConfirmModal()" style="border-color: var(--accent-blue); color: var(--accent-blue);">
+                            <i data-lucide="lock" style="width: 14px; height: 14px;"></i> Unlock to Edit
+                        </button>
+                    </div>
+                    
+                    <form action="/settings" method="POST" id="profileForm">
+                        <div class="mb-4">
+                            <label class="ui-label"><i data-lucide="mail" style="width: 14px; height: 14px;"></i> Email Address</label>
+                            <input type="text" class="form-control" value="{{ profile.email }}" disabled style="opacity: 0.6; cursor: not-allowed;">
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label class="ui-label"><i data-lucide="at-sign" style="width: 14px; height: 14px;"></i> Username</label>
+                                <input type="text" name="username" id="usernameInput" class="form-control profile-field" value="{{ profile.username }}" disabled required>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label class="ui-label"><i data-lucide="building-2" style="width: 14px; height: 14px;"></i> Company Name</label>
+                                <input type="text" name="company_name" id="companyInput" class="form-control profile-field" value="{{ profile.company_name or '' }}" placeholder="e.g. Acme Corporation" disabled>
+                            </div>
+                        </div>
+                        
+                        <div id="saveBtnContainer" style="display: none;">
+                            <button type="submit" class="btn-primary-custom w-100 mt-2">
+                                <i data-lucide="save" style="width: 18px; height: 18px;"></i> Save Profile Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- 2. Appearance Tab -->
+                <div id="appearanceTab" class="tab-pane settings-card">
+                    <div class="d-flex align-items-center gap-3 mb-4">
+                        <div style="width: 48px; height: 48px; background: rgba(37,99,235,0.15); color: var(--accent-blue); border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="palette" style="width: 24px; height: 24px;"></i>
+                        </div>
+                        <div>
+                            <h3 class="brand-text m-0 fs-3">Appearance</h3>
+                            <p class="small m-0" style="color: var(--text-muted);">Customize your workspace theme and visual interface.</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="ui-label"><i data-lucide="moon" style="width: 14px; height: 14px;"></i> Theme Preference</label>
+                        <select id="themeSelect" class="form-select" onchange="applyThemePreference(this.value)">
+                            <option value="dark">Dark Mode</option>
+                            <option value="light">Light Mode</option>
+                        </select>
+                        <small style="color: var(--text-muted); font-size: 12px; margin-top: 8px; display: block;">Changes apply instantly across all QuoStudio views and quotation editor.</small>
+                    </div>
+                </div>
+
+                <!-- 3. Notifications Tab -->
+                <div id="notificationsTab" class="tab-pane settings-card">
+                    <div class="d-flex align-items-center gap-3 mb-4">
+                        <div style="width: 48px; height: 48px; background: rgba(37,99,235,0.15); color: var(--accent-blue); border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="bell" style="width: 24px; height: 24px;"></i>
+                        </div>
+                        <div>
+                            <h3 class="brand-text m-0 fs-3">Notifications</h3>
+                            <p class="small m-0" style="color: var(--text-muted);">Manage alert preferences for quote acceptances and messages.</p>
+                        </div>
+                    </div>
+
+                    <form action="/update_general_settings" method="POST">
+                        <input type="hidden" name="currency" value="{{ profile.currency or 'EUR' }}">
+                        <input type="hidden" name="date_format" value="{{ profile.date_format or 'DD/MM/YYYY' }}">
+                        <input type="hidden" name="quote_validity" value="{{ profile.quote_validity or 30 }}">
+                        <input type="hidden" name="tax_rate" value="{{ profile.tax_rate or 19.0 }}">
+
+                        <div class="d-flex flex-column gap-3 mb-4">
+                            <div class="form-check form-switch d-flex align-items-center gap-3 p-0">
+                                <input class="form-check-input m-0" type="checkbox" name="notif_quote_accepted" id="notifQuoteAccepted" value="1" {{ 'checked' if profile.notif_quote_accepted is not false else '' }} style="width: 44px; height: 22px; cursor: pointer;">
+                                <label class="form-check-label fw-medium m-0" for="notifQuoteAccepted" style="cursor: pointer; font-size: 15px;">Quote Accepted Alerts (Notify when a client signs & accepts a quotation)</label>
+                            </div>
+                            <div class="form-check form-switch d-flex align-items-center gap-3 p-0">
+                                <input class="form-check-input m-0" type="checkbox" name="notif_new_messages" id="notifNewMessages" value="1" {{ 'checked' if profile.notif_new_messages is not false else '' }} style="width: 44px; height: 22px; cursor: pointer;">
+                                <label class="form-check-label fw-medium m-0" for="notifNewMessages" style="cursor: pointer; font-size: 15px;">New Message Alerts (Notify when you receive a chat message)</label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-primary-custom w-100 mt-2">
+                            <i data-lucide="save" style="width: 18px; height: 18px;"></i> Save Notification Preferences
+                        </button>
+                    </form>
+                </div>
+
+                <!-- 4. Security & Password Tab -->
+                <div id="securityTab" class="tab-pane settings-card">
+                    <div class="d-flex align-items-center gap-3 mb-4">
+                        <div style="width: 48px; height: 48px; background: rgba(37,99,235,0.15); color: var(--accent-blue); border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="shield-check" style="width: 24px; height: 24px;"></i>
+                        </div>
+                        <div>
+                            <h3 class="brand-text m-0 fs-3">Security & Password</h3>
+                            <p class="small m-0" style="color: var(--text-muted);">Manage your account password and authentication credentials.</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="ui-label"><i data-lucide="key" style="width: 14px; height: 14px;"></i> Current Password</label>
+                        <div class="d-flex gap-2 align-items-center">
+                            <input type="password" class="form-control flex-grow-1" value="••••••••••••" disabled style="opacity: 0.6; cursor: not-allowed; letter-spacing: 2px;">
+                            <a href="/forgot-password" class="btn btn-outline-secondary rounded-pill px-4 py-3 d-flex align-items-center gap-2" style="border-color: var(--border-color); color: var(--text-main); font-weight: 500;">
+                                <i data-lucide="key-round" style="width: 16px; height: 16px;"></i> Change Password
+                            </a>
+                        </div>
+                        <small style="color: var(--text-muted); font-size: 12px; margin-top: 8px; display: block;">Clicking change password will send a secure password reset link to your verified email address.</small>
+                    </div>
+                </div>
+
+                <!-- 5. Data & Privacy (GDPR) Tab -->
+                <div id="privacyTab" class="tab-pane settings-card" style="border-color: rgba(239, 68, 68, 0.25);">
+                    <div class="d-flex align-items-center gap-3 mb-4">
+                        <div style="width: 48px; height: 48px; background: rgba(239, 68, 68, 0.1); color: #EF4444; border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="shield-alert" style="width: 24px; height: 24px;"></i>
+                        </div>
+                        <div>
+                            <h3 class="brand-text m-0 fs-3 text-danger">Data & Privacy (GDPR Compliance)</h3>
+                            <p class="small m-0" style="color: var(--text-muted);">Exercise your rights under the EU General Data Protection Regulation.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex flex-column gap-3">
+                        <div class="action-row">
+                            <div>
+                                <div class="fw-bold mb-1" style="font-size: 16px;">Export My Data</div>
+                                <div class="small" style="color: var(--text-muted); max-width: 450px;">Download a complete JSON copy of all your quotation records, inventory catalogs, messages, and profile information.</div>
+                            </div>
+                            <a href="/export_data" class="btn btn-sm btn-outline-light rounded-pill px-4 py-2 fw-semibold" download="quostudio_data_export.json" style="border-color: var(--border-color);">
+                                <i data-lucide="download" style="width: 14px; height: 14px; margin-right: 4px;"></i> Export JSON
+                            </a>
+                        </div>
+
+                        <div class="action-row" style="background: rgba(239, 68, 68, 0.04); border-color: rgba(239, 68, 68, 0.2);">
+                            <div>
+                                <div class="fw-bold mb-1 text-danger" style="font-size: 16px;">Right to be Forgotten (Account Deletion)</div>
+                                <div class="small" style="color: var(--text-muted); max-width: 450px;">Permanently and irreversibly wipe your account, quotations, messages, and inventory catalogs from our servers.</div>
+                            </div>
+                            <form action="/delete_account" method="POST" onsubmit="return confirm('WARNING: This action is completely irreversible. All your quotations, encrypted drafts, and uploaded databases will be permanently destroyed. Proceed?');">
+                                <button type="submit" class="btn-outline-danger-custom">
+                                    <i data-lucide="trash-2" style="width: 16px; height: 16px; margin-right: 4px;"></i> Delete Account
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Password Confirmation Modal -->
+    <div class="modal fade" id="passwordConfirmModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content p-4">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold brand-text fs-4" style="color: var(--text-main);">Confirm Your Password</h5>
+                    <button type="button" class="btn-close" style="filter: var(--invert-close, invert(1));" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body py-4">
+                    <p class="small mb-3" style="color: var(--text-muted);">Please enter your current account password to unlock profile editing.</p>
+                    <label class="ui-label">Current Password</label>
+                    <input type="password" id="confirmPasswordInput" class="form-control" placeholder="••••••••••••" required>
+                    <div id="passwordErrorMsg" class="text-danger small mt-2" style="display: none;"></div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-primary w-100 py-3 rounded-pill fw-semibold" onclick="verifyPasswordForUnlock()">Confirm & Unlock</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+        if (currentTheme === 'light') {
+            document.body.classList.add('light-theme');
+            document.documentElement.style.setProperty('--invert-close', 'invert(0)');
+            document.getElementById('themeSelect').value = 'light';
+        } else {
+            document.documentElement.style.setProperty('--invert-close', 'invert(1)');
+            document.getElementById('themeSelect').value = 'dark';
+        }
+        lucide.createIcons();
+
+        function applyThemePreference(val) {
+            if (val === 'light') {
+                document.body.classList.add('light-theme');
+                localStorage.setItem('theme', 'light');
+                document.documentElement.style.setProperty('--invert-close', 'invert(0)');
+            } else {
+                document.body.classList.remove('light-theme');
+                localStorage.setItem('theme', 'dark');
+                document.documentElement.style.setProperty('--invert-close', 'invert(1)');
+            }
+        }
+
+        function switchTab(e, tabId) {
+            e.preventDefault();
+            document.querySelectorAll('.settings-nav-link').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+            
+            e.currentTarget.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+            lucide.createIcons();
+        }
+
+        function openPasswordConfirmModal() {
+            const modal = new bootstrap.Modal(document.getElementById('passwordConfirmModal'));
+            modal.show();
+        }
+
+        function verifyPasswordForUnlock() {
+            const password = document.getElementById('confirmPasswordInput').value;
+            const errorDiv = document.getElementById('passwordErrorMsg');
+            errorDiv.style.display = 'none';
+
+            if (!password) {
+                errorDiv.textContent = 'Please enter your password.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            fetch('/verify_password_backend', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({password: password})
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    document.querySelectorAll('.profile-field').forEach(el => el.disabled = false);
+                    document.getElementById('saveBtnContainer').style.display = 'block';
+                    document.getElementById('unlockBtn').innerHTML = '<i data-lucide="unlock" style="width: 14px; height: 14px;"></i> Unlocked';
+                    document.getElementById('unlockBtn').classList.remove('btn-outline-primary');
+                    document.getElementById('unlockBtn').classList.add('btn-success');
+                    document.getElementById('unlockBtn').style.borderColor = '#10B981';
+                    document.getElementById('unlockBtn').style.color = '#ffffff';
+                    document.getElementById('unlockBtn').disabled = true;
+                    lucide.createIcons();
+
+                    const modalEl = document.getElementById('passwordConfirmModal');
+                    const modal = bootstrap.Modal.getInstance(modalEl);
+                    modal.hide();
+                } else {
+                    errorDiv.textContent = 'Incorrect password. Please try again.';
+                    errorDiv.style.display = 'block';
+                }
+            })
+            .catch(err => {
+                errorDiv.textContent = 'An error occurred. Please try again.';
+                errorDiv.style.display = 'block';
+            });
+        }
+    </script>
+</body>
+</html>
