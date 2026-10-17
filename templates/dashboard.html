@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Dashboard - QuoStudio</title>
     
     <link href="https://api.fontshare.com/v2/css?f[]=clash-grotesk@400,500,600,700&display=swap" rel="stylesheet">
@@ -104,8 +105,31 @@
             box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2); 
         }
         
-        .nav-tabs { border-bottom: 1px solid var(--border-color); margin-bottom: 24px; gap: 32px; border: none; }
-        .nav-tabs .nav-link { color: var(--text-muted); border: none; padding: 12px 0; font-weight: 500; font-size: 15px; background: transparent; transition: 0.2s; }
+        /* Scrollable Nav Tabs for Mobile */
+        .nav-tabs { 
+            border-bottom: 1px solid var(--border-color); 
+            margin-bottom: 24px; 
+            gap: 16px; 
+            border: none; 
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; /* Firefox */
+        }
+        .nav-tabs::-webkit-scrollbar {
+            display: none; /* Safari and Chrome */
+        }
+        .nav-tabs .nav-link { 
+            color: var(--text-muted); 
+            border: none; 
+            padding: 12px 4px; 
+            font-weight: 500; 
+            font-size: 15px; 
+            background: transparent; 
+            transition: 0.2s; 
+            white-space: nowrap; 
+        }
         .nav-tabs .nav-link:hover { color: var(--text-main); background: transparent; border: none; }
         .nav-tabs .nav-link.active { color: var(--text-main) !important; background: transparent !important; border: none !important; border-bottom: 2px solid var(--accent-blue) !important; font-weight: 600; }
 
@@ -156,29 +180,78 @@
         .btn-primary { background-color: var(--accent-blue); border: none; font-weight: 600; padding: 10px 24px; transition: 0.2s; }
         .btn-primary:hover { background-color: #1D4ED8; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
 
+        /* Responsive Chat Container */
         .chat-container { display: flex; height: 600px; background: var(--bg-card); backdrop-filter: blur(12px); border: 1px solid var(--border-color); border-radius: 20px; overflow: hidden; box-shadow: 0 30px 60px -15px rgba(0,0,0,0.3); }
-        .chat-sidebar { width: 320px; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; background: rgba(0,0,0,0.1); }
+        .chat-sidebar { width: 320px; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; background: rgba(0,0,0,0.1); flex-shrink: 0; }
         .chat-user-item { padding: 16px 20px; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: 0.2s; }
         .chat-user-item:hover { background: rgba(255,255,255,0.05); }
         .chat-user-item.active { background: rgba(37,99,235,0.15); border-left: 3px solid var(--accent-blue); }
-        .chat-main { flex-grow: 1; display: flex; flex-direction: column; background: var(--input-bg); }
+        .chat-main { flex-grow: 1; display: flex; flex-direction: column; background: var(--input-bg); min-width: 0; }
         .chat-bubble { padding: 12px 18px; border-radius: 20px; font-size: 14.5px; max-width: 75%; line-height: 1.5; font-weight: 400;}
         .chat-bubble.me { background: var(--accent-blue); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
         .chat-bubble.them { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); align-self: flex-start; border-bottom-left-radius: 4px; }
         
         .delete-btn { color: #ef4444; background: transparent; border: none; cursor: pointer; padding: 6px; border-radius: 8px; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
         .delete-btn:hover { background: rgba(239, 68, 68, 0.15); transform: scale(1.1); }
+
+        .back-to-chats-btn { display: none; }
+
+        /* Mobile Optimization Media Queries */
+        @media (max-width: 991.98px) {
+            .navbar {
+                padding: 12px 16px;
+            }
+            .container {
+                padding-left: 16px !important;
+                padding-right: 16px !important;
+            }
+            .list-row {
+                padding: 16px;
+                gap: 12px;
+            }
+            .chat-container {
+                height: 520px;
+                position: relative;
+            }
+            .chat-sidebar {
+                width: 100%;
+                position: absolute;
+                top: 0; left: 0; bottom: 0;
+                z-index: 10;
+                transition: transform 0.3s ease;
+                background: var(--modal-bg);
+            }
+            .chat-sidebar.mobile-hidden {
+                transform: translateX(-100%);
+            }
+            .chat-main {
+                width: 100%;
+                height: 100%;
+            }
+            .back-to-chats-btn {
+                display: flex !important;
+                align-items: center;
+                gap: 6px;
+                background: transparent;
+                border: 1px solid var(--border-color);
+                color: var(--text-main);
+                padding: 6px 12px;
+                border-radius: 8px;
+                font-size: 13px;
+                font-weight: 500;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="cinematic-bg"></div>
 
     <nav class="navbar d-flex justify-content-between align-items-center">
-        <a href="/" class="d-flex align-items-center gap-3 text-decoration-none" style="color: var(--text-main);">
+        <a href="/" class="d-flex align-items-center gap-2 text-decoration-none" style="color: var(--text-main);">
             <div style="width: 28px; height: 28px; background: var(--accent-blue); color: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; font-family: 'Clash Grotesk', sans-serif;">Q</div>
             <div class="d-flex align-items-center gap-2">
                 <strong class="fs-5 brand-text" style="letter-spacing: -0.02em;">QuoStudio</strong>
-                <span class="badge" style="background: rgba(37, 99, 235, 0.15); color: #3B82F6; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; padding: 4px 8px; border-radius: 100px; font-family: 'Geist', sans-serif;">Dashboard</span>
+                <span class="badge d-none d-sm-inline-block" style="background: rgba(37, 99, 235, 0.15); color: #3B82F6; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; padding: 4px 8px; border-radius: 100px; font-family: 'Geist', sans-serif;">Dashboard</span>
             </div>
         </a>
         
@@ -241,17 +314,17 @@
                         <div>
                             {% for quote in my_drafts %}
                             <div class="list-row">
-                                <a href="/editor/{{ quote.id }}" class="d-flex align-items-center gap-4 text-decoration-none flex-grow-1" style="color: var(--text-main);">
-                                    <div style="width: 48px; height: 48px; background: rgba(37,99,235,0.1); color: var(--accent-blue); border-radius: 14px; display: flex; align-items: center; justify-content: center;">
-                                        <i data-lucide="file-edit" style="width: 24px; height: 24px;"></i>
+                                <a href="/editor/{{ quote.id }}" class="d-flex align-items-center gap-3 text-decoration-none flex-grow-1 min-w-0" style="color: var(--text-main);">
+                                    <div style="width: 44px; height: 44px; flex-shrink: 0; background: rgba(37,99,235,0.1); color: var(--accent-blue); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                        <i data-lucide="file-edit" style="width: 22px; height: 22px;"></i>
                                     </div>
-                                    <div>
-                                        <h6 class="fw-semibold m-0 fs-5 brand-text" style="letter-spacing: -0.01em; color: var(--text-main);">{{ quote.client_name }}</h6>
+                                    <div class="min-w-0">
+                                        <h6 class="fw-semibold m-0 fs-6 fs-md-5 brand-text text-truncate" style="letter-spacing: -0.01em; color: var(--text-main);">{{ quote.client_name }}</h6>
                                         <small style="color: var(--text-muted);">Quote #QS-{{ quote.id }} • Editing</small>
                                     </div>
                                 </a>
-                                <div class="d-flex align-items-center gap-3">
-                                    <span class="status-badge status-draft">Draft</span>
+                                <div class="d-flex align-items-center gap-2 ms-2">
+                                    <span class="status-badge status-draft d-none d-sm-inline-block">Draft</span>
                                     <button class="delete-btn" onclick="deleteDraft(event, '{{ quote.id }}')" title="Delete Draft"><i data-lucide="trash-2" style="width: 18px; height: 18px;"></i></button>
                                 </div>
                             </div>
@@ -268,14 +341,14 @@
                         </div>
                         <div>
                             {% for cat in catalogs %}
-                            <div class="list-row px-4 py-3">
-                                <div class="d-flex align-items-center gap-3 flex-grow-1">
-                                    <div class="d-flex align-items-center justify-content: center;" style="color: var(--accent-blue);">
+                            <div class="list-row px-3 py-3">
+                                <div class="d-flex align-items-center gap-3 flex-grow-1 min-w-0">
+                                    <div class="d-flex align-items-center justify-content-center flex-shrink-0" style="color: var(--accent-blue);">
                                         <i data-lucide="archive" style="width: 20px; height: 20px;"></i>
                                     </div>
-                                    <div class="fw-semibold" style="color: var(--text-main);">{{ cat.name }}</div>
+                                    <div class="fw-semibold text-truncate" style="color: var(--text-main);">{{ cat.name }}</div>
                                 </div>
-                                <button class="delete-btn" onclick="deleteDatabase('{{ cat.id }}')" title="Delete Database"><i data-lucide="trash-2" style="width: 18px; height: 18px;"></i></button>
+                                <button class="delete-btn ms-2" onclick="deleteDatabase('{{ cat.id }}')" title="Delete Database"><i data-lucide="trash-2" style="width: 18px; height: 18px;"></i></button>
                             </div>
                             {% else %}
                             <div class="text-center py-5 small border rounded-4" style="color: var(--text-main); border-color: var(--border-color) !important; background: var(--bg-card); backdrop-filter: blur(12px);">No inventory loaded.</div>
@@ -291,17 +364,17 @@
                 <div>
                     {% for quote in my_sent %}
                     <div class="list-row">
-                        <a href="/editor/{{ quote.id }}" class="d-flex align-items-center gap-4 text-decoration-none flex-grow-1" style="color: var(--text-main);">
-                            <div style="width: 48px; height: 48px; background: rgba(245, 158, 11, 0.1); color: #F59E0B; border-radius: 14px; display: flex; align-items: center; justify-content: center;">
-                                <i data-lucide="send" style="width: 24px; height: 24px;"></i>
+                        <a href="/editor/{{ quote.id }}" class="d-flex align-items-center gap-3 text-decoration-none flex-grow-1 min-w-0" style="color: var(--text-main);">
+                            <div style="width: 44px; height: 44px; flex-shrink: 0; background: rgba(245, 158, 11, 0.1); color: #F59E0B; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="send" style="width: 22px; height: 22px;"></i>
                             </div>
-                            <div>
-                                <h6 class="fw-semibold m-0 fs-5 brand-text" style="letter-spacing: -0.01em; color: var(--text-main);">{{ quote.client_name }}</h6>
+                            <div class="min-w-0">
+                                <h6 class="fw-semibold m-0 fs-6 fs-md-5 brand-text text-truncate" style="letter-spacing: -0.01em; color: var(--text-main);">{{ quote.client_name }}</h6>
                                 <small style="color: var(--text-muted);">Locked • Sent to @{{ quote.recipient_name }}</small>
                             </div>
                         </a>
-                        <div class="d-flex align-items-center gap-3">
-                            <span class="status-badge status-awaiting">Awaiting Sign</span>
+                        <div class="d-flex align-items-center gap-2 ms-2">
+                            <span class="status-badge status-awaiting d-none d-sm-inline-block">Awaiting</span>
                             <button class="delete-btn" onclick="deleteDraft(event, '{{ quote.id }}')" title="Delete History Item"><i data-lucide="trash-2" style="width: 18px; height: 18px;"></i></button>
                         </div>
                     </div>
@@ -317,16 +390,16 @@
                 <div>
                     {% for quote in inbox_active %}
                     <a href="/editor/{{ quote.id }}" class="list-row">
-                        <div class="d-flex align-items-center gap-4">
-                            <div style="width: 48px; height: 48px; background: rgba(16,185,129,0.1); color: #10B981; border-radius: 14px; display: flex; align-items: center; justify-content: center;">
-                                <i data-lucide="inbox" style="width: 24px; height: 24px;"></i>
+                        <div class="d-flex align-items-center gap-3 min-w-0">
+                            <div style="width: 44px; height: 44px; flex-shrink: 0; background: rgba(16,185,129,0.1); color: #10B981; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="inbox" style="width: 22px; height: 22px;"></i>
                             </div>
-                            <div>
-                                <h6 class="fw-semibold m-0 fs-5 brand-text" style="letter-spacing: -0.01em; color: var(--text-main);">{{ quote.client_name }}</h6>
+                            <div class="min-w-0">
+                                <h6 class="fw-semibold m-0 fs-6 fs-md-5 brand-text text-truncate" style="letter-spacing: -0.01em; color: var(--text-main);">{{ quote.client_name }}</h6>
                                 <small style="color: var(--text-muted);">From: {{ quote.sender_company }} (@{{ quote.sender_name }})</small>
                             </div>
                         </div>
-                        <div><span class="status-badge status-sent">Action Required</span></div>
+                        <div class="ms-2"><span class="status-badge status-sent d-none d-sm-inline-block">Action Required</span></div>
                     </a>
                     {% else %}
                     <div class="text-center py-5 border rounded-4" style="color: var(--text-main); border-color: var(--border-color) !important; background: var(--bg-card); backdrop-filter: blur(12px);">Your inbox is clear.</div>
@@ -337,22 +410,23 @@
             <!-- 4. Web Messaging Interface -->
             <div class="tab-pane fade" id="messages">
                 <div class="chat-container">
-                    <div class="chat-sidebar">
-                        <div class="p-4 border-bottom" style="border-color: var(--border-color) !important;">
+                    <div class="chat-sidebar" id="chatSidebar">
+                        <div class="p-3 border-bottom" style="border-color: var(--border-color) !important;">
                             <input type="text" id="chatSearch" class="form-control" placeholder="Search users..." onkeyup="searchChatUsers()">
                         </div>
                         <div id="chatUserList" style="flex-grow: 1; overflow-y: auto;"></div>
                     </div>
                     
                     <div class="chat-main">
-                        <div id="chatHeader" class="p-4 border-bottom d-flex align-items-center gap-3" style="border-color: var(--border-color) !important; background: rgba(0,0,0,0.1); min-height: 75px;">
-                            <div class="fw-semibold" style="color: var(--text-muted);">Select a conversation to start messaging</div>
+                        <div id="chatHeader" class="p-3 p-md-4 border-bottom d-flex align-items-center gap-3" style="border-color: var(--border-color) !important; background: rgba(0,0,0,0.1); min-height: 75px;">
+                            <button class="back-to-chats-btn" onclick="toggleChatSidebar()" id="backBtn"><i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i> Chats</button>
+                            <div class="fw-semibold text-muted" id="chatHeaderTitle">Select a conversation to start messaging</div>
                         </div>
-                        <div id="chatMessages" class="p-4" style="flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 16px;"></div>
+                        <div id="chatMessages" class="p-3 p-md-4" style="flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 16px;"></div>
                         <div id="chatInputArea" class="p-3 border-top" style="border-color: var(--border-color) !important; background: rgba(0,0,0,0.1); display: none;">
                             <form onsubmit="sendChatMessage(event)" class="d-flex gap-2">
                                 <input type="text" id="chatInput" class="form-control" placeholder="Type a message..." required autocomplete="off">
-                                <button type="submit" class="btn btn-primary rounded-pill px-4 d-flex align-items-center gap-2">Send <i data-lucide="send" style="width: 14px; height: 14px;"></i></button>
+                                <button type="submit" class="btn btn-primary rounded-pill px-4 d-flex align-items-center gap-2 flex-shrink-0">Send <i data-lucide="send" style="width: 14px; height: 14px;"></i></button>
                             </form>
                         </div>
                     </div>
@@ -365,17 +439,17 @@
                 <div>
                     {% for quote in my_signed %}
                     <div class="list-row">
-                        <a href="/editor/{{ quote.id }}" class="d-flex align-items-center gap-4 text-decoration-none flex-grow-1" style="color: var(--text-main);">
-                            <div style="width: 48px; height: 48px; background: rgba(16,185,129,0.1); color: #10B981; border-radius: 14px; display: flex; align-items: center; justify-content: center;">
-                                <i data-lucide="lock" style="width: 24px; height: 24px;"></i>
+                        <a href="/editor/{{ quote.id }}" class="d-flex align-items-center gap-3 text-decoration-none flex-grow-1 min-w-0" style="color: var(--text-main);">
+                            <div style="width: 44px; height: 44px; flex-shrink: 0; background: rgba(16,185,129,0.1); color: #10B981; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="lock" style="width: 22px; height: 22px;"></i>
                             </div>
-                            <div>
-                                <h6 class="fw-semibold m-0 fs-5 brand-text" style="letter-spacing: -0.01em; color: var(--text-main);">{{ quote.client_name }}</h6>
+                            <div class="min-w-0">
+                                <h6 class="fw-semibold m-0 fs-6 fs-md-5 brand-text text-truncate" style="letter-spacing: -0.01em; color: var(--text-main);">{{ quote.client_name }}</h6>
                                 <small style="color: var(--text-muted);">Locked • Signed by @{{ quote.recipient_name }}</small>
                             </div>
                         </a>
-                        <div class="d-flex align-items-center gap-3">
-                            <span class="status-badge status-accepted">Accepted</span>
+                        <div class="d-flex align-items-center gap-2 ms-2">
+                            <span class="status-badge status-accepted d-none d-sm-inline-block">Accepted</span>
                             <button class="delete-btn" onclick="deleteDraft(event, '{{ quote.id }}')" title="Delete History Item"><i data-lucide="trash-2" style="width: 18px; height: 18px;"></i></button>
                         </div>
                     </div>
@@ -383,17 +457,17 @@
 
                     {% for quote in inbox_signed %}
                     <div class="list-row">
-                        <a href="/editor/{{ quote.id }}" class="d-flex align-items-center gap-4 text-decoration-none flex-grow-1" style="color: var(--text-main);">
-                            <div style="width: 48px; height: 48px; background: rgba(16,185,129,0.1); color: #10B981; border-radius: 14px; display: flex; align-items: center; justify-content: center;">
-                                <i data-lucide="lock" style="width: 24px; height: 24px;"></i>
+                        <a href="/editor/{{ quote.id }}" class="d-flex align-items-center gap-3 text-decoration-none flex-grow-1 min-w-0" style="color: var(--text-main);">
+                            <div style="width: 44px; height: 44px; flex-shrink: 0; background: rgba(16,185,129,0.1); color: #10B981; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="lock" style="width: 22px; height: 22px;"></i>
                             </div>
-                            <div>
-                                <h6 class="fw-semibold m-0 fs-5 brand-text" style="letter-spacing: -0.01em; color: var(--text-main);">{{ quote.client_name }}</h6>
-                                <small style="color: var(--text-muted);">Locked • Signed by You (Sent by @{{ quote.sender_name }})</small>
+                            <div class="min-w-0">
+                                <h6 class="fw-semibold m-0 fs-6 fs-md-5 brand-text text-truncate" style="letter-spacing: -0.01em; color: var(--text-main);">{{ quote.client_name }}</h6>
+                                <small style="color: var(--text-muted);">Locked • Signed by You</small>
                             </div>
                         </a>
-                        <div class="d-flex align-items-center gap-3">
-                            <span class="status-badge status-accepted">Accepted</span>
+                        <div class="d-flex align-items-center gap-2 ms-2">
+                            <span class="status-badge status-accepted d-none d-sm-inline-block">Accepted</span>
                             <button class="delete-btn" onclick="deleteDraft(event, '{{ quote.id }}')" title="Delete History Item"><i data-lucide="trash-2" style="width: 18px; height: 18px;"></i></button>
                         </div>
                     </div>
@@ -442,7 +516,7 @@
                         
                         <label class="small fw-semibold mb-2 text-uppercase" style="letter-spacing: 0.5px; color: var(--text-main);">CSV File</label>
                         <input type="file" name="csv_file" class="form-control p-2 mb-1" accept=".csv" required>
-                        <div class="mb-2 fw-semibold" style="font-size: 11px; color: #EF4444;">* only supports csv</div>
+                        <div class="mb-2 fw-semibold" style="font-size: 11px; color: #EF4444;">only supports csv</div>
                     </div>
                     <div class="modal-footer border-0 pt-0 mb-2">
                         <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fs-6">Upload Database</button>
@@ -526,8 +600,13 @@
 
         function openChat(userId, username) {
             currentChatUserId = userId;
-            document.getElementById('chatHeader').innerHTML = `<div class="fw-semibold fs-5 brand-text" style="color: var(--text-main);">@${username}</div>`;
+            document.getElementById('chatHeaderTitle').innerText = '@' + username;
             document.getElementById('chatInputArea').style.display = 'block';
+            
+            // On mobile, slide out the sidebar so chat main is visible
+            if (window.innerWidth < 992) {
+                document.getElementById('chatSidebar').classList.add('mobile-hidden');
+            }
             
             document.querySelectorAll('.chat-user-item').forEach(el => el.classList.remove('active'));
             event.currentTarget.classList.add('active');
@@ -536,6 +615,10 @@
             
             if(chatPollInterval) clearInterval(chatPollInterval);
             chatPollInterval = setInterval(loadMessages, 3000);
+        }
+
+        function toggleChatSidebar() {
+            document.getElementById('chatSidebar').classList.remove('mobile-hidden');
         }
 
         function loadMessages() {

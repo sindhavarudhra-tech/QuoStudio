@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Settings & Privacy - QuoStudio</title>
     
     <link href="https://api.fontshare.com/v2/css?f[]=clash-grotesk@400,500,600,700&display=swap" rel="stylesheet">
@@ -102,6 +103,35 @@
             font-weight: 600;
         }
 
+        .mobile-settings-nav {
+            display: none;
+            overflow-x: auto;
+            gap: 8px;
+            padding-bottom: 4px;
+            margin-bottom: 24px;
+            scrollbar-width: none;
+        }
+        .mobile-settings-nav::-webkit-scrollbar { display: none; }
+        .mobile-nav-pill {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 10px 18px;
+            border-radius: 100px;
+            font-size: 14px;
+            font-weight: 500;
+            white-space: nowrap;
+            cursor: pointer;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+        .mobile-nav-pill.active {
+            background: var(--accent-blue);
+            color: white;
+            border-color: var(--accent-blue);
+            font-weight: 600;
+        }
+
         .settings-card { 
             background: var(--bg-card); 
             backdrop-filter: blur(16px); 
@@ -155,75 +185,77 @@
             justify-content: center;
             gap: 8px;
         }
-        .btn-primary-custom:hover { 
+        .btn-primary-custom:hover:not(:disabled) { 
             background-color: #1D4ED8; 
             transform: translateY(-2px); 
             box-shadow: 0 10px 25px rgba(37,99,235,0.4); 
         }
-        
-        .btn-outline-danger-custom { 
-            background: rgba(239, 68, 68, 0.08); 
-            color: #EF4444; 
-            border: 1px solid rgba(239, 68, 68, 0.3); 
-            border-radius: 14px; 
-            font-weight: 600; 
-            padding: 12px 24px; 
-            transition: 0.2s ease; 
-        }
-        .btn-outline-danger-custom:hover { 
-            background: #EF4444; 
-            color: white; 
-            transform: translateY(-1px);
+        .btn-primary-custom:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
-        .action-row {
-            background: rgba(0,0,0,0.15);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 20px;
+        .username-suggestion-pill {
+            background: rgba(37, 99, 235, 0.15);
+            border: 1px solid rgba(37, 99, 235, 0.3);
+            color: #60A5FA;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
             transition: 0.2s;
         }
-        .action-row:hover {
-            border-color: rgba(255,255,255,0.15);
-            background: rgba(0,0,0,0.25);
-        }
-        
-        .modal-content {
-            background-color: var(--modal-bg) !important;
-            backdrop-filter: blur(30px);
-            border: 1px solid var(--border-color);
-            border-radius: 24px;
-            color: var(--text-main);
+        .username-suggestion-pill:hover {
+            background: rgba(37, 99, 235, 0.3);
+            color: white;
         }
 
         .tab-pane { display: none; }
         .tab-pane.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 991px) {
+            .navbar { padding: 14px 20px; }
+            .desktop-sidebar { display: none !important; }
+            .mobile-settings-nav { display: flex !important; }
+            .settings-card { padding: 28px 20px; border-radius: 20px; }
+        }
+        @media (max-width: 480px) {
+            .form-control, .form-select { font-size: 16px; }
+        }
     </style>
 </head>
 <body>
     <div class="cinematic-bg"></div>
 
     <nav class="navbar d-flex justify-content-between align-items-center">
-        <a href="/dashboard" class="d-flex align-items-center gap-3 text-decoration-none" style="color: var(--text-main);">
+        <!-- Desktop Logo & Title -->
+        <a href="/dashboard" class="d-none d-md-flex align-items-center gap-3 text-decoration-none" style="color: var(--text-main);">
             <div style="width: 32px; height: 32px; background: var(--accent-blue); color: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; font-family: 'Clash Grotesk', sans-serif;">Q</div>
             <strong class="fs-5 brand-text" style="letter-spacing: -0.02em;">QuoStudio Settings</strong>
         </a>
-        <a href="/dashboard" class="btn btn-sm btn-outline-secondary rounded-pill px-4" style="color: var(--text-main); border-color: var(--border-color); font-weight: 500;">&larr; Back to Dashboard</a>
+
+        <!-- Mobile Back Button & Settings Title -->
+        <div class="d-flex d-md-none align-items-center gap-3">
+            <a href="/dashboard" class="d-flex align-items-center text-decoration-none" style="color: var(--text-main); padding: 4px;">
+                <i data-lucide="arrow-left" style="width: 20px; height: 20px;"></i>
+            </a>
+            <span class="fw-bold brand-text fs-5" style="color: var(--text-main);">Settings</span>
+        </div>
+
+        <!-- Desktop Back to Dashboard Button -->
+        <a href="/dashboard" class="d-none d-md-inline-block btn btn-sm btn-outline-secondary rounded-pill px-4" style="color: var(--text-main); border-color: var(--border-color); font-weight: 500; font-size: 13px;">&larr; Dashboard</a>
     </nav>
 
-    <div class="container mt-5" style="max-width: 1100px; padding-bottom: 120px;">
+    <div class="container mt-4 mt-lg-5" style="max-width: 1100px; padding-bottom: 120px;">
         
         {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}
             {% for category, message in messages %}
               <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} border-0 mb-4 rounded-4 shadow-sm" style="background: var(--bg-card); color: var(--text-main); border-left: 5px solid {{ '#EF4444' if category == 'error' else '#10B981' }} !important; backdrop-filter: blur(12px); padding: 20px;">
                 <div class="d-flex align-items-center gap-3">
-                    <i data-lucide="{{ 'alert-circle' if category == 'error' else 'check-circle-2' }}" style="width: 24px; height: 24px; color: {{ '#EF4444' if category == 'error' else '#10B981' }};"></i>
+                    <i data-lucide="{{ 'alert-circle' if category == 'error' else 'check-circle-2' }}" style="width: 24px; height: 24px; color: {{ '#EF4444' if category == 'error' else '#10B981' }}; flex-shrink: 0;"></i>
                     <div>{{ message }}</div>
                 </div>
               </div>
@@ -231,9 +263,18 @@
           {% endif %}
         {% endwith %}
 
+        <!-- Mobile Horizontal Quick Navigation Bar -->
+        <div class="mobile-settings-nav">
+            <a href="#" class="mobile-nav-pill active" onclick="switchTab(event, 'profileTab')">Profile</a>
+            <a href="#" class="mobile-nav-pill" onclick="switchTab(event, 'appearanceTab')">Appearance</a>
+            <a href="#" class="mobile-nav-pill" onclick="switchTab(event, 'notificationsTab')">Notifications</a>
+            <a href="#" class="mobile-nav-pill" onclick="switchTab(event, 'securityTab')">Security</a>
+            <a href="#" class="mobile-nav-pill" onclick="switchTab(event, 'privacyTab')">Privacy</a>
+        </div>
+
         <div class="row gx-4">
-            <!-- Sidebar Navigation -->
-            <div class="col-lg-3 mb-4 mb-lg-0">
+            <!-- Desktop Sidebar Navigation -->
+            <div class="col-lg-3 mb-4 mb-lg-0 desktop-sidebar">
                 <div class="settings-sidebar">
                     <div class="small fw-bold text-uppercase px-3 mb-3" style="color: var(--text-muted); letter-spacing: 1px; font-size: 10px;">Account</div>
                     <a href="#" class="settings-nav-link active" onclick="switchTab(event, 'profileTab')">
@@ -263,9 +304,9 @@
                 
                 <!-- 1. Profile Details Tab -->
                 <div id="profileTab" class="tab-pane active settings-card">
-                    <div class="d-flex align-items-center justify-content-between mb-4">
+                    <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-3 mb-4">
                         <div class="d-flex align-items-center gap-3">
-                            <div style="width: 48px; height: 48px; background: rgba(37,99,235,0.15); color: var(--accent-blue); border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+                            <div style="width: 48px; height: 48px; background: rgba(37,99,235,0.15); color: var(--accent-blue); border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                                 <i data-lucide="user-cog" style="width: 24px; height: 24px;"></i>
                             </div>
                             <div>
@@ -274,7 +315,7 @@
                             </div>
                         </div>
                         
-                        <button type="button" id="unlockBtn" class="btn btn-sm btn-outline-primary rounded-pill px-4 py-2 fw-semibold d-flex align-items-center gap-2" onclick="openPasswordConfirmModal()" style="border-color: var(--accent-blue); color: var(--accent-blue);">
+                        <button type="button" id="unlockBtn" class="btn btn-sm btn-outline-primary rounded-pill px-4 py-2 fw-semibold d-flex align-items-center gap-2" onclick="openPasswordConfirmModal()" style="border-color: var(--accent-blue); color: var(--accent-blue); white-space: nowrap;">
                             <i data-lucide="lock" style="width: 14px; height: 14px;"></i> Unlock to Edit
                         </button>
                     </div>
@@ -289,6 +330,8 @@
                             <div class="col-md-6 mb-4">
                                 <label class="ui-label"><i data-lucide="at-sign" style="width: 14px; height: 14px;"></i> Username</label>
                                 <input type="text" name="username" id="usernameInput" class="form-control profile-field" value="{{ profile.username }}" disabled required>
+                                <div id="usernameFeedback" style="font-size: 12px; font-weight: 500; margin-top: 6px; display: none;"></div>
+                                <div id="usernameSuggestions" class="d-flex flex-wrap gap-2 mt-2" style="display: none;"></div>
                             </div>
                             <div class="col-md-6 mb-4">
                                 <label class="ui-label"><i data-lucide="building-2" style="width: 14px; height: 14px;"></i> Company Name</label>
@@ -297,7 +340,7 @@
                         </div>
                         
                         <div id="saveBtnContainer" style="display: none;">
-                            <button type="submit" class="btn-primary-custom w-100 mt-2">
+                            <button type="submit" id="saveProfileBtn" class="btn-primary-custom w-100 mt-2">
                                 <i data-lucide="save" style="width: 18px; height: 18px;"></i> Save Profile Changes
                             </button>
                         </div>
@@ -307,7 +350,7 @@
                 <!-- 2. Appearance Tab -->
                 <div id="appearanceTab" class="tab-pane settings-card">
                     <div class="d-flex align-items-center gap-3 mb-4">
-                        <div style="width: 48px; height: 48px; background: rgba(37,99,235,0.15); color: var(--accent-blue); border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+                        <div style="width: 48px; height: 48px; background: rgba(37,99,235,0.15); color: var(--accent-blue); border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                             <i data-lucide="palette" style="width: 24px; height: 24px;"></i>
                         </div>
                         <div>
@@ -329,7 +372,7 @@
                 <!-- 3. Notifications Tab -->
                 <div id="notificationsTab" class="tab-pane settings-card">
                     <div class="d-flex align-items-center gap-3 mb-4">
-                        <div style="width: 48px; height: 48px; background: rgba(37,99,235,0.15); color: var(--accent-blue); border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+                        <div style="width: 48px; height: 48px; background: rgba(37,99,235,0.15); color: var(--accent-blue); border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                             <i data-lucide="bell" style="width: 24px; height: 24px;"></i>
                         </div>
                         <div>
@@ -345,13 +388,24 @@
                         <input type="hidden" name="tax_rate" value="{{ profile.tax_rate or 19.0 }}">
 
                         <div class="d-flex flex-column gap-3 mb-4">
-                            <div class="form-check form-switch d-flex align-items-center gap-3 p-0">
-                                <input class="form-check-input m-0" type="checkbox" name="notif_quote_accepted" id="notifQuoteAccepted" value="1" {{ 'checked' if profile.notif_quote_accepted is not false else '' }} style="width: 44px; height: 22px; cursor: pointer;">
-                                <label class="form-check-label fw-medium m-0" for="notifQuoteAccepted" style="cursor: pointer; font-size: 15px;">Quote Accepted Alerts (Notify when a client signs & accepts a quotation)</label>
+                            <div class="notif-row" style="background: rgba(0,0,0,0.15); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; gap: 20px;">
+                                <div>
+                                    <div class="fw-bold mb-1" style="font-size: 15px;">Quote Accepted Alerts</div>
+                                    <div class="small" style="color: var(--text-muted);">Notify when a client signs & accepts a quotation</div>
+                                </div>
+                                <div class="form-check form-switch m-0 p-0">
+                                    <input class="form-check-input m-0" type="checkbox" name="notif_quote_accepted" id="notifQuoteAccepted" value="1" {{ 'checked' if profile.notif_quote_accepted is not false else '' }} style="width: 44px; height: 22px; cursor: pointer;">
+                                </div>
                             </div>
-                            <div class="form-check form-switch d-flex align-items-center gap-3 p-0">
-                                <input class="form-check-input m-0" type="checkbox" name="notif_new_messages" id="notifNewMessages" value="1" {{ 'checked' if profile.notif_new_messages is not false else '' }} style="width: 44px; height: 22px; cursor: pointer;">
-                                <label class="form-check-label fw-medium m-0" for="notifNewMessages" style="cursor: pointer; font-size: 15px;">New Message Alerts (Notify when you receive a chat message)</label>
+
+                            <div class="notif-row" style="background: rgba(0,0,0,0.15); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; gap: 20px;">
+                                <div>
+                                    <div class="fw-bold mb-1" style="font-size: 15px;">New Message Alerts</div>
+                                    <div class="small" style="color: var(--text-muted);">Notify when you receive a chat message</div>
+                                </div>
+                                <div class="form-check form-switch m-0 p-0">
+                                    <input class="form-check-input m-0" type="checkbox" name="notif_new_messages" id="notifNewMessages" value="1" {{ 'checked' if profile.notif_new_messages is not false else '' }} style="width: 44px; height: 22px; cursor: pointer;">
+                                </div>
                             </div>
                         </div>
 
@@ -364,7 +418,7 @@
                 <!-- 4. Security & Password Tab -->
                 <div id="securityTab" class="tab-pane settings-card">
                     <div class="d-flex align-items-center gap-3 mb-4">
-                        <div style="width: 48px; height: 48px; background: rgba(37,99,235,0.15); color: var(--accent-blue); border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+                        <div style="width: 48px; height: 48px; background: rgba(37,99,235,0.15); color: var(--accent-blue); border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                             <i data-lucide="shield-check" style="width: 24px; height: 24px;"></i>
                         </div>
                         <div>
@@ -375,9 +429,9 @@
 
                     <div class="mb-4">
                         <label class="ui-label"><i data-lucide="key" style="width: 14px; height: 14px;"></i> Current Password</label>
-                        <div class="d-flex gap-2 align-items-center">
+                        <div class="d-flex flex-column flex-sm-row gap-2 align-items-stretch align-items-sm-center">
                             <input type="password" class="form-control flex-grow-1" value="••••••••••••" disabled style="opacity: 0.6; cursor: not-allowed; letter-spacing: 2px;">
-                            <a href="/forgot-password" class="btn btn-outline-secondary rounded-pill px-4 py-3 d-flex align-items-center gap-2" style="border-color: var(--border-color); color: var(--text-main); font-weight: 500;">
+                            <a href="/forgot-password" class="btn btn-outline-secondary rounded-pill px-4 py-3 d-flex align-items-center justify-content-center gap-2" style="border-color: var(--border-color); color: var(--text-main); font-weight: 500; white-space: nowrap;">
                                 <i data-lucide="key-round" style="width: 16px; height: 16px;"></i> Change Password
                             </a>
                         </div>
@@ -388,7 +442,7 @@
                 <!-- 5. Data & Privacy (GDPR) Tab -->
                 <div id="privacyTab" class="tab-pane settings-card" style="border-color: rgba(239, 68, 68, 0.25);">
                     <div class="d-flex align-items-center gap-3 mb-4">
-                        <div style="width: 48px; height: 48px; background: rgba(239, 68, 68, 0.1); color: #EF4444; border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+                        <div style="width: 48px; height: 48px; background: rgba(239, 68, 68, 0.1); color: #EF4444; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                             <i data-lucide="shield-alert" style="width: 24px; height: 24px;"></i>
                         </div>
                         <div>
@@ -398,22 +452,22 @@
                     </div>
                     
                     <div class="d-flex flex-column gap-3">
-                        <div class="action-row">
+                        <div class="action-row" style="background: rgba(0,0,0,0.15); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; display: flex; align-items: center; justify-content: space-between; gap: 20px;">
                             <div>
                                 <div class="fw-bold mb-1" style="font-size: 16px;">Export My Data</div>
-                                <div class="small" style="color: var(--text-muted); max-width: 450px;">Download a complete JSON copy of all your quotation records, inventory catalogs, messages, and profile information.</div>
+                                <div class="small" style="color: var(--text-muted);">Download a complete JSON copy of all your quotation records, inventory catalogs, messages, and profile information.</div>
                             </div>
-                            <a href="/export_data" class="btn btn-sm btn-outline-light rounded-pill px-4 py-2 fw-semibold" download="quostudio_data_export.json" style="border-color: var(--border-color);">
+                            <a href="/export_data" class="btn btn-sm btn-outline-light rounded-pill px-4 py-2 fw-semibold text-nowrap" download="quostudio_data_export.json" style="border-color: var(--border-color);">
                                 <i data-lucide="download" style="width: 14px; height: 14px; margin-right: 4px;"></i> Export JSON
                             </a>
                         </div>
 
-                        <div class="action-row" style="background: rgba(239, 68, 68, 0.04); border-color: rgba(239, 68, 68, 0.2);">
+                        <div class="action-row" style="background: rgba(239, 68, 68, 0.04); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 16px; padding: 24px; display: flex; align-items: center; justify-content: space-between; gap: 20px;">
                             <div>
                                 <div class="fw-bold mb-1 text-danger" style="font-size: 16px;">Right to be Forgotten (Account Deletion)</div>
-                                <div class="small" style="color: var(--text-muted); max-width: 450px;">Permanently and irreversibly wipe your account, quotations, messages, and inventory catalogs from our servers.</div>
+                                <div class="small" style="color: var(--text-muted);">Permanently and irreversibly wipe your account, quotations, messages, and inventory catalogs from our servers.</div>
                             </div>
-                            <form action="/delete_account" method="POST" onsubmit="return confirm('WARNING: This action is completely irreversible. All your quotations, encrypted drafts, and uploaded databases will be permanently destroyed. Proceed?');">
+                            <form action="/delete_account" method="POST" onsubmit="return confirm('WARNING: This action is completely irreversible. All your quotations, encrypted drafts, and uploaded databases will be permanently destroyed. Proceed?');" class="text-nowrap">
                                 <button type="submit" class="btn-outline-danger-custom">
                                     <i data-lucide="trash-2" style="width: 16px; height: 16px; margin-right: 4px;"></i> Delete Account
                                 </button>
@@ -475,9 +529,21 @@
         function switchTab(e, tabId) {
             e.preventDefault();
             document.querySelectorAll('.settings-nav-link').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.mobile-nav-pill').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
             
-            e.currentTarget.classList.add('active');
+            document.querySelectorAll('.settings-nav-link').forEach(el => {
+                if(el.getAttribute('onclick') && el.getAttribute('onclick').includes(tabId)) {
+                    el.classList.add('active');
+                }
+            });
+
+            document.querySelectorAll('.mobile-nav-pill').forEach(el => {
+                if(el.getAttribute('onclick') && el.getAttribute('onclick').includes(tabId)) {
+                    el.classList.add('active');
+                }
+            });
+
             document.getElementById(tabId).classList.add('active');
             lucide.createIcons();
         }
@@ -528,6 +594,78 @@
                 errorDiv.textContent = 'An error occurred. Please try again.';
                 errorDiv.style.display = 'block';
             });
+        }
+
+        // Real-time Username Verification & Suggestion Generator
+        const usernameInput = document.getElementById('usernameInput');
+        const usernameFeedback = document.getElementById('usernameFeedback');
+        const usernameSuggestions = document.getElementById('usernameSuggestions');
+        const saveProfileBtn = document.getElementById('saveProfileBtn');
+        let typingTimer;
+        const currentOriginalUsername = "{{ profile.username }}";
+
+        usernameInput.addEventListener('input', function() {
+            clearTimeout(typingTimer);
+            const val = this.value.trim();
+            
+            if (val === currentOriginalUsername) {
+                usernameFeedback.style.display = 'none';
+                usernameSuggestions.style.display = 'none';
+                saveProfileBtn.disabled = false;
+                return;
+            }
+
+            if(val.length < 3) {
+                usernameFeedback.style.display = 'block';
+                usernameFeedback.style.color = 'var(--text-muted)';
+                usernameFeedback.innerText = 'Username must be at least 3 characters.';
+                usernameSuggestions.style.display = 'none';
+                saveProfileBtn.disabled = true;
+                return;
+            }
+
+            usernameFeedback.style.display = 'block';
+            usernameFeedback.style.color = 'var(--text-muted)';
+            usernameFeedback.innerText = 'Checking availability...';
+            usernameSuggestions.style.display = 'none';
+
+            typingTimer = setTimeout(() => {
+                fetch('/check_username?username=' + encodeURIComponent(val))
+                    .then(response => response.json())
+                    .then(data => {
+                        if(data.available) {
+                            usernameFeedback.style.color = '#10B981';
+                            usernameFeedback.innerHTML = '<i data-lucide="check-circle" style="width: 14px; height: 14px; margin-right: 4px; vertical-align: -2px;"></i>Available';
+                            usernameSuggestions.style.display = 'none';
+                            saveProfileBtn.disabled = false;
+                        } else {
+                            usernameFeedback.style.color = '#EF4444';
+                            usernameFeedback.innerHTML = '<i data-lucide="x-circle" style="width: 14px; height: 14px; margin-right: 4px; vertical-align: -2px;"></i>Username already taken';
+                            
+                            // Generate smart unique suggestions
+                            const randNum = Math.floor(10 + Math.random() * 90);
+                            const suggestions = [
+                                `${val}_official`,
+                                `${val}${randNum}`,
+                                `the_${val}`
+                            ];
+
+                            usernameSuggestions.innerHTML = '<span class="small text-muted align-self-center me-1" style="font-size: 11px;">Suggestions:</span>' + 
+                                suggestions.map(s => `<span class="username-suggestion-pill" onclick="selectSuggestion('${s}')">@${s}</span>`).join('');
+                            usernameSuggestions.style.display = 'flex';
+                            saveProfileBtn.disabled = true;
+                        }
+                        lucide.createIcons();
+                    })
+                    .catch(err => {
+                        usernameFeedback.style.display = 'none';
+                    });
+            }, 500);
+        });
+
+        function selectSuggestion(sug) {
+            usernameInput.value = sug;
+            usernameInput.dispatchEvent(new Event('input'));
         }
     </script>
 </body>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>QuoStudio | Next-Gen Quotations</title>
     
     <!-- Premium Fonts: Clash Grotesk (Headings) & Geist (Body) -->
@@ -34,55 +34,6 @@
             margin: 0;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            cursor: default;
-        }
-
-        /* Custom Cursor Styles */
-        .cursor-dot {
-            width: 10px;
-            height: 10px;
-            background-color: var(--accent-blue);
-            border-radius: 50%;
-            position: fixed;
-            top: 0;
-            left: 0;
-            pointer-events: none;
-            z-index: 10000;
-            box-shadow: 0 0 12px var(--accent-blue);
-            transition: transform 0.1s ease-out, background-color 0.2s ease;
-        }
-
-        .cursor-ring {
-            width: 36px;
-            height: 36px;
-            border: 1px solid rgba(37, 99, 235, 0.5);
-            border-radius: 50%;
-            position: fixed;
-            top: 0;
-            left: 0;
-            pointer-events: none;
-            z-index: 9999;
-            transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), width 0.2s ease, height 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
-        }
-
-        body.cursor-hover .cursor-ring {
-            width: 56px;
-            height: 56px;
-            border-color: rgba(96, 165, 250, 0.8);
-            background-color: rgba(37, 99, 235, 0.08);
-        }
-
-        body.cursor-click .cursor-dot {
-            transform: scale(0.6);
-        }
-
-        body.cursor-click .cursor-ring {
-            transform: scale(0.85);
-        }
-
-        @media (max-width: 1024px) {
-            .cursor-dot, .cursor-ring { display: none; }
-            body { cursor: auto; }
         }
 
         h1, h2, h3, h4, h5, h6, .brand-container strong {
@@ -120,13 +71,17 @@
             z-index: 1000;
             box-shadow: 0 20px 40px -10px rgba(0,0,0,0.3);
             white-space: nowrap; 
+            width: max-content;
+            max-width: 95%;
+            transition: 0.3s ease;
         }
 
-        .brand-container { display: flex; align-items: center; gap: 12px; margin-right: 20px; text-decoration: none; }
+        .brand-container { display: flex; align-items: center; gap: 12px; margin-right: 20px; text-decoration: none; z-index: 1001;}
         .nav-logo-img { height: 26px; width: auto; border-radius: 6px; }
 
-        .pill-nav a.nav-link { color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.3s ease; opacity: 0.9; }
-        .pill-nav a.nav-link:hover { opacity: 1; text-shadow: 0 0 10px rgba(255,255,255,0.3); }
+        .desktop-menu { display: flex; align-items: center; gap: 40px; }
+        .desktop-menu a.nav-link { color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.3s ease; opacity: 0.9; }
+        .desktop-menu a.nav-link:hover { opacity: 1; text-shadow: 0 0 10px rgba(255,255,255,0.3); }
         
         .btn-login {
             background-color: #ffffff;
@@ -139,51 +94,127 @@
             font-family: 'Geist', sans-serif;
             font-size: 14px;
             display: inline-block;
+            z-index: 1001;
         }
         .btn-login:hover { transform: scale(1.04); box-shadow: 0 10px 25px rgba(255,255,255,0.2); }
 
         .btn-accent {
             background-color: var(--accent-blue) !important; color: white !important; border-radius: 100px;
             padding: 12px 28px !important; font-weight: 600 !important; transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            border: none; cursor: pointer; text-decoration: none; font-size: 14px;
+            border: none; cursor: pointer; text-decoration: none; font-size: 14px; text-align: center;
         }
         .btn-accent:hover { background-color: #1D4ED8 !important; transform: scale(1.04); box-shadow: 0 0 30px rgba(37, 99, 235, 0.4); }
+
+        /* Profile Icon & Dropdown Styles */
+        .profile-dropdown-container {
+            position: relative;
+            display: inline-block;
+        }
 
         .profile-icon {
             width: 42px; height: 42px; background-color: var(--accent-blue); color: white !important; border-radius: 50%;
             display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 15px; text-decoration: none;
-            border: 2px solid rgba(255,255,255,0.2); transition: 0.3s ease; text-transform: uppercase;
+            border: 2px solid rgba(255,255,255,0.2); transition: 0.3s ease; text-transform: uppercase; flex-shrink: 0; z-index: 1001; cursor: pointer;
         }
-        .profile-icon:hover { transform: scale(1.05); border-color: white; box-shadow: 0 0 20px rgba(37, 99, 235, 0.5); }
+        .profile-icon:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(37,99,235,0.5); }
+
+        .profile-dropdown-menu {
+            position: absolute;
+            right: 0;
+            top: calc(100% + 12px);
+            background: rgba(17, 24, 39, 0.95);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            width: 170px;
+            padding: 8px;
+            display: none;
+            z-index: 1002;
+            animation: dropdownFade 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateY(-8px);
+        }
+
+        .profile-dropdown-menu.show {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @keyframes dropdownFade {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .profile-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 10px 14px;
+            color: #EF4444; 
+            background: transparent;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Geist', sans-serif;
+        }
+
+        .profile-dropdown-item:hover {
+            background: rgba(239, 68, 68, 0.15);
+            color: #FCA5A5;
+        }
 
         .nav-actions { display: flex; align-items: center; gap: 16px; border-left: 1px solid rgba(255,255,255,0.15); padding-left: 20px; margin-left: 12px; }
+        .hamburger-btn { display: none; background: none; border: none; color: white; padding: 0; cursor: pointer; z-index: 1001; }
+        
+        /* Cinematic Mobile Menu */
+        .mobile-menu-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
+            background: rgba(11, 15, 25, 0.98);
+            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            gap: 24px; z-index: 999;
+            clip-path: circle(0px at calc(100% - 60px) 60px);
+            transition: clip-path 0.7s cubic-bezier(0.64, 0.04, 0.26, 1.01);
+            pointer-events: none;
+        }
+        .mobile-menu-overlay.active {
+            clip-path: circle(150vh at calc(100% - 60px) 60px);
+            pointer-events: auto;
+        }
+        .mobile-nav-link {
+            font-size: 1.75rem; color: #fff; font-family: 'Clash Grotesk', sans-serif;
+            text-transform: uppercase; letter-spacing: 2px; text-decoration: none;
+            opacity: 0; transform: translateY(30px);
+            transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .mobile-menu-overlay.active .mobile-nav-link { opacity: 1; transform: translateY(0); }
+        .mobile-menu-overlay.active .mobile-nav-link:nth-child(1) { transition-delay: 0.2s; }
+        .mobile-menu-overlay.active .mobile-nav-link:nth-child(2) { transition-delay: 0.3s; }
+        .mobile-menu-overlay.active .mobile-nav-link:nth-child(3) { transition-delay: 0.4s; }
+        
+        .mobile-menu-overlay .btn-accent {
+            margin-top: 16px; font-size: 1.1rem; padding: 14px 32px !important;
+            opacity: 0; transform: translateY(30px); transition: 0.5s ease;
+        }
+        .mobile-menu-overlay.active .btn-accent { opacity: 1; transform: translateY(0); transition-delay: 0.5s; }
 
-        /* -------------------------------------------
-           GLOBAL SCROLL ANIMATIONS (Fade & Roll)
-        ------------------------------------------- */
+        /* Global Scroll Animations */
         .scroll-section {
             transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
             will-change: opacity, transform;
         }
-        
-        .scroll-section.hidden-bottom {
-            opacity: 0;
-            transform: translateY(120px);
-        }
-        
-        .scroll-section.hidden-top {
-            opacity: 0;
-            transform: scale(0.95) translateY(-60px);
-        }
-        
-        .scroll-section.visible {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-        }
+        .scroll-section.hidden-bottom { opacity: 0; transform: translateY(120px); }
+        .scroll-section.hidden-top { opacity: 0; transform: scale(0.95) translateY(-60px); }
+        .scroll-section.visible { opacity: 1; transform: translateY(0) scale(1); }
 
-        /* -------------------------------------------
-           HERO SECTION
-        ------------------------------------------- */
+        /* HERO SECTION */
         .hero-scroll-container { height: 250vh; position: relative; }
         .hero-sticky-viewport { position: sticky; top: 0; height: 100vh; width: 100%; overflow: hidden; display: flex; align-items: center; justify-content: center; }
 
@@ -211,59 +242,27 @@
 
         .hero-subtitle-new { font-size: 1.25rem; color: var(--text-muted); max-width: 900px; margin: 24px auto 36px; line-height: 1.7; font-weight: 400; letter-spacing: 0.5px; }
 
-        /* Platform Single-Line Flex Layout */
-        .platform-btns {
-            display: flex;
-            align-items: flex-end;
-            gap: 20px;
-            justify-content: center;
-            margin-bottom: 10px;
-        }
-        
-        .platform-group {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+        .platform-btns { display: flex; align-items: flex-end; gap: 20px; justify-content: center; margin-bottom: 10px; }
+        .platform-group { display: flex; flex-direction: column; align-items: center; }
 
-        .status-label {
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
-            color: var(--text-muted);
-            height: 17px;
-            display: flex;
-            align-items: center;
-        }
-
-        .downloads-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .downloads-row {
-            display: flex;
-            gap: 16px;
-        }
+        .status-label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; color: var(--text-muted); height: 17px; display: flex; align-items: center; }
+        .downloads-container { display: flex; flex-direction: column; align-items: center; }
+        .downloads-row { display: flex; gap: 16px; }
 
         .btn-platform {
             background: rgba(255, 255, 255, 0.03); border: 1px solid var(--glass-border); border-radius: 14px;
-            padding: 16px 28px; display: flex; align-items: center; gap: 12px; color: #FFFFFF; font-weight: 500;
+            padding: 16px 28px; display: flex; align-items: center; justify-content: center; gap: 12px; color: #FFFFFF; font-weight: 500;
             text-decoration: none; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1); position: relative;
         }
         .btn-platform:hover { transform: translateY(-4px); box-shadow: 0 15px 30px rgba(0,0,0,0.4); border-color: rgba(255,255,255,0.2); background: rgba(255, 255, 255, 0.08); }
         .btn-platform svg { width: 22px; height: 22px; fill: var(--text-muted); transition: 0.2s; }
         .btn-platform:hover svg { fill: #FFFFFF; }
 
-        .btn-web { background: var(--accent-blue); color: white; border: none; box-shadow: 0 15px 35px -5px rgba(37,99,235,0.4); }
+        .btn-web { background: var(--accent-blue); color: white; border: none; box-shadow: 0 15px 35px -5px rgba(37,99,235,0.4); width: 100%; }
         .btn-web:hover { background: #1D4ED8; color: white; transform: translateY(-4px); box-shadow: 0 25px 50px -5px rgba(37,99,235,0.5); border-color: transparent; }
         .btn-web svg { stroke: white; fill: none; }
         .btn-web:hover svg { stroke: white; }
 
-        /* Animated Interactive Mockup (Sidebar on Right with translucent background) */
         .mockup-wrapper {
             width: 100%; background: rgba(10, 15, 29, 0.85); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px;
             overflow: hidden; box-shadow: 0 50px 100px -20px rgba(0,0,0,0.9); display: flex; height: 650px; position: relative; text-align: left;
@@ -288,19 +287,8 @@
         .metric-value { font-size: 20px; font-weight: 700; color: #0F172A; font-family: 'Geist', sans-serif;}
         .metric-value.highlight { color: var(--accent-blue); }
 
-        .cursor { width: 24px; height: 24px; background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="%232563EB" stroke="white" stroke-width="2"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/></svg>') no-repeat; position: absolute; z-index: 30; animation: dragAndDrop 6s infinite ease-in-out; }
         .drag-item { position: absolute; width: 260px; background: var(--accent-blue); color: white; padding: 14px 20px; border-radius: 10px; font-weight: 600; font-size: 14px; opacity: 0; animation: itemFollow 6s infinite ease-in-out; box-shadow: 0 15px 35px rgba(37,99,235,0.5); pointer-events: none; z-index: 25; display: flex; justify-content: space-between; font-family: 'Geist', sans-serif; }
-
-        @keyframes dragAndDrop { 
-            0% { top: 140px; left: 860px; } 
-            15% { top: 220px; left: 860px; } 
-            20% { top: 220px; left: 860px; transform: scale(0.9); } 
-            40% { top: 380px; left: 380px; transform: scale(1); } 
-            45% { top: 380px; left: 380px; transform: scale(1); } 
-            60% { top: 220px; left: 750px; } 
-            80% { top: 240px; left: 800px; } 
-            100% { top: 140px; left: 860px; } 
-        }
+        
         @keyframes itemFollow { 
             0%, 20% { opacity: 0; top: 220px; left: 860px; } 
             21% { opacity: 1; top: 220px; left: 860px; } 
@@ -308,21 +296,21 @@
             41%, 100% { opacity: 0; top: 380px; left: 380px; } 
         }
 
-        /* SECTION HEADERS */
         .section-header { text-align: center; padding: var(--section-padding); padding-bottom: 80px; max-width: 900px; margin: 0 auto; }
         .section-header h2 { font-size: clamp(3rem, 5vw, 4.5rem); font-weight: 600; letter-spacing: -0.02em; margin-bottom: 24px; line-height: 1.1; }
-        
         .text-gradient { background: linear-gradient(135deg, #60A5FA, #8B5CF6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; padding-right: 0.1em; display: inline-block; }
 
-        /* FEATURES BENTO GRID */
+        .features-scroll-wrapper { display: block; position: relative; }
+        .features-sticky-container { display: block; position: relative; }
         .bento-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; max-width: var(--max-width); margin: 0 auto; padding: 0 40px 180px; }
+        .bento-slide { display: contents; }
+        
         .bento-card { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 28px; padding: 48px 40px; position: relative; overflow: hidden; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         .bento-card:hover { transform: translateY(-8px); border-color: rgba(37, 99, 235, 0.5); background: rgba(255, 255, 255, 0.04); box-shadow: 0 30px 60px -15px rgba(0,0,0,0.6); }
         .bento-icon { width: 56px; height: 56px; background: rgba(37, 99, 235, 0.15); color: var(--accent-blue); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 32px; }
         .bento-card h3 { font-size: 1.75rem; font-weight: 500; margin-bottom: 16px; color: #FFFFFF; }
         .bento-card p { color: var(--text-muted); font-size: 1.1rem; line-height: 1.7; margin: 0; }
 
-        /* USE CASES SECTION */
         .use-cases-container { display: grid; grid-template-columns: 350px 1fr; gap: 80px; align-items: center; max-width: var(--max-width); margin: 0 auto; padding: 0 40px 180px; }
         .uc-menu { display: flex; flex-direction: column; gap: 12px; }
         .uc-item { padding: 24px 32px; font-size: 1.25rem; font-weight: 500; color: var(--text-muted); border-left: 2px solid transparent; background: transparent; cursor: pointer; transition: all 0.3s ease; border-radius: 0 16px 16px 0; }
@@ -339,32 +327,18 @@
         .uc-metric-container { margin-top: auto; }
         .uc-metric { display: inline-flex; align-items: center; gap: 10px; background: rgba(16, 185, 129, 0.1); color: #10B981; padding: 10px 20px; border-radius: 100px; font-weight: 600; font-size: 1rem; }
 
-        /* CTA SECTION */
         .cta-section { display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: center; max-width: var(--max-width); margin: 0 auto; padding: 0 40px 180px; }
         .cta-content .overline { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 20px; display: block; }
-        .cta-content h2 { font-size: 4rem; font-weight: 600; line-height: 1.1; margin-bottom: 32px; letter-spacing: -0.02em; color: #FFFFFF; }
+        .cta-content h2 { font-size: clamp(3rem, 5vw, 4rem); font-weight: 600; line-height: 1.1; margin-bottom: 32px; letter-spacing: -0.02em; color: #FFFFFF; }
         .cta-content p { font-size: 1.25rem; color: var(--text-muted); margin-bottom: 40px; line-height: 1.7; max-width: 500px; }
-        .btn-white { background-color: #fff; color: #0F172A; border: none; border-radius: 100px; padding: 18px 40px; font-size: 1.15rem; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 10px; transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1); font-family: 'Geist', sans-serif; }
+        .btn-white { background-color: #fff; color: #0F172A; border: none; border-radius: 100px; padding: 18px 40px; font-size: 1.15rem; font-weight: 600; text-decoration: none; display: inline-flex; justify-content: center; align-items: center; gap: 10px; transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1); font-family: 'Geist', sans-serif; }
         .btn-white:hover { background-color: #f8fafc; transform: translateY(-4px) scale(1.03); box-shadow: 0 15px 35px rgba(255,255,255,0.25); }
         .cta-visual { background: #fff; border-radius: 24px; padding: 64px; color: #0F172A; box-shadow: 0 40px 80px -20px rgba(0,0,0,0.6); transform: rotate(3deg); transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); position: relative; }
         .cta-visual:hover { transform: rotate(0deg) scale(1.02); }
         .cta-visual .doc-logo { width: 64px; height: 64px; background: var(--accent-blue); color: #fff; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 32px; margin-bottom: 40px; font-family: 'Clash Grotesk', sans-serif; }
-        .cta-visual h3 { font-size: 3rem; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 40px; line-height: 1.1; max-width: 400px;}
+        .cta-visual h3 { font-size: clamp(2rem, 4vw, 3rem); font-weight: 600; letter-spacing: -0.02em; margin-bottom: 40px; line-height: 1.1; max-width: 400px;}
         .cta-line { height: 12px; background: #E2E8F0; border-radius: 100px; margin-bottom: 16px; }
 
-        @media (max-width: 1024px) {
-            .bento-grid { grid-template-columns: 1fr; }
-            .bento-card { grid-column: span 1 !important; }
-            .use-cases-container { grid-template-columns: 1fr; gap: 40px; }
-            .uc-item { border-left: none; border-bottom: 2px solid transparent; border-radius: 16px 16px 0 0; text-align: center; }
-            .uc-item.active { border-bottom-color: var(--accent-blue); }
-            .uc-display-area { height: 500px; }
-            .cta-section { grid-template-columns: 1fr; gap: 80px; text-align: center; }
-            .cta-content p { margin: 0 auto 40px; }
-            .cta-visual { margin: 0 auto; max-width: 600px; }
-        }
-
-        /* Apple-Style Glass Footer */
         .site-footer { background-color: rgba(11, 15, 25, 0.4); backdrop-filter: blur(40px) saturate(150%); -webkit-backdrop-filter: blur(40px) saturate(150%); border-top: 1px solid rgba(255, 255, 255, 0.05); padding: 100px 40px 60px; }
         .footer-content { max-width: var(--max-width); margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1.5fr; gap: 60px; }
         .footer-brand h2 { font-size: 1.75rem; font-weight: 600; margin-bottom: 20px; color: #fff; letter-spacing: -0.02em; }
@@ -381,103 +355,162 @@
         .contact-form button:hover { background: #1D4ED8; }
         .footer-bottom { max-width: var(--max-width); margin: 80px auto 0; padding-top: 32px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; color: var(--text-muted); font-size: 0.95rem; }
 
-        /* Footer Item Modals */
         .footer-modal-backdrop {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(11, 15, 25, 0.8);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            z-index: 100000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(11, 15, 25, 0.8);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 100000;
+            display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
         }
-        .footer-modal-backdrop.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
+        .footer-modal-backdrop.active { opacity: 1; pointer-events: auto; }
         .footer-modal {
-            background: #111827;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 24px;
-            width: 90%;
-            max-width: 750px;
-            padding: 40px;
-            box-shadow: 0 40px 100px rgba(0,0,0,0.8);
-            transform: translateY(20px) scale(0.95);
-            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            text-align: left;
-            position: relative;
+            background: #111827; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 24px; width: 90%; max-width: 750px;
+            padding: 40px; box-shadow: 0 40px 100px rgba(0,0,0,0.8); transform: translateY(20px) scale(0.95); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            text-align: left; position: relative;
         }
-        .footer-modal-backdrop.active .footer-modal {
-            transform: translateY(0) scale(1);
+        .footer-modal-backdrop.active .footer-modal { transform: translateY(0) scale(1); }
+        .footer-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 16px; }
+        .footer-modal-header h3 { font-family: 'Clash Grotesk', sans-serif; font-size: 1.8rem; color: #fff; margin: 0; }
+        .footer-modal-close { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; transition: background 0.2s; }
+        .footer-modal-close:hover { background: rgba(255,255,255,0.15); }
+        .footer-modal-body { color: var(--text-muted); font-size: 1.05rem; line-height: 1.7; max-height: 65vh; overflow-y: auto; padding-right: 10px; }
+        .footer-modal-body h4 { color: #fff; font-size: 1.2rem; margin-top: 20px; margin-bottom: 8px; font-family: 'Clash Grotesk', sans-serif; }
+        .footer-modal-body ul { padding-left: 20px; margin-bottom: 16px; }
+        .footer-modal-body li { margin-bottom: 12px; }
+
+        @media (max-width: 1024px) {
+            :root { --section-padding: 80px 20px; }
+
+            .desktop-only { display: none !important; }
+            .desktop-menu { display: none; }
+            .hamburger-btn { display: flex; align-items: center; justify-content: center; }
+            .pill-nav { 
+                width: 95%; max-width: none; justify-content: space-between; 
+                padding: 12px 16px; left: 2.5%; transform: none; box-sizing: border-box; 
+                background: rgba(11, 15, 25, 0.6);
+            }
+            .brand-container { margin-right: 0; }
+            .nav-actions { border-left: none; padding-left: 0; margin-left: 0; gap: 12px; }
+            
+            .hero-scroll-container { height: auto; padding-top: 140px; padding-bottom: 60px; }
+            .hero-sticky-viewport { position: relative; height: auto; overflow: visible; display: block; }
+            .hero-text-layer { position: relative; padding: 0 20px; text-align: left; align-items: flex-start; }
+            .hero-badge { margin-bottom: 20px; }
+            
+            .hero-title-massive { font-size: clamp(2.5rem, 11vw, 4.5rem); text-align: left; line-height: 1.1; }
+            .hero-subtitle-new { font-size: 1.1rem; text-align: left; margin: 20px 0 32px; padding: 0; }
+            
+            .platform-btns { flex-direction: column; align-items: stretch; gap: 24px; width: 100%; }
+            .platform-group { align-items: flex-start; width: 100%; }
+            .downloads-container { align-items: flex-start; width: 100%; }
+            .downloads-row { flex-direction: column; width: 100%; gap: 12px; }
+            .btn-platform { justify-content: center; }
+            
+            .hero-mockup-layer {
+                position: relative; transform: none !important; opacity: 1 !important;
+                margin-top: 40px; padding: 0; pointer-events: auto !important;
+                display: flex; justify-content: center; overflow: hidden;
+            }
+            .mockup-wrapper { 
+                width: 1000px !important; height: 650px !important; flex-direction: row !important; flex-shrink: 0;
+                transform: scale(0.35); transform-origin: top center; margin-bottom: -420px;
+            }
+            .mockup-sidebar { width: 280px !important; border-left: 1px solid var(--glass-border) !important; border-top: none !important; }
+            .drag-item { display: none !important; }
+
+            .features-scroll-wrapper {
+                height: 400vh;
+                position: relative;
+                display: block;
+            }
+            .features-sticky-container {
+                position: sticky;
+                top: 0;
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                overflow: hidden;
+            }
+            .features-header {
+                padding-top: 100px;
+                padding-bottom: 20px;
+                flex-shrink: 0;
+                text-align: left;
+            }
+            .features-header h2 { margin-bottom: 0; font-size: clamp(2.5rem, 8vw, 3.5rem); }
+            
+            .features-track-container {
+                width: 100%;
+                overflow: hidden; 
+                display: flex;
+                align-items: center;
+                flex-grow: 1;
+            }
+            .bento-grid.features-track {
+                display: flex;
+                flex-wrap: nowrap;
+                width: max-content; 
+                padding: 0; margin: 0; gap: 0;
+                will-change: transform;
+            }
+            .bento-slide {
+                display: flex;
+                width: 100vw;
+                flex-shrink: 0;
+                padding: 0 20px;
+                align-items: center;
+                justify-content: center;
+                box-sizing: border-box;
+            }
+            .bento-card {
+                width: 100%;
+                margin: 0;
+                padding: 32px 24px;
+                transform: none !important; 
+                box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            }
+
+            .use-cases-container { grid-template-columns: 1fr; gap: 32px; padding: 0 20px 80px; }
+            .uc-menu { flex-direction: row; overflow-x: auto; padding-bottom: 10px; gap: 8px; scrollbar-width: none; -ms-overflow-style: none; }
+            .uc-menu::-webkit-scrollbar { display: none; }
+            .uc-item { padding: 12px 20px; font-size: 1rem; border-left: none; border-bottom: 2px solid transparent; border-radius: 12px; white-space: nowrap; }
+            .uc-item.active { border-bottom-color: var(--accent-blue); background: rgba(255, 255, 255, 0.05); }
+            
+            .uc-display-area { height: auto; min-height: 400px; }
+            .uc-content { position: relative; padding: 32px 24px; opacity: 0; display: none; transform: none !important; }
+            .uc-content.active { opacity: 1; display: flex; }
+            .uc-content h3 { font-size: 2rem; }
+
+            .cta-section { grid-template-columns: 1fr; gap: 60px; text-align: left; padding: 0 20px 80px; }
+            .cta-content p { margin: 0 0 32px 0; }
+            .cta-visual { padding: 40px 32px; }
+
+            .site-footer { padding: 60px 20px 40px; }
+            .footer-content { grid-template-columns: 1fr; gap: 40px; }
+            .footer-bottom { flex-direction: column; gap: 20px; text-align: center; margin-top: 60px; }
+            
+            .footer-modal { width: 95%; padding: 24px; max-height: 90vh; }
+            .footer-modal-header h3 { font-size: 1.5rem; }
         }
-        .footer-modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-            padding-bottom: 16px;
+
+        @media (max-width: 480px) {
+            .mockup-wrapper { transform: scale(0.35); margin-bottom: -420px; }
         }
-        .footer-modal-header h3 {
-            font-family: 'Clash Grotesk', sans-serif;
-            font-size: 1.8rem;
-            color: #fff;
-            margin: 0;
-        }
-        .footer-modal-close {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: #fff;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .footer-modal-close:hover {
-            background: rgba(255,255,255,0.15);
-        }
-        .footer-modal-body {
-            color: var(--text-muted);
-            font-size: 1.05rem;
-            line-height: 1.7;
-            max-height: 65vh;
-            overflow-y: auto;
-            padding-right: 10px;
-        }
-        .footer-modal-body h4 {
-            color: #fff;
-            font-size: 1.2rem;
-            margin-top: 20px;
-            margin-bottom: 8px;
-            font-family: 'Clash Grotesk', sans-serif;
-        }
-        .footer-modal-body ul {
-            padding-left: 20px;
-            margin-bottom: 16px;
-        }
-        .footer-modal-body li {
-            margin-bottom: 12px;
+        @media (max-width: 375px) {
+            .mockup-wrapper { transform: scale(0.32); margin-bottom: -440px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Custom Cursor Elements -->
-    <div class="cursor-dot" id="cursorDot"></div>
-    <div class="cursor-ring" id="cursorRing"></div>
+    <div class="mobile-menu-overlay" id="mobileMenu">
+        <a href="#features" class="mobile-nav-link">Features</a>
+        <a href="#use-cases" class="mobile-nav-link">Use Cases</a>
+        {% if logged_in %}
+            <a href="/dashboard" class="mobile-nav-link">Dashboard</a>
+        {% endif %}
+        <a href="/dashboard" class="btn-accent">Get Started</a>
+    </div>
 
-    <!-- Footer Modal Overlay -->
     <div class="footer-modal-backdrop" id="footerModalBackdrop">
         <div class="footer-modal" id="footerModal">
             <div class="footer-modal-header">
@@ -497,26 +530,40 @@
             <img src="/static/Screenshot 2026-10-09 at 23.50.14.png" alt="QS Logo" class="nav-logo-img">
             <strong style="color: white; font-size: 1.15rem;">QuoStudio</strong>
         </a>
-        <a href="#features" class="nav-link">Features</a>
-        <a href="#use-cases" class="nav-link">Use Cases</a>
         
-        {% if logged_in %}
-            <a href="/dashboard" class="nav-link" style="color: var(--accent-blue); border-left: 1px solid rgba(255,255,255,0.15); padding-left: 20px; margin-left: 10px;">Dashboard</a>
-        {% endif %}
+        <div class="desktop-menu">
+            <a href="#features" class="nav-link">Features</a>
+            <a href="#use-cases" class="nav-link">Use Cases</a>
+            {% if logged_in %}
+                <a href="/dashboard" class="nav-link" style="color: var(--accent-blue); border-left: 1px solid rgba(255,255,255,0.15); padding-left: 20px; margin-left: 10px;">Dashboard</a>
+            {% endif %}
+        </div>
         
         <div class="nav-actions">
             {% if logged_in %}
-                <a href="/dashboard" class="profile-icon" title="Go to Dashboard">
-                    {{ initials }}
-                </a>
+                <div class="profile-dropdown-container">
+                    <button type="button" class="profile-icon" id="profileDropdownToggle" onclick="toggleProfileDropdown(event)" aria-label="Profile menu">
+                        {{ initials }}
+                    </button>
+                    
+                    <div class="profile-dropdown-menu" id="profileDropdownMenu">
+                        <a href="/logout" class="profile-dropdown-item">
+                            <i data-lucide="log-out" style="width: 16px; height: 16px;"></i> Log Out
+                        </a>
+                    </div>
+                </div>
             {% else %}
                 <a href="/login" class="btn-login">Log In</a>
             {% endif %}
-            <a href="/dashboard" class="btn-accent">Get Started</a>
+            
+            <a href="/dashboard" class="btn-accent desktop-only">Get Started</a>
+            
+            <button class="hamburger-btn" id="hamburgerBtn">
+                <i data-lucide="menu"></i>
+            </button>
         </div>
     </nav>
 
-    <!-- FIXED HERO SCROLL: Text holds ground and fades, Mockup slides over -->
     <div class="hero-scroll-container">
         <div class="hero-sticky-viewport">
             <div class="hero-text-layer">
@@ -534,9 +581,7 @@
                     Build precise, beautiful quotes at the speed of thought. Your inventory, pricing,<br class="d-none d-md-block"> and profit—all working in one fluid canvas.
                 </p>
                 
-                <!-- Platform Buttons Single-Line Layout -->
                 <div class="platform-btns">
-                    <!-- Web App Group -->
                     <div class="platform-group">
                         <span class="status-label">Available Now</span>
                         <a href="/dashboard" class="btn-platform btn-web">
@@ -544,30 +589,25 @@
                             Launch Web App
                         </a>
                     </div>
-
-                    <!-- Downloads Group with Coming Soon label centered above macOS & Windows -->
                     <div class="downloads-container">
                         <span class="status-label">Coming Soon</span>
                         <div class="downloads-row">
                             <a href="#" onclick="alert('Coming Soon!')" class="btn-platform">
                                 <svg viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.3 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.3zM242 98.4c21.5-26 31.7-60.5 27.6-98.4-32.6 1.5-70.5 22.3-93.1 48.4-18.2 20.9-30 47.9-26.3 75.7 35.8 2.5 70.3-25.7 91.8-25.7z"/></svg>
-                                Download for macOS
+                                Download macOS
                             </a>
                             <a href="#" onclick="alert('Coming Soon!')" class="btn-platform">
                                 <svg viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M0 93.7l183.6-25.3v177.4H0V93.7zm0 324.6l183.6 25.3V268.4H0v149.9zm203.8 28L448 480V268.4H203.8v177.9zm0-380.6v180.1H448V32L203.8 65.7z"/></svg>
-                                Download for Windows
+                                Download Windows
                             </a>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Mockup with Inventory Catalog on the Right -->
             <div class="hero-mockup-layer">
                 <div class="mockup-wrapper">
-                    <div class="cursor"></div>
                     <div class="drag-item"><span>Enterprise SSL</span><span style="opacity: 0.8;">$450.00</span></div>
-                    
                     <div class="mockup-canvas">
                         <h3 style="color: #0F172A; font-weight: 700; font-size: 28px; margin-bottom: 32px; letter-spacing: -0.02em;">QS Corp Migration</h3>
                         <div class="ui-block"><div><div style="font-size: 15px; font-weight: 600; color: #0F172A; margin-bottom: 6px;">Initial System Audit</div><div style="font-size: 13px; color: #64748B;">Comprehensive review of legacy infrastructure</div></div><div style="font-weight: 600; color: #0F172A; font-size: 15px;">€2,500.00</div></div>
@@ -583,7 +623,6 @@
                             <button class="btn-accent" style="padding: 12px 28px; font-size: 14px; font-family: 'Geist', sans-serif;">Generate PDF</button>
                         </div>
                     </div>
-
                     <div class="mockup-sidebar">
                         <div style="font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.5); letter-spacing: 1px; margin-bottom: 24px; font-family: 'Geist', sans-serif;">INVENTORY CATALOG</div>
                         <div class="mockup-db-item"><div style="font-size: 14px; color: white; font-weight: 500; margin-bottom: 6px;">Cloud Hosting (1TB)</div><div style="font-size: 12px; color: rgba(255,255,255,0.6);">€299.00 / mo</div></div>
@@ -595,42 +634,57 @@
         </div>
     </div>
 
-    <!-- 1. Features Grid Section -->
-    <div id="features" class="section-header scroll-section">
-        <h2>Powerful alone.<br><span style="color: var(--accent-blue);">Unstoppable together.</span></h2>
-        <p style="color: var(--text-muted); font-size: 1.35rem; line-height: 1.7;">Everything you need to close deals faster, built seamlessly into one elegant platform.</p>
+    <div class="features-scroll-wrapper" id="features">
+        <div class="features-sticky-container">
+            
+            <div class="section-header features-header">
+                <h2>Powerful alone.<br><span style="color: var(--accent-blue);">Unstoppable together.</span></h2>
+                <p class="desktop-only" style="color: var(--text-muted); font-size: 1.35rem; line-height: 1.7;">Everything you need to close deals faster, built seamlessly into one elegant platform.</p>
+            </div>
+
+            <div class="features-track-container">
+                <section class="bento-grid features-track">
+                    
+                    <div class="bento-slide" style="grid-column: span 1;">
+                        <div class="bento-card scroll-section">
+                            <div class="bento-icon"><i data-lucide="layout-grid"></i></div>
+                            <h3>Block-based Design</h3>
+                            <p>Construct complex quotes in seconds. Drag, drop, and reorder rich text blocks, tables, and variables directly on an A4 canvas.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bento-slide" style="grid-column: span 2;">
+                        <div class="bento-card scroll-section">
+                            <div class="bento-icon"><i data-lucide="database-zap"></i></div>
+                            <h3>Live Database Sync</h3>
+                            <p>Upload your CSV inventory catalogs and let the engine do the work. Instantly search, filter, and inject products with their exact pricing straight into your proposals.</p>
+                        </div>
+                    </div>
+
+                    <div class="bento-slide" style="grid-column: span 2;">
+                        <div class="bento-card scroll-section">
+                            <div class="bento-icon"><i data-lucide="pie-chart"></i></div>
+                            <h3>Dynamic Margins</h3>
+                            <p>Take control of your financials. Add custom multi-tier taxes, calculate automatic subtotals, and analyze your net profit margins in real-time before you hit send.</p>
+                        </div>
+                    </div>
+
+                    <div class="bento-slide" style="grid-column: span 1;">
+                        <div class="bento-card scroll-section">
+                            <div class="bento-icon"><i data-lucide="pen-tool"></i></div>
+                            <h3>Instant Signatures</h3>
+                            <p>Send quotes securely through the platform. Clients can review, accept, and sign dynamically on any device to instantly lock the document.</p>
+                        </div>
+                    </div>
+                    
+                </section>
+            </div>
+        </div>
     </div>
 
-    <section class="bento-grid">
-        <div class="bento-card scroll-section" style="grid-column: span 1;">
-            <div class="bento-icon"><i data-lucide="layout-grid"></i></div>
-            <h3>Block-based Design</h3>
-            <p>Construct complex quotes in seconds. Drag, drop, and reorder rich text blocks, tables, and variables directly on an A4 canvas.</p>
-        </div>
-        
-        <div class="bento-card scroll-section" style="grid-column: span 2;">
-            <div class="bento-icon"><i data-lucide="database-zap"></i></div>
-            <h3>Live Database Sync</h3>
-            <p>Upload your CSV inventory catalogs and let the engine do the work. Instantly search, filter, and inject products with their exact pricing, SKUs, and specifications straight into your proposals.</p>
-        </div>
-
-        <div class="bento-card scroll-section" style="grid-column: span 2;">
-            <div class="bento-icon"><i data-lucide="pie-chart"></i></div>
-            <h3>Dynamic Profit Margins</h3>
-            <p>Take control of your financials. Add custom multi-tier taxes, calculate automatic subtotals, and analyze your net profit margins in real-time before you ever hit send.</p>
-        </div>
-
-        <div class="bento-card scroll-section" style="grid-column: span 1;">
-            <div class="bento-icon"><i data-lucide="pen-tool"></i></div>
-            <h3>Legally Binding Signatures</h3>
-            <p>Send quotes securely through the platform. Clients can review, accept, and sign dynamically on any device to instantly lock the document.</p>
-        </div>
-    </section>
-
-    <!-- 2. Use Cases Section -->
     <div id="use-cases" class="section-header scroll-section">
         <h2>Built for every<br><span class="text-gradient">workflow.</span></h2>
-        <p style="color: var(--text-muted); font-size: 1.35rem; line-height: 1.7;">Whether you are an independent creator or a scaling enterprise, QuoStudio adapts to your exact quoting needs.</p>
+        <p class="desktop-only" style="color: var(--text-muted); font-size: 1.35rem; line-height: 1.7;">Whether you are an independent creator or a scaling enterprise, QuoStudio adapts to your exact quoting needs.</p>
     </div>
 
     <section class="use-cases-container scroll-section">
@@ -670,7 +724,6 @@
         </div>
     </section>
 
-    <!-- 3. CTA Section -->
     <section class="cta-section scroll-section">
         <div class="cta-content">
             <span class="overline">Make the next big client</span>
@@ -693,9 +746,8 @@
         </div>
     </section>
 
-    <!-- Footer -->
     <footer class="site-footer scroll-section">
-        <div class="footer-content" style="grid-template-columns: 2fr 1fr 1.5fr;">
+        <div class="footer-content">
             <div class="footer-brand">
                 <h2>QuoStudio</h2>
                 <p style="color: var(--text-muted); font-size: 1.05rem; margin-top: 16px; line-height: 1.7;">
@@ -714,18 +766,18 @@
 
             <div class="footer-col">
                 <h4>Contact Us</h4>
-                <form class="contact-form" onsubmit="event.preventDefault(); alert('Message sent successfully! We will get back to you shortly.'); this.reset();">
-                    <input type="text" placeholder="Your Name" required />
-                    <input type="email" placeholder="Your Email" required />
-                    <textarea placeholder="Your Message" required></textarea>
-                    <button type="submit">Send Message</button>
+                <form class="contact-form" id="contactForm" onsubmit="submitContactForm(event)">
+                    <input type="text" name="name" id="contactName" placeholder="Your Name" required />
+                    <input type="email" name="email" id="contactEmail" placeholder="Your Email" required />
+                    <textarea name="message" id="contactMessage" placeholder="Your Message" required></textarea>
+                    <button type="submit" id="contactSubmitBtn">Send Message</button>
                 </form>
             </div>
         </div>
         
         <div class="footer-bottom">
             <div>&copy; 2026 QuoStudio. All rights reserved.</div>
-            <div style="display: flex; gap: 32px; align-items: center;">
+            <div style="display: flex; gap: 32px; align-items: center; justify-content: center;">
                 <a data-modal="privacy" style="cursor: pointer;">Privacy Policy</a>
                 <a data-modal="terms" style="cursor: pointer;">Terms of Service</a>
             </div>
@@ -735,121 +787,130 @@
     <script>
         lucide.createIcons();
 
-        // Custom Cursor Logic
-        const dot = document.getElementById('cursorDot');
-        const ring = document.getElementById('cursorRing');
-
-        let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
-        let ringX = mouseX, ringY = mouseY;
-
-        window.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-            dot.style.transform = `translate3d(${mouseX - 5}px, ${mouseY - 5}px, 0)`;
-        });
-
-        function renderCursor() {
-            ringX += (mouseX - ringX) * 0.15;
-            ringY += (mouseY - ringY) * 0.15;
-            ring.style.transform = `translate3d(${ringX - 18}px, ${ringY - 18}px, 0)`;
-            requestAnimationFrame(renderCursor);
+        // Profile Dropdown Toggle Logic
+        function toggleProfileDropdown(e) {
+            e.stopPropagation();
+            const menu = document.getElementById('profileDropdownMenu');
+            menu.classList.toggle('show');
         }
-        requestAnimationFrame(renderCursor);
 
-        window.addEventListener('mousedown', () => document.body.classList.add('cursor-click'));
-        window.addEventListener('mouseup', () => document.body.classList.remove('cursor-click'));
-
-        // Interactive hover states
-        const interactiveEls = document.querySelectorAll('a, button, .bento-card, .uc-item, .mockup-db-item, input, textarea');
-        interactiveEls.forEach(el => {
-            el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
-            el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+        window.addEventListener('click', function() {
+            const menu = document.getElementById('profileDropdownMenu');
+            if (menu && menu.classList.contains('show')) {
+                menu.classList.remove('show');
+            }
         });
 
-        // Modal Content Database (Comprehensive Multi-Point Detailed Breakdown including v0.0.3 & v0.0.2)
+        // Contact Form Submission Handler
+        function submitContactForm(e) {
+            e.preventDefault();
+            const btn = document.getElementById('contactSubmitBtn');
+            btn.disabled = true;
+            btn.innerText = 'Sending...';
+
+            const formData = {
+                name: document.getElementById('contactName').value,
+                email: document.getElementById('contactEmail').value,
+                message: document.getElementById('contactMessage').value
+            };
+
+            fetch('/api/contact', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Message sent successfully! We will get back to you shortly.');
+                    document.getElementById('contactForm').reset();
+                } else {
+                    alert('Error: ' + (data.error || 'Could not send message.'));
+                }
+            })
+            .catch(err => {
+                alert('An unexpected error occurred. Please try again.');
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.innerText = 'Send Message';
+            });
+        }
+
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        hamburgerBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('active');
+            const icon = hamburgerBtn.querySelector('i');
+            if (mobileMenu.classList.contains('active')) {
+                icon.setAttribute('data-lucide', 'x');
+                document.body.style.overflow = 'hidden'; 
+            } else {
+                icon.setAttribute('data-lucide', 'menu');
+                document.body.style.overflow = '';
+            }
+            lucide.createIcons();
+        });
+        
+        document.querySelectorAll('.mobile-nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('active');
+                hamburgerBtn.querySelector('i').setAttribute('data-lucide', 'menu');
+                document.body.style.overflow = '';
+                lucide.createIcons();
+            });
+        });
+
         const modalData = {
-            features: {
-                title: "Platform Features & Capabilities",
-                content: `
-                    <p>QuoStudio is engineered from the ground up for high-velocity teams and professionals who demand absolute precision, security, and elegance.</p>
-                    <ul>
-                        <li><strong>Block-Based A4 Canvas:</strong> Fluidly drag, drop, and structure rich-text blocks, dynamic variables, and custom line items directly onto a publication-grade A4 layout.</li>
-                        <li><strong>Live Database Integration:</strong> Seamlessly connect external inventory catalogs or CSV uploads to instantly inject verified SKUs, wholesale pricing, and tax specifications into proposals.</li>
-                        <li><strong>Dynamic Margin Analysis:</strong> Real-time calculation of multi-tier taxes, subtotals, and net profit margins before sealing deals.</li>
-                        <li><strong>Client-Side Zero-Knowledge Encryption:</strong> Complete AES-GCM encryption on the client side ensures your catalog data is unreadable to anyone else.</li>
-                        <li><strong>Legally Binding E-Signatures:</strong> Send proposals securely with dynamic multi-device client sign-off capabilities that instantly lock documents.</li>
-                        <li><strong>Cross-Platform Desktop Apps:</strong> Dedicated native application support optimized for both macOS and Windows workflows.</li>
-                    </ul>
-                `
+            features: { 
+                title: "Platform Features", 
+                content: "<p>Engineered for high-velocity teams and modern workflows.</p><ul><li><strong>Block-Based A4 Canvas:</strong> Construct and style professional proposals with rich blocks, tables, and variables.</li><li><strong>Live Database Integration:</strong> Upload CSV inventory catalogs and instantly sync product pricing and details.</li><li><strong>Dynamic Margin Analysis:</strong> Real-time calculation of taxes, subtotals, and net profit margins.</li><li><strong>Client Collaboration & Signatures:</strong> Securely share quotes and collect binding digital signatures on any device.</li></ul>" 
             },
-            business: {
-                title: "Enterprise Business Solutions",
-                content: `
-                    <p>Scale your agency or enterprise quoting workflows with robust multi-tenant security, custom branding, and centralized management.</p>
-                    <ul>
-                        <li><strong>Granular Multi-Tenant Access:</strong> Enforce precise administrative privileges, role-based controls, and secure multi-user review workflows for growing corporate teams.</li>
-                        <li><strong>Zero-Knowledge Architecture:</strong> Leverage client-side end-to-end encryption and isolated cloud data structures ensuring proprietary business metrics remain exclusively yours.</li>
-                        <li><strong>White-Label PDF Exports:</strong> Customize exported proposals with your organization's unique insignia, color palettes, and typographic styling.</li>
-                        <li><strong>Supabase Backend Integration:</strong> Direct PostgreSQL database connectivity leveraging Row-Level Security (RLS) policies.</li>
-                        <li><strong>Dedicated Enterprise SLAs:</strong> 99.9% uptime guarantees backed by 24/7 priority support and infrastructure monitoring.</li>
-                        <li><strong>Centralized Team Management:</strong> Oversee team activity logs, quotation statuses, and pipeline metrics effortlessly.</li>
-                    </ul>
-                `
+            business: { 
+                title: "Business Solutions", 
+                content: "<p>Scale your enterprise quoting workflows seamlessly.</p><ul><li><strong>Granular Multi-Tenant Access:</strong> Role-based access controls and secure workspaces for growing sales teams.</li><li><strong>White-Label PDF Exports:</strong> Generate immaculate PDF proposals branded entirely with your company identity.</li><li><strong>Centralized Team Management:</strong> Track client interaction history, sent quotations, and team activity in one dashboard.</li></ul>" 
             },
-            changelog: {
-                title: "Changelog & System Updates",
-                content: `
-                    <p>Stay up to date with the latest architectural improvements, security enhancements, and feature releases across QuoStudio.</p>
-                    <ul>
-                        <li><strong>v0.0.3 (In Development / Current):</strong> Implementing client-side AES-GCM zero-knowledge encryption, enhanced footer modal breakdowns with multi-point accuracy, and streamlined single-line cross-platform desktop download actions.</li>
-                        <li><strong>v0.0.2 (Live in Production):</strong> Successfully deployed initial core quoting engine, Supabase authentication integration, dynamic profit margin calculators, and glassmorphic user interface components.</li>
-                        <li><strong>v0.0.1 (Alpha):</strong> Initial prototype featuring block-based canvas layout and foundational database architecture.</li>
-                    </ul>
-                `
+            changelog: { 
+                title: "Changelog", 
+                content: "<p>Stay up to date with the latest QuoStudio releases and improvements.</p><ul><li><strong>v1.2.0 (Current):</strong> Introduced contact form database persistence, real-time client history tracking, and enhanced catalog CSV mapping.</li><li><strong>v1.1.0:</strong> Added Supabase authentication workflows, digital signature tracking (IP & user-agent logging), and PDF generation.</li><li><strong>v1.0.0:</strong> Initial release of the core block-based quotation editor and inventory system.</li></ul>" 
             },
-            privacy: {
-                title: "Privacy Policy & Security",
-                content: `
-                    <p>Last updated: October 14, 2026</p>
-                    <p>At QuoStudio, we enforce absolute data privacy and zero-knowledge architecture so that your business data remains exclusively yours.</p>
-                    <ul>
-                        <li><strong>Client-Side Zero-Knowledge Encryption:</strong> All inventory catalogs, pricing matrices, and financial quotes are encrypted locally in your browser using AES-GCM; our servers hold only unreadable ciphertext with zero decryption capability.</li>
-                        <li><strong>Minimal Data Collection:</strong> We strictly collect only your account credentials (name, email, and organization) necessary to maintain your secure session and authentication.</li>
-                        <li><strong>Absolute Data Isolation:</strong> Your inventory catalogs and quotations reside entirely within your private database schema, protected by rigorous Row-Level Security (RLS).</li>
-                        <li><strong>Zero Third-Party Tracking:</strong> We do not sell, rent, or monetize your user telemetry or business records to advertisers or external analytics networks.</li>
-                        <li><strong>Transport Layer Security (TLS):</strong> All network communications between your browser and our servers are secured using industry-standard modern TLS protocols.</li>
-                        <li><strong>User Data Control:</strong> You maintain full authority to export, modify, or permanently purge your account data at any time directly from your dashboard settings.</li>
-                    </ul>
-                `
+            privacy: { 
+                title: "Privacy Policy", 
+                content: "<p>Last updated: October 2026</p>" +
+                         "<p>At QuoStudio, we enforce absolute data privacy and zero-knowledge architecture so that your business data remains exclusively yours.</p>" +
+                         "<ul>" +
+                         "<li><strong>Client-Side Zero-Knowledge Encryption:</strong> All inventory catalogs, pricing matrices, and financial quotes are encrypted locally in your browser using AES-GCM; our servers hold only unreadable ciphertext with zero decryption capability.</li>" +
+                         "<li><strong>Minimal Data Collection:</strong> We strictly collect only your account credentials (name, email, and organization) necessary to maintain your secure session and authentication.</li>" +
+                         "<li><strong>Absolute Data Isolation:</strong> Your inventory catalogs and quotations reside entirely within your private database schema, protected by rigorous Row-Level Security (RLS).</li>" +
+                         "<li><strong>Zero Third-Party Tracking:</strong> We do not sell, rent, or monetize your user telemetry or business records to advertisers or external analytics networks.</li>" +
+                         "<li><strong>Transport Layer Security (TLS):</strong> All network communications between your browser and our servers are secured using industry-standard modern TLS protocols.</li>" +
+                         "<li><strong>User Data Control:</strong> You maintain full authority to export, modify, or permanently purge your account data at any time directly from your dashboard settings.</li>" +
+                         "</ul>" 
             },
-            terms: {
-                title: "Terms of Service",
-                content: `
-                    <p>Last updated: October 14, 2026</p>
-                    <p>By accessing or using QuoStudio, you agree to be bound by these Terms of Service.</p>
-                    <ul>
-                        <li><strong>Data Ownership & Portability:</strong> You retain 100% intellectual property rights and full ownership over all quotation records, pricing matrices, and inventory catalogs created on the platform.</li>
-                        <li><strong>Service Availability & Support:</strong> We guarantee 99.9% uptime reliability across web and desktop applications, supported by dedicated infrastructure monitoring and security compliance.</li>
-                        <li><strong>Acceptable Use Policy:</strong> Users agree not to misuse the platform for unlawful activities, unauthorized data harvesting, or attempting to breach platform security barriers.</li>
-                        <li><strong>Account Responsibility:</strong> You are solely responsible for maintaining the confidentiality of your account credentials and local encryption passphrases.</li>
-                        <li><strong>Modifications to Service:</strong> QuoStudio reserves the right to update features, desktop client binaries, and pricing tiers with advance notice to active subscribers.</li>
-                        <li><strong>Limitation of Liability:</strong> QuoStudio is provided on an "as is" and "as available" basis without warranties of any kind beyond our guaranteed SLAs.</li>
-                    </ul>
-                `
+            terms: { 
+                title: "Terms of Service", 
+                content: "<p>Last updated: October 2026</p>" +
+                         "<p>By accessing or using QuoStudio, you agree to be bound by these Terms of Service.</p>" +
+                         "<ul>" +
+                         "<li><strong>Data Ownership & Portability:</strong> You retain 100% intellectual property rights and full ownership over all quotation records, pricing matrices, and inventory catalogs created on the platform.</li>" +
+                         "<li><strong>Service Availability & Support:</strong> We guarantee 99.9% uptime reliability across web and desktop applications, supported by dedicated infrastructure monitoring and security compliance.</li>" +
+                         "<li><strong>Acceptable Use Policy:</strong> Users agree not to misuse the platform for unlawful activities, unauthorized data harvesting, or attempting to breach platform security barriers.</li>" +
+                         "<li><strong>Account Responsibility:</strong> You are solely responsible for maintaining the confidentiality of your account credentials and local encryption passphrases.</li>" +
+                         "<li><strong>Modifications to Service:</strong> QuoStudio reserves the right to update features, desktop client binaries, and pricing tiers with advance notice to active subscribers.</li>" +
+                         "<li><strong>Limitation of Liability:</strong> QuoStudio is provided on an \"as is\" and \"as available\" basis without warranties of any kind beyond our guaranteed SLAs.</li>" +
+                         "</ul>" 
             }
         };
 
-        // Modal Logic
         const modalBackdrop = document.getElementById('footerModalBackdrop');
         const modalTitle = document.getElementById('modalTitle');
         const modalBody = document.getElementById('modalBody');
-        const modalClose = document.getElementById('modalClose');
 
         document.querySelectorAll('a[data-modal]').forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
-                const modalKey = link.getAttribute('data-modal');
-                const data = modalData[modalKey];
+                const data = modalData[link.getAttribute('data-modal')];
                 if (data) {
                     modalTitle.textContent = data.title;
                     modalBody.innerHTML = data.content;
@@ -858,53 +919,62 @@
             });
         });
 
-        const closeModal = () => {
-            modalBackdrop.classList.remove('active');
-        };
+        const closeModal = () => modalBackdrop.classList.remove('active');
+        document.getElementById('modalClose').addEventListener('click', closeModal);
+        modalBackdrop.addEventListener('click', e => { if (e.target === modalBackdrop) closeModal(); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-        modalClose.addEventListener('click', closeModal);
-        modalBackdrop.addEventListener('click', (e) => {
-            if (e.target === modalBackdrop) closeModal();
-        });
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeModal();
-        });
-
-        // Hero Scroll Animation
         document.addEventListener('DOMContentLoaded', () => {
             const seqContainer = document.querySelector('.hero-scroll-container');
             const textLayer = document.querySelector('.hero-text-layer');
             const mockupLayer = document.querySelector('.hero-mockup-layer');
+            
+            const featuresWrapper = document.querySelector('.features-scroll-wrapper');
+            const featuresTrack = document.querySelector('.features-track');
 
             window.addEventListener('scroll', () => {
-                if(!seqContainer || !textLayer || !mockupLayer) return;
-                
-                const rect = seqContainer.getBoundingClientRect();
-                const maxScroll = seqContainer.offsetHeight - window.innerHeight;
-                let progress = Math.max(0, Math.min(1, -rect.top / maxScroll));
+                if (window.innerWidth > 1024) {
+                    if (seqContainer && textLayer && mockupLayer) {
+                        const rect = seqContainer.getBoundingClientRect();
+                        const maxScroll = seqContainer.offsetHeight - window.innerHeight;
+                        let progress = Math.max(0, Math.min(1, -rect.top / maxScroll));
 
-                let textOpacity = 1 - (progress * 3);
-                textLayer.style.opacity = Math.max(0, textOpacity);
-                textLayer.style.transform = `scale(${1 - (progress * 0.05)})`;
-                textLayer.style.pointerEvents = textOpacity > 0.1 ? 'auto' : 'none';
+                        let textOpacity = 1 - (progress * 3);
+                        textLayer.style.opacity = Math.max(0, textOpacity);
+                        textLayer.style.transform = `scale(${1 + (progress * 0.05)})`;
+                        textLayer.style.pointerEvents = textOpacity > 0.1 ? 'auto' : 'none';
 
-                let mockProgress = Math.max(0, Math.min(1, (progress - 0.1) * 2));
-                mockupLayer.style.opacity = mockProgress;
-                mockupLayer.style.transform = `translateY(${40 - (mockProgress * 40)}vh) scale(${0.9 + (mockProgress * 0.1)})`;
-                mockProgress > 0.95 ? mockupLayer.classList.add('interactive') : mockupLayer.classList.remove('interactive');
+                        let mockProgress = Math.max(0, Math.min(1, (progress - 0.1) * 2));
+                        mockupLayer.style.opacity = mockProgress;
+                        mockupLayer.style.transform = `translateY(${40 * (1 - mockProgress)}vh) scale(${0.9 + (mockProgress * 0.1)})`;
+                        mockProgress > 0.95 ? mockupLayer.classList.add('interactive') : mockupLayer.classList.remove('interactive');
+                    }
+                    if (featuresTrack) featuresTrack.style.transform = 'none'; 
+                } 
+                else {
+                    if (featuresWrapper && featuresTrack) {
+                        const rect = featuresWrapper.getBoundingClientRect();
+                        const maxScroll = featuresWrapper.offsetHeight - window.innerHeight;
+                        
+                        let progress = -rect.top / maxScroll;
+                        progress = Math.max(0, Math.min(1, progress));
+                        
+                        const maxScrollLeft = featuresTrack.scrollWidth - window.innerWidth;
+                        const translateX = progress * -maxScrollLeft;
+                        featuresTrack.style.transform = `translate3d(${translateX}px, 0, 0)`;
+                    }
+                }
             });
         });
 
-        // Global Bi-Directional Scroll Animations (Fade out top, Roll up bottom)
         const scrollObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-                const rect = entry.boundingClientRect;
                 if (entry.isIntersecting) {
                     entry.target.classList.remove('hidden-bottom', 'hidden-top');
                     entry.target.classList.add('visible');
                 } else {
                     entry.target.classList.remove('visible');
-                    if (rect.top < 0) {
+                    if (entry.boundingClientRect.top < 0) {
                         entry.target.classList.add('hidden-top');
                     } else {
                         entry.target.classList.add('hidden-bottom');
@@ -918,7 +988,6 @@
             scrollObserver.observe(sec);
         });
 
-        // Interactive Use Cases Menu
         const ucItems = document.querySelectorAll('.uc-item');
         const ucContents = document.querySelectorAll('.uc-content');
 

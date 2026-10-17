@@ -125,6 +125,17 @@ def init_db():
             is_read BOOLEAN DEFAULT FALSE
         )
     ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS contact_messages (
+            id SERIAL PRIMARY KEY,
+            name VARCHAR(255) NOT NULL,
+            email VARCHAR(255) NOT NULL,
+            message TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            is_read BOOLEAN DEFAULT FALSE
+        )
+    ''')
     
     try:
         cursor.execute("ALTER TABLE users DROP COLUMN IF EXISTS password;")
@@ -352,14 +363,14 @@ def set_flask_session():
 @app.route('/logout')
 def logout():
     session.clear()
-    return redirect(url_for('login'))
+    return redirect(url_for('index'))
 
 # ==========================================
 # DASHBOARD & SETTINGS
 # ==========================================
 @app.route('/dashboard')
 def dashboard():
-    if 'user_id' not in session: return redirect(url_for('login'))
+    if 'user_id' not in session: return redirect(url_for('index'))
         
     user_id = session['user_id']
     conn = get_db_connection()
@@ -685,6 +696,33 @@ def send_message():
     cursor.close()
     conn.close()
     return jsonify({'status': 'success'})
+
+# ==========================================
+# CONTACT FORM API ROUTE
+# ==========================================
+@app.route('/api/contact', methods=['POST'])
+def contact_submit():
+    data = request.get_json() or request.form
+    name = data.get('name')
+    email = data.get('email')
+    message = data.get('message')
+    
+    if not name or not email or not message:
+        return jsonify({'success': False, 'error': 'All fields are required.'}), 400
+        
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            'INSERT INTO contact_messages (name, email, message) VALUES (%s, %s, %s)',
+            (name, email, message)
+        )
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return jsonify({'success': True, 'message': 'Message sent successfully!'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 # ==========================================
 # INVENTORY & CATALOG ROUTES

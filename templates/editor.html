@@ -3,6 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Editor - {{ quote.client_name }}</title>
     
     <!-- Premium Fonts: Clash Grotesk (Headings) & Geist (Body) -->
@@ -70,23 +71,23 @@
             background-image: linear-gradient(to bottom, rgba(241, 245, 249, 0.93), rgba(241, 245, 249, 0.93)), url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop');
         }
 
-        .app-layout { display: flex; height: 100vh; width: 100vw; }
-        .main-area { flex-grow: 1; display: flex; flex-direction: column; position: relative; }
+        .app-layout { display: flex; height: 100vh; width: 100vw; position: relative; }
+        .main-area { flex-grow: 1; display: flex; flex-direction: column; position: relative; overflow: hidden; }
 
         /* Glassmorphic Navbar */
         .top-header { 
-            min-height: 80px; 
+            min-height: 70px; 
             background-color: var(--bg-nav); 
             backdrop-filter: var(--blur-val); -webkit-backdrop-filter: var(--blur-val);
             border-bottom: 1px solid var(--border-color); 
-            display: flex; align-items: center; justify-content: space-between; padding: 20px 32px; z-index: 40; transition: 0.3s; 
+            display: flex; align-items: center; justify-content: space-between; padding: 12px 24px; z-index: 40; transition: 0.3s; 
         }
-        .breadcrumb-title { font-weight: 500; color: var(--text-muted); font-size: 14px; display: flex; align-items: center; gap: 12px; }
+        .breadcrumb-title { font-weight: 500; color: var(--text-muted); font-size: 14px; display: flex; align-items: center; gap: 10px; }
         .doc-title { color: var(--text-main); font-weight: 600; }
         .status-dot { width: 6px; height: 6px; background: #10B981; border-radius: 50%; display: inline-block; box-shadow: 0 0 8px rgba(16,185,129,0.6); }
         .status-dot.locked { background: #F59E0B; box-shadow: 0 0 8px rgba(245,158,11,0.6); }
         
-        .header-actions { display: flex; align-items: center; gap: 12px; }
+        .header-actions { display: flex; align-items: center; gap: 10px; }
         .btn-outline-darker { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 16px; border-radius: 100px; font-size: 13px; font-weight: 600; transition: 0.2s; cursor: pointer;}
         .btn-outline-darker:hover { background: var(--bg-card-hover); border-color: var(--border-hover); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
         .btn-primary-custom { background: var(--accent-blue); border: none; color: white; padding: 8px 20px; border-radius: 100px; font-size: 13px; font-weight: 600; transition: 0.2s;}
@@ -94,11 +95,10 @@
         .btn-success-custom { background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #10B981; padding: 8px 20px; border-radius: 100px; font-size: 13px; font-weight: 600; }
         .btn-warning-custom { background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); color: #F59E0B; padding: 8px 20px; border-radius: 100px; font-size: 13px; font-weight: 600; }
         
-        .avatar { width: 34px; height: 34px; background: var(--accent-blue); border-radius: 50%; border: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: white; margin-left: 12px; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .avatar { width: 34px; height: 34px; background: var(--accent-blue); border-radius: 50%; border: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: white; margin-left: 8px; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
         .avatar:hover { transform: scale(1.05); border-color: rgba(255,255,255,0.3); }
         .avatar::after { display: none !important; }
 
-        /* Fixed Profile Dropdown Hover Text Visibility */
         .dropdown-menu .dropdown-item {
             color: var(--text-main) !important;
             font-weight: 500;
@@ -112,9 +112,22 @@
             color: #EF4444 !important;
         }
 
-        .workspace { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 60px 0 100px 0; background-color: transparent; transition: 0.3s; perspective: 1000px; position: relative; }
+        /* Workspace and Zoom containment */
+        .workspace { 
+            flex-grow: 1; 
+            overflow-y: auto; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 20px 16px 40px 16px; 
+            background-color: transparent; 
+            transition: 0.3s; 
+            perspective: 1000px; 
+            position: relative; 
+            -webkit-overflow-scrolling: touch; 
+            box-sizing: border-box; 
+        }
         
-        /* Zoom Container Wrapper */
         #zoomWrapper {
             display: flex;
             flex-direction: column;
@@ -122,6 +135,7 @@
             width: 100%;
             transition: transform 0.2s ease;
             transform-origin: top center;
+            margin-bottom: 0;
         }
 
         #documentContainer {
@@ -129,14 +143,13 @@
             flex-direction: column;
             align-items: center;
             width: 100%;
+            margin-bottom: 0;
         }
 
-        /* Fixed Screen-Centered Bottom Zoom Pill - Centered to the page area accounting for right panel */
         .zoom-floating-pill {
             position: fixed;
-            bottom: 24px;
-            left: calc(50% - 180px);
-            transform: translateX(-50%);
+            bottom: 20px;
+            left: 20px;
             background: var(--modal-bg);
             backdrop-filter: var(--blur-val);
             -webkit-backdrop-filter: var(--blur-val);
@@ -147,14 +160,14 @@
             align-items: center;
             gap: 10px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            z-index: 1000;
+            z-index: 1020;
         }
         .zoom-floating-pill button {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             color: var(--text-main);
-            width: 30px;
-            height: 30px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             font-size: 16px;
             font-weight: bold;
@@ -180,28 +193,16 @@
             text-align: center;
         }
 
-        /* Ensure number input spinners (arrows) adapt correctly to theme */
-        input[type="number"] {
-            color-scheme: dark;
-        }
-        body.light-theme input[type="number"] {
-            color-scheme: light;
+        @media (min-width: 992px) {
+            .zoom-floating-pill { left: calc(50% - 180px); transform: translateX(-50%); }
         }
 
-        /* Fix modal backdrop overlay clipping/cut-off issue */
-        .modal-backdrop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: #000;
-        }
-        .modal-backdrop.show {
-            opacity: 0.6;
-        }
+        input[type="number"] { color-scheme: dark; }
+        body.light-theme input[type="number"] { color-scheme: light; }
 
-        /* The Document Page (Stays white for PDF export fidelity - Normal fonts for print) */
+        .modal-backdrop { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #000; }
+        .modal-backdrop.show { opacity: 0.6; }
+
         .page { 
             width: 210mm; 
             height: 297mm !important; 
@@ -217,7 +218,7 @@
             flex-direction: column; 
             overflow: hidden; 
             flex-shrink: 0; 
-            margin-bottom: 20mm; 
+            margin-bottom: 12mm; 
             font-family: Arial, Helvetica, "Segoe UI", -apple-system, sans-serif !important;
         }
         .page h1, .page h2, .page h3, .page h4, .page h5, .page h6, 
@@ -229,8 +230,23 @@
         .content-layer { position: relative; z-index: 1; display: flex; flex-direction: column; height: 100%; padding: 20mm; box-sizing: border-box; }
 
         {% if is_editable %}
-        [contenteditable="true"] { outline: none; border-bottom: 1px dashed transparent; transition: 0.2s; }
-        [contenteditable="true"]:hover { border-bottom: 1px dashed #CBD5E1; background: rgba(0,0,0,0.02); }
+        [contenteditable="true"] { 
+            outline: none; 
+            border-bottom: 1px dashed rgba(37, 99, 235, 0.4); 
+            background: rgba(37, 99, 235, 0.02);
+            border-radius: 4px;
+            padding: 2px 6px;
+            transition: 0.2s; 
+        }
+        [contenteditable="true"]:hover { 
+            border-bottom: 1px dashed #2563EB; 
+            background: rgba(37, 99, 235, 0.06); 
+        }
+        [contenteditable="true"]:focus {
+            background: rgba(37, 99, 235, 0.08);
+            border-bottom: 2px solid #2563EB;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
         {% else %}
         [contenteditable="true"] { outline: none; border-bottom: none; cursor: default; }
         {% endif %}
@@ -239,12 +255,12 @@
         .doc-h1 { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.02em; margin: 0; color: #0F172A; padding: 4px; }
         .meta-row { display: flex; padding: 12px 0; margin-bottom: 16px; gap: 32px; }
         .meta-col { flex: 1; }
-        .meta-label { font-size: 9px; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; font-family: inherit; }
+        .meta-label { font-size: 9px; font-weight: 700; color: #334155; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; font-family: inherit; }
         .meta-value { font-size: 13px; font-weight: 600; color: #0F172A; }
 
-        .quote-table { width: 100%; font-size: 12.5px; border-collapse: collapse; color: #0F172A; }
-        .quote-table th { padding: 12px 8px; font-weight: 600; text-transform: uppercase; font-size: 10px; color: #94A3B8; border-bottom: 1px solid rgba(226, 232, 240, 0.8); }
-        .quote-table td { padding: 14px 8px; vertical-align: top; border-bottom: 1px solid rgba(241, 245, 249, 0.5); transition: background-color 0.2s; word-break: break-word; }
+        .quote-table { width: 100%; font-size: 12.5px; border-collapse: collapse; color: #0F172A; table-layout: fixed; }
+        .quote-table th { padding: 12px 6px; font-weight: 600; text-transform: uppercase; font-size: 10px; color: #334155; border-bottom: 1px solid rgba(226, 232, 240, 0.8); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .quote-table td { padding: 12px 6px; vertical-align: middle; border-bottom: 1px solid rgba(241, 245, 249, 0.5); transition: background-color 0.2s; }
         
         {% if is_editable %}
         .quote-table tbody tr { cursor: grab; }
@@ -257,7 +273,7 @@
         .delete-btn { display: none !important; }
         {% endif %}
         
-        .item-name { font-weight: 600; color: #0F172A; font-size: 13.5px; margin-bottom: 4px; white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word; }
+        .item-name { font-weight: 600; color: #0F172A; font-size: 13px; white-space: normal; overflow: visible; word-break: break-word; line-height: 1.3; }
         
         .dragging { opacity: 0.4; background-color: rgba(248, 250, 252, 0.8); }
         .drag-over { border-top: 2px solid #2563EB !important; background-color: rgba(239, 246, 255, 0.8) !important; }
@@ -267,26 +283,24 @@
         .payment-section { width: 35%; padding-right: 20px; color: #0F172A; }
         .signature-section { width: 30%; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
         .totals-section { width: 35%; color: #0F172A; }
-        .totals-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; color: #64748B; }
+        .totals-row { display: flex; color: #334155; justify-content: space-between; margin-bottom: 8px; font-size: 13px; color: #334155; }
         .totals-row.grand { font-size: 16px; font-weight: 700; color: #0F172A; margin-top: 16px; border-top: 2px solid rgba(226, 232, 240, 0.8); padding-top: 16px; }
 
         /* Glassmorphic Right Panel */
         .right-panel { 
-            width: 360px; 
+            width: 380px; 
             background-color: var(--bg-panel); 
             backdrop-filter: var(--blur-val); -webkit-backdrop-filter: var(--blur-val);
             border-left: 1px solid var(--border-color); 
             display: flex; flex-direction: column; overflow: hidden; z-index: 40; transition: 0.3s; 
         }
         
-        .tab-btn { background: transparent; border: none; color: var(--text-muted); padding: 16px 0; font-size: 13.5px; font-weight: 600; border-bottom: 2px solid transparent; cursor: pointer; transition: 0.2s; outline: none; }
+        .tab-btn { background: transparent; border: none; color: var(--text-muted); padding: 16px 0; font-size: 14px; font-weight: 600; border-bottom: 2px solid transparent; cursor: pointer; transition: 0.2s; outline: none; }
         .tab-btn:hover { color: var(--text-main); background: rgba(255,255,255,0.02); }
         .tab-btn.active { color: var(--text-main); border-bottom-color: var(--accent-blue); }
 
-        /* Guaranteed High Contrast Label matching "Choose a loaded catalog..." color */
         .ui-label { font-size: 12px; font-weight: 700; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; display: block; opacity: 1; }
 
-        /* Shifted arrow to the left with right padding */
         .db-select { 
             background: var(--input-bg); 
             border: 1px solid var(--border-color); 
@@ -307,30 +321,18 @@
         }
         .db-select:focus { outline: none; border-color: var(--accent-blue); box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
         
-        /* High contrast placeholder color matching dropdown text */
-        .form-control::placeholder {
-            color: var(--text-muted) !important;
-            opacity: 1;
-        }
-        .form-control::-webkit-input-placeholder {
-            color: var(--text-muted) !important;
-            opacity: 1;
-        }
-        .form-control::-moz-placeholder {
-            color: var(--text-muted) !important;
-            opacity: 1;
-        }
-        .form-control:-ms-input-placeholder {
-            color: var(--text-muted) !important;
-            opacity: 1;
-        }
+        .form-control::placeholder { color: var(--text-muted) !important; opacity: 1; }
+        .form-control::-webkit-input-placeholder { color: var(--text-muted) !important; opacity: 1; }
+        .form-control::-moz-placeholder { color: var(--text-muted) !important; opacity: 1; }
+        .form-control:-ms-input-placeholder { color: var(--text-muted) !important; opacity: 1; }
 
-        .inventory-item { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 12px; padding: 14px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: all 0.2s ease; }
+        .inventory-item { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 12px; padding: 14px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; cursor: pointer; transition: all 0.2s ease; }
+        .inv-name { flex: 1; min-width: 0; word-break: break-word; white-space: normal; }
+        .inv-price { white-space: nowrap; flex-shrink: 0; }
         .inventory-item:hover { border-color: var(--border-hover); background: var(--bg-card-hover); transform: translateY(-2px); }
         .inventory-item.selected { border-color: var(--accent-blue); background: rgba(37, 99, 235, 0.15); }
         .inventory-item.selected .inv-name { color: #60A5FA; font-weight: 600; }
         
-        /* Glassmorphic Modals */
         .modal-content { 
             background-color: var(--modal-bg) !important; 
             backdrop-filter: var(--blur-val); -webkit-backdrop-filter: var(--blur-val);
@@ -339,7 +341,6 @@
         .form-control { background-color: var(--input-bg) !important; color: var(--text-main) !important; border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 16px; transition: 0.3s; }
         .form-control:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 4px rgba(37,99,235,0.15); }
         
-        /* Fixed Search Result Padding & Outline Cut-off */
         .client-search-result { 
             padding: 12px 16px; 
             border: 1px solid var(--border-color); 
@@ -358,18 +359,97 @@
         .signature-box { border: 2px dashed #CBD5E1; border-radius: 12px; height: 100px; display: flex; align-items: center; justify-content: center; font-family: 'Brush Script MT', cursive; font-size: 32px; color: #0F172A; margin-top: 16px; cursor: pointer; background: white; transition: 0.2s; }
         .signature-box:hover { border-color: var(--accent-blue); background: #F8FAFC; }
 
-        /* Fade & Roll Scroll Animation specifically for pages */
-        .scroll-section {
-            will-change: opacity, transform;
-        }
+        .scroll-section { will-change: opacity, transform; }
         .scroll-section.hidden-bottom { opacity: 0; transform: translateY(40px) scale(0.98); }
         .scroll-section.hidden-top { opacity: 0; transform: translateY(-20px) scale(0.98); }
         .scroll-section.visible { opacity: 1; transform: translateY(0) scale(1); }
 
+        #dynamicColsContainer.disabled-section {
+            opacity: 0.4;
+            pointer-events: none;
+            filter: grayscale(50%);
+        }
+
+        /* Mobile Responsive Optimizations */
+        .mobile-panel-toggle { display: none; }
+        .mobile-panel-overlay { display: none; }
+
+        @media (max-width: 991px) {
+            .app-layout { flex-direction: column; height: 100vh; overflow: hidden; }
+            .right-panel {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                width: 100% !important;
+                height: 82vh;
+                max-height: 82vh;
+                z-index: 1050;
+                border-left: none;
+                border-top: 1px solid var(--border-color);
+                border-radius: 28px 28px 0 0;
+                transform: translateY(105%);
+                transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+                box-shadow: 0 -15px 50px rgba(0,0,0,0.6);
+            }
+            .right-panel.open {
+                transform: translateY(0);
+            }
+            .mobile-panel-overlay {
+                display: block;
+                position: fixed;
+                top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0,0,0,0.6);
+                backdrop-filter: blur(6px);
+                z-index: 1040;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.3s;
+            }
+            .mobile-panel-overlay.show {
+                opacity: 1;
+                pointer-events: auto;
+            }
+            .mobile-panel-toggle {
+                display: flex;
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                z-index: 1020;
+                background: var(--accent-blue);
+                color: white;
+                border: none;
+                border-radius: 100px;
+                padding: 10px 18px;
+                font-weight: 600;
+                font-size: 13px;
+                box-shadow: 0 10px 25px rgba(37,99,235,0.4);
+                align-items: center;
+                gap: 6px;
+            }
+            .zoom-floating-pill {
+                left: 20px;
+                transform: none;
+                bottom: 20px;
+                padding: 4px 10px;
+            }
+            .top-header { padding: 12px 16px; min-height: 64px; }
+            .workspace { padding: 12px 8px 30px 8px; }
+        }
+
         @media print {
             @page { size: A4 portrait; margin: 0; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            .cinematic-bg, .zoom-floating-pill, .d-print-none { display: none !important; }
+            .cinematic-bg, .zoom-floating-pill, .d-print-none, .mobile-panel-toggle, .mobile-panel-overlay { display: none !important; }
+            
+            [contenteditable="true"] {
+                border-bottom: none !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                padding: 0 !important;
+            }
+
             html, body { background: #ffffff !important; width: 210mm; height: 297mm; margin: 0; padding: 0; overflow: visible; }
             .app-layout, .main-area, .workspace { display: block; height: auto; width: 100%; overflow: visible; background: none; padding: 0; margin: 0; }
             #zoomWrapper, #documentContainer { transform: none !important; width: 100% !important; display: block !important; margin: 0 !important; padding: 0 !important; }
@@ -386,49 +466,53 @@
 <div class="app-layout">
     <div class="main-area">
         <div class="top-header d-print-none">
-            <div class="d-flex align-items-center gap-4">
-                <a href="/dashboard" class="text-decoration-none"><div style="width: 28px; height: 28px; background: var(--accent-blue); color: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; font-family: 'Clash Grotesk', sans-serif;">Q</div></a>
+            <div class="d-flex align-items-center gap-3">
+                <a href="/dashboard" class="text-decoration-none" title="Return to Dashboard"><div style="width: 28px; height: 28px; background: var(--accent-blue); color: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; font-family: 'Clash Grotesk', sans-serif;">Q</div></a>
                 <div class="breadcrumb-title">
-                    QuoStudio / <span class="doc-title">{{ quote.client_name }}</span> 
+                    <span class="d-none d-sm-inline">QuoStudio /</span> <span class="doc-title text-truncate" style="max-width: 140px;">{{ quote.client_name }}</span> 
                     
                     {% if quote.status == 'draft' %}
-                        <span class="status-dot"></span> <span style="color: #10B981; font-size: 12px; font-weight: 600;">Saved Draft</span>
+                        <span class="status-dot"></span> <span style="color: #10B981; font-size: 12px; font-weight: 600;" class="d-none d-md-inline">Saved Draft</span>
                     {% elif quote.status == 'sent' %}
-                        <span class="status-dot locked"></span> <span style="color: #F59E0B; font-size: 12px; font-weight: 600;">Locked • Sent</span>
+                        <span class="status-dot locked"></span> <span style="color: #F59E0B; font-size: 12px; font-weight: 600;" class="d-none d-md-inline">Locked • Sent</span>
                     {% elif quote.status == 'accepted' %}
-                        <span class="status-dot"></span> <span style="color: #10B981; font-size: 12px; font-weight: 600;">Locked • Signed</span>
+                        <span class="status-dot"></span> <span style="color: #10B981; font-size: 12px; font-weight: 600;" class="d-none d-md-inline">Locked • Signed</span>
                     {% endif %}
                 </div>
             </div>
             
             <div class="header-actions">
-                <button class="btn-outline-darker" onclick="window.print()">Print / Download</button>
+                <!-- Optimized responsive text: displays "Print / Download" on medium+ screens and "PDF" on mobile phones -->
+                <button class="btn-outline-darker px-3 px-sm-4" onclick="window.print()" title="Print document or save as PDF">
+                    <span class="d-none d-md-inline">Print / Download</span>
+                    <span class="d-inline d-md-none">PDF</span>
+                </button>
                 
                 {% if is_owner %}
                     {% if quote.status == 'draft' %}
-                        <button class="btn-primary-custom" data-bs-toggle="modal" data-bs-target="#sendModal">Send quote</button>
+                        <button class="btn-primary-custom" data-bs-toggle="modal" data-bs-target="#sendModal" title="Send quotation to client">Send</button>
                     {% elif quote.status == 'sent' %}
-                        <span class="btn-warning-custom">Awaiting Signature</span>
+                        <span class="btn-warning-custom small px-3">Pending</span>
                     {% elif quote.status == 'accepted' %}
-                        <span class="btn-success-custom">Accepted & Signed</span>
+                        <span class="btn-success-custom small px-3">Signed</span>
                     {% endif %}
                 {% endif %}
                 
                 {% if is_recipient %}
                     {% if quote.status == 'sent' %}
-                        <button class="btn-primary-custom" data-bs-toggle="modal" data-bs-target="#acceptModal" style="background: #10B981;">Review & Accept</button>
+                        <button class="btn-primary-custom" data-bs-toggle="modal" data-bs-target="#acceptModal" style="background: #10B981;" title="Review terms and sign quotation">Review & Accept</button>
                     {% elif quote.status == 'accepted' %}
-                        <span class="btn-success-custom">You Accepted This</span>
+                        <span class="btn-success-custom">Accepted</span>
                     {% endif %}
                 {% endif %}
                 
                 <div class="dropdown">
-                    <div class="avatar dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{ initials }}</div>
+                    <div class="avatar dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Account profile & settings">{{ initials }}</div>
                     <ul class="dropdown-menu dropdown-menu-end shadow-lg" style="background-color: var(--modal-bg); backdrop-filter: blur(24px); border-color: var(--border-color); border-radius: 16px; padding: 8px;">
-                        <li><a class="dropdown-item d-flex align-items-center rounded" href="/dashboard"><i data-lucide="home" class="me-3" style="width: 16px; height: 16px;"></i> Dashboard</a></li>
-                        <li><a class="dropdown-item d-flex align-items-center rounded" href="#" onclick="toggleTheme()"><i data-lucide="moon" class="me-3" style="width: 16px; height: 16px;"></i> Toggle Theme</a></li>
+                        <li><a class="dropdown-item d-flex align-items-center rounded py-2" href="/dashboard"><i data-lucide="home" class="me-3" style="width: 16px; height: 16px;"></i> Dashboard</a></li>
+                        <li><a class="dropdown-item d-flex align-items-center rounded py-2" href="#" onclick="toggleTheme()"><i data-lucide="moon" class="me-3" style="width: 16px; height: 16px;"></i> Toggle Theme</a></li>
                         <li><hr class="dropdown-divider" style="border-color: var(--border-color); margin: 8px 0;"></li>
-                        <li><a class="dropdown-item text-danger d-flex align-items-center rounded fw-bold" href="/logout"><i data-lucide="log-out" class="me-3" style="width: 16px; height: 16px;"></i> Log Out</a></li>
+                        <li><a class="dropdown-item text-danger d-flex align-items-center rounded py-2 fw-bold" href="/logout"><i data-lucide="log-out" class="me-3" style="width: 16px; height: 16px;"></i> Log Out</a></li>
                     </ul>
                 </div>
             </div>
@@ -440,20 +524,33 @@
             </div>
         </div>
 
-        <!-- Fixed Screen-Centered Bottom Zoom Pill centered specifically to the document viewing area -->
+        <!-- Fixed Zoom Indicator on the LEFT side -->
         <div class="zoom-floating-pill d-print-none">
-            <button onclick="adjustZoom(-0.1)" title="Zoom Out">−</button>
+            <button onclick="adjustZoom(-0.1)" title="Zoom out document view">−</button>
             <span id="zoomLevelDisplay">100%</span>
-            <button onclick="adjustZoom(0.1)" title="Zoom In">+</button>
+            <button onclick="adjustZoom(0.1)" title="Zoom in document view">+</button>
         </div>
+
+        <!-- Mobile Drawer Toggle Button on the RIGHT side -->
+        {% if is_editable %}
+        <button class="mobile-panel-toggle d-print-none" onclick="toggleMobilePanel()" title="Open editor controls & catalog inventory">
+            <i data-lucide="sliders-horizontal" style="width: 16px; height: 16px;"></i> Customize
+        </button>
+        <div class="mobile-panel-overlay d-print-none" id="mobileOverlay" onclick="toggleMobilePanel()"></div>
+        {% endif %}
     </div>
 
     {% if is_editable %}
-    <div class="right-panel d-print-none">
-        
+    <div class="right-panel d-print-none" id="rightPanel">
+        <div class="d-flex d-lg-none justify-content-between align-items-center px-4 pt-3 pb-2 border-bottom" style="border-color: var(--border-color) !important;">
+            <div class="fw-bold brand-text fs-5" style="color: var(--text-main);">Editor Controls</div>
+            <button class="btn btn-sm btn-close" style="filter: var(--invert-close, invert(1));" onclick="toggleMobilePanel()"></button>
+        </div>
+
+        <!-- Tabs Header -->
         <div class="tabs-header d-flex border-bottom" style="border-color: var(--border-color) !important; flex-shrink: 0;">
-            <button class="tab-btn active flex-fill d-flex align-items-center justify-content-center" onclick="switchTab('inventory')"><i data-lucide="archive" class="me-2" style="width: 16px; height: 16px;"></i> Inventory</button>
-            <button class="tab-btn flex-fill d-flex align-items-center justify-content-center" onclick="switchTab('setup')"><i data-lucide="settings" class="me-2" style="width: 16px; height: 16px;"></i> Setup</button>
+            <button class="tab-btn active flex-fill d-flex align-items-center justify-content-center" onclick="switchTab('inventory')" title="Browse product databases & inventory items"><i data-lucide="archive" class="me-2" style="width: 16px; height: 16px;"></i> Inventory</button>
+            <button class="tab-btn flex-fill d-flex align-items-center justify-content-center" onclick="switchTab('setup')" title="Configure taxes, discounts, currency, and branding"><i data-lucide="settings" class="me-2" style="width: 16px; height: 16px;"></i> Setup</button>
         </div>
         
         <div class="tab-content-container" style="flex-grow: 1; overflow-y: auto;">
@@ -461,33 +558,62 @@
             <!-- INVENTORY TAB -->
             <div id="tab-inventory" class="tab-pane" style="display: block; padding: 24px;">
                 <label class="ui-label">Select a database to view items</label>
-                <select id="dbSelect" class="db-select mb-3" onchange="fetchDatabase(this.value)">
+                <select id="dbSelect" class="db-select mb-3" onchange="fetchDatabase(this.value)" title="Choose a loaded product dataset">
                     <option value="" disabled selected>Choose a loaded catalog...</option>
                     {% for cat in catalogs %}
                     <option value="{{ cat.id }}">{{ cat.name }}</option>
                     {% endfor %}
                 </select>
 
-                <div class="mb-4 p-3 rounded-4" style="background: rgba(255, 255, 255, 0.03); border: 1px dashed var(--border-color);">
-                    <label class="ui-label">Dataset Name</label>
-                    <form action="/upload_catalog" method="POST" enctype="multipart/form-data">
-                        <input type="hidden" name="quote_id" value="{{ quote.id }}">
-                        <input type="text" name="catalog_name" class="form-control mb-2" placeholder="Dataset Name" required>
-                        <input type="file" name="csv_file" accept=".csv" class="form-control p-2 mb-1" required>
-                        <div class="mb-2 fw-semibold" style="font-size: 11px; color: #EF4444;">* only supports csv</div>
-                        <button type="submit" class="btn w-100 fw-bold rounded-pill mt-1" style="background: var(--bg-card-hover); color: var(--text-main); border: 1px solid var(--border-hover); font-size: 13px;">Upload & Reload</button>
-                    </form>
+                <!-- Sleek Expandable Upload Accordion with Explicit Text -->
+                <div class="mb-4">
+                    <button type="button" class="btn w-100 d-flex align-items-center justify-content-between p-3 rounded-4 fw-bold" style="background: rgba(255, 255, 255, 0.03); border: 1px dashed var(--border-color); color: var(--text-main); font-size: 13px; transition: 0.2s;" onclick="toggleUploadAccordion()" title="Upload a new CSV product catalog">
+                        <span class="d-flex align-items-center gap-2">
+                            <i data-lucide="plus-circle" style="width: 16px; height: 16px; color: var(--accent-blue);"></i>
+                            <span>Upload New Dataset</span>
+                        </span>
+                        <i data-lucide="chevron-down" id="uploadChevron" style="width: 16px; height: 16px; transition: transform 0.3s;"></i>
+                    </button>
+                    
+                    <div id="uploadAccordionContent" style="display: none; margin-top: 10px; padding: 16px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); border-radius: 16px;">
+                        <form action="/upload_catalog" method="POST" enctype="multipart/form-data">
+                            <input type="hidden" name="quote_id" value="{{ quote.id }}">
+                            <label class="ui-label mb-2">Dataset Name</label>
+                            <input type="text" name="catalog_name" class="form-control mb-3" placeholder="e.g. Product Catalog" required>
+                            
+                            <label class="ui-label mb-2">CSV File</label>
+                            <input type="file" name="csv_file" accept=".csv" class="form-control p-2 mb-2" required>
+                            <div class="mb-3 fw-semibold" style="font-size: 11px; color: #EF4444;">* only supports csv format</div>
+                            
+                            <button type="submit" class="btn w-100 fw-bold rounded-pill" style="background: var(--accent-blue); color: white; border: none; font-size: 13px; padding: 10px;" title="Process and save uploaded CSV dataset">Upload & Reload</button>
+                        </form>
+                    </div>
                 </div>
 
-                <label class="ui-label">Dynamic Columns</label>
-                <div class="d-flex align-items-center gap-2 mt-1 p-1 rounded-pill mb-3" style="background: var(--bg-card); border: 1px solid var(--border-color);">
-                    <button class="btn border-0 px-3 fw-bold rounded-pill" style="color: var(--text-main); font-size: 16px; background: rgba(255,255,255,0.05);" onclick="changeColCount(-1)">-</button>
-                    <span id="colCountDisplay" style="color: var(--text-main);" class="small fw-semibold flex-grow-1 text-center">2 Columns</span>
-                    <button class="btn border-0 px-3 fw-bold rounded-pill" style="color: var(--text-main); font-size: 16px; background: rgba(255,255,255,0.05);" onclick="changeColCount(1)">+</button>
+                <!-- Dynamic Columns & Mapping (Disabled by default until a catalog is selected) -->
+                <div id="dynamicColsContainer" class="disabled-section">
+                    <label class="ui-label">Dynamic Columns</label>
+                    <div class="d-flex align-items-center gap-2 mt-1 p-1 rounded-pill mb-3" style="background: var(--bg-card); border: 1px solid var(--border-color);">
+                        <button class="btn border-0 px-3 fw-bold rounded-pill" style="color: var(--text-main); font-size: 16px; background: rgba(255,255,255,0.05);" onclick="changeColCount(-1)" title="Remove dynamic column">−</button>
+                        <span id="colCountDisplay" style="color: var(--text-main);" class="small fw-semibold flex-grow-1 text-center">2 Columns</span>
+                        <button class="btn border-0 px-3 fw-bold rounded-pill" style="color: var(--text-main); font-size: 16px; background: rgba(255,255,255,0.05);" onclick="changeColCount(1)" title="Add dynamic column">+</button>
+                    </div>
+                    
+                    <div id="colMappingContainer" class="mb-4"></div>
+                </div>
+
+                <!-- Search bar & Category filter pills -->
+                <input type="text" id="inventorySearchInput" class="form-control mb-3 py-2" placeholder="Search catalog items..." oninput="filterInventoryItems()" title="Filter items by name or attributes">
+
+                <div id="category-pills" class="flex items-center space-x-2 overflow-x-auto pb-2 mb-3 scrollbar-none" style="display: flex; gap: 6px; overflow-x: auto; white-space: nowrap;">
+                    <!-- Dynamically populated filter pills -->
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <label class="ui-label mb-0">Inventory Items</label>
+                    <span id="itemCountBadge" class="small fw-semibold" style="color: var(--text-muted); font-size: 11px;">0 items</span>
                 </div>
                 
-                <div id="colMappingContainer" class="mb-4"></div>
-
                 <label class="ui-label">Drag or Click to Add</label>
                 <div id="inventoryList" style="padding-right: 4px;">
                     <div class="small p-3 text-center border rounded-4" style="color: var(--text-main); border-color: var(--border-color) !important; background: rgba(0,0,0,0.2);">Select a database to view items and columns.</div>
@@ -499,10 +625,10 @@
                 <div class="mb-4 pb-4 border-bottom" style="border-color: var(--border-color) !important;">
                     <label class="ui-label mb-3" style="color: #60A5FA;">PAGE CONFIGURATION</label>
                     <div class="d-flex align-items-center gap-2 mb-3 small fw-medium" style="color: var(--text-main);">
-                        <input type="checkbox" id="pageNumberToggle" onchange="togglePageNumbers(this.checked)" style="accent-color: var(--accent-blue);"> Print Page Numbers on PDF
+                        <input type="checkbox" id="pageNumberToggle" onchange="togglePageNumbers(this.checked)" style="accent-color: var(--accent-blue);" title="Include page numbers on exported PDF"> Print Page Numbers on PDF
                     </div>
                     <label class="ui-label mb-2">Document Currency</label>
-                    <select id="currencySelect" class="db-select mb-0 py-2" onchange="updateCurrency(this.value)">
+                    <select id="currencySelect" class="db-select mb-0 py-2" onchange="updateCurrency(this.value)" title="Select currency symbol">
                         <option value="EUR">EUR (€)</option>
                         <option value="USD">USD ($)</option>
                         <option value="GBP">GBP (£)</option>
@@ -514,22 +640,23 @@
                     </select>
                 </div>
 
+                <div id="discountsConfigContainer"></div>
                 <div id="taxesConfigContainer"></div>
 
                 <div class="d-flex justify-content-between align-items-center mt-4 mb-2">
                     <label class="ui-label mb-0">Brand Logo</label>
-                    <button class="btn btn-link text-danger p-0 text-decoration-none" style="font-size: 10px; font-weight: bold; letter-spacing: 0.5px;" onclick="clearBase64('logo')">REMOVE</button>
+                    <button class="btn btn-link text-danger p-0 text-decoration-none" style="font-size: 10px; font-weight: bold; letter-spacing: 0.5px;" onclick="clearBase64('logo')" title="Remove uploaded brand logo">REMOVE</button>
                 </div>
-                <input type="file" id="logoUpload" class="db-select py-2" accept="image/*" onchange="loadBase64(this, 'logo')">
+                <input type="file" id="logoUpload" class="db-select py-2" accept="image/*" onchange="loadBase64(this, 'logo')" title="Upload brand logo image">
                 
                 <div class="d-flex justify-content-between align-items-center mt-3 mb-2">
                     <label class="ui-label mb-0">Background Artwork</label>
-                    <button class="btn btn-link text-danger p-0 text-decoration-none" style="font-size: 10px; font-weight: bold; letter-spacing: 0.5px;" onclick="clearBase64('bg')">REMOVE</button>
+                    <button class="btn btn-link text-danger p-0 text-decoration-none" style="font-size: 10px; font-weight: bold; letter-spacing: 0.5px;" onclick="clearBase64('bg')" title="Remove background artwork">REMOVE</button>
                 </div>
-                <input type="file" id="bgUpload" class="db-select py-2" accept="image/*" onchange="loadBase64(this, 'bg')">
+                <input type="file" id="bgUpload" class="db-select py-2" accept="image/*" onchange="loadBase64(this, 'bg')" title="Upload background texture or artwork image">
                 
                 <label class="ui-label mt-2">Background Opacity</label>
-                <input type="range" id="bgOpacity" class="w-100 mt-2" style="accent-color: var(--accent-blue);" min="0.1" max="1" step="0.05" value="1" onchange="updateBgOpacity(this.value)">
+                <input type="range" id="bgOpacity" class="w-100 mt-2" style="accent-color: var(--accent-blue);" min="0.1" max="1" step="0.05" value="1" onchange="updateBgOpacity(this.value)" title="Adjust background image opacity">
             </div>
 
         </div>
@@ -543,10 +670,10 @@
         <div class="modal-content">
             <div class="modal-header border-0 pb-0 mt-2">
                 <h5 class="modal-title fw-bold brand-text fs-4" style="color: var(--text-main);">Send to Client</h5>
-                <button type="button" class="btn-close" style="filter: var(--invert-close, invert(1));" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" style="filter: var(--invert-close, invert(1));" data-bs-dismiss="modal" title="Close modal"></button>
             </div>
             <div class="modal-body py-4">
-                <input type="text" id="clientSearch" class="form-control mb-4" placeholder="Search by @username or email..." onkeyup="searchClients()">
+                <input type="text" id="clientSearch" class="form-control mb-4" placeholder="Search by @username or email..." onkeyup="searchClients()" title="Search client directory">
                 <div class="ui-label mb-2" style="color: var(--text-main);">Directory Results</div>
                 <div id="searchResults" style="max-height: 250px; overflow-y: auto; padding: 2px;"></div>
             </div>
@@ -560,28 +687,28 @@
         <div class="modal-content">
             <div class="modal-header border-0 pb-0 mt-2">
                 <h5 class="modal-title fw-bold brand-text fs-4" style="color: var(--text-main);">Review & Sign</h5>
-                <button type="button" class="btn-close" style="filter: var(--invert-close, invert(1));" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" style="filter: var(--invert-close, invert(1));" data-bs-dismiss="modal" title="Close modal"></button>
             </div>
             <div class="modal-body text-center py-4">
                 <p class="small mb-4 fw-medium" style="color: var(--text-muted);">By signing, you officially accept the terms and totals of this document.</p>
                 
                 <div class="d-flex justify-content-center gap-2 mb-4">
-                    <button class="btn btn-sm fw-bold px-4 rounded-pill" style="background: var(--bg-card-hover); color: var(--text-main); border: 1px solid var(--border-hover);" onclick="document.getElementById('typeSigBox').style.display='block'; document.getElementById('uploadSigBox').style.display='none'; sigType='text';">Type Name</button>
-                    <button class="btn btn-sm fw-bold px-4 rounded-pill" style="background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color);" onclick="document.getElementById('typeSigBox').style.display='none'; document.getElementById('uploadSigBox').style.display='block'; sigType='image';">Upload Image</button>
+                    <button class="btn btn-sm fw-bold px-4 rounded-pill" style="background: var(--bg-card-hover); color: var(--text-main); border: 1px solid var(--border-hover);" onclick="document.getElementById('typeSigBox').style.display='block'; document.getElementById('uploadSigBox').style.display='none'; sigType='text';" title="Type your name signature">Type Name</button>
+                    <button class="btn btn-sm fw-bold px-4 rounded-pill" style="background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color);" onclick="document.getElementById('typeSigBox').style.display='none'; document.getElementById('uploadSigBox').style.display='block'; sigType='image';" title="Upload signature image file">Upload Image</button>
                 </div>
 
                 <div id="typeSigBox">
                     <div class="signature-box bg-white" id="sigBox" onclick="document.getElementById('sigInput').focus()">Type to sign...</div>
-                    <input type="text" id="sigInput" class="form-control mt-3 text-center" placeholder="Type your full name" onkeyup="document.getElementById('sigBox').innerText = this.value || 'Type to sign...'">
+                    <input type="text" id="sigInput" class="form-control mt-3 text-center" placeholder="Type your full name" onkeyup="document.getElementById('sigBox').innerText = this.value || 'Type to sign...'" title="Type your signature">
                 </div>
 
                 <div id="uploadSigBox" style="display: none;">
-                    <input type="file" id="sigFileInput" accept="image/*" class="form-control p-2 mb-2" onchange="previewSignature(this)">
+                    <input type="file" id="sigFileInput" accept="image/*" class="form-control p-2 mb-2" onchange="previewSignature(this)" title="Upload signature image">
                     <img id="sigPreview" style="max-height: 100px; display: none; margin: 0 auto; border-radius: 8px; background: white; padding: 4px;">
                 </div>
             </div>
             <div class="modal-footer border-0 pt-0 mb-2 mt-2">
-                <button type="button" class="btn w-100 fw-bold py-3 rounded-pill text-white" style="background: #10B981; font-size: 15px;" onclick="submitSignature()">Confirm Acceptance</button>
+                <button type="button" class="btn w-100 fw-bold py-3 rounded-pill text-white" style="background: #10B981; font-size: 15px;" onclick="submitSignature()" title="Confirm acceptance and sign document">Confirm Acceptance</button>
             </div>
         </div>
     </div>
@@ -596,6 +723,28 @@
 <script>
     // Initialize Lucide Icons
     lucide.createIcons();
+
+    function toggleUploadAccordion() {
+        const content = document.getElementById('uploadAccordionContent');
+        const chevron = document.getElementById('uploadChevron');
+        if (content.style.display === 'none' || !content.style.display) {
+            content.style.display = 'block';
+            if (chevron) chevron.style.transform = 'rotate(180deg)';
+        } else {
+            content.style.display = 'none';
+            if (chevron) chevron.style.transform = 'rotate(0deg)';
+        }
+    }
+
+    // Mobile Panel Drawer Toggle
+    function toggleMobilePanel() {
+        const panel = document.getElementById('rightPanel');
+        const overlay = document.getElementById('mobileOverlay');
+        if (panel && overlay) {
+            panel.classList.toggle('open');
+            overlay.classList.toggle('show');
+        }
+    }
 
     // Currency symbol mapping
     const currencySymbols = {
@@ -616,15 +765,25 @@
     // User Selected Currency from Settings or Document state
     let userCurrency = "{{ user_settings.currency if user_settings and user_settings.currency else 'EUR' }}";
 
-    // Zoom Level Management
-    let currentZoom = 1.0;
+    // Optimized Zoom Level Management for Mobile vs Desktop
+    let currentZoom = window.innerWidth < 992 ? Math.min(0.72, (window.innerWidth - 24) / 794) : 1.0;
     function adjustZoom(delta) {
         currentZoom = Math.round((currentZoom + delta) * 10) / 10;
-        if (currentZoom < 0.5) currentZoom = 0.5;
+        if (currentZoom < 0.35) currentZoom = 0.35;
         if (currentZoom > 2.0) currentZoom = 2.0;
         
         document.getElementById('zoomWrapper').style.transform = `scale(${currentZoom})`;
         document.getElementById('zoomLevelDisplay').innerText = Math.round(currentZoom * 100) + '%';
+        updateWorkspaceFit();
+    }
+
+    function updateWorkspaceFit() {
+        const wrapper = document.getElementById('zoomWrapper');
+        const container = document.getElementById('documentContainer');
+        if (wrapper && container) {
+            const scaledHeight = container.offsetHeight * currentZoom;
+            wrapper.style.height = scaledHeight + 'px';
+        }
     }
 
     // Fade & Roll Scroll Animation specifically for pages in the workspace
@@ -652,7 +811,7 @@
         if (tabId === 'inventory') {
             document.querySelectorAll('.tab-btn')[0].classList.add('active');
             document.getElementById('tab-inventory').style.display = 'block';
-        } else {
+        } else if (tabId === 'setup') {
             document.querySelectorAll('.tab-btn')[1].classList.add('active');
             document.getElementById('tab-setup').style.display = 'block';
         }
@@ -684,6 +843,7 @@
     let bgDataUrl = '';
     let bgOpacityVal = 1;
     let documentTaxes = [{ name: 'Tax', rate: 19 }]; 
+    let documentDiscounts = []; 
     let signatureData = document.getElementById('savedSignatureData').innerText;
     let pageNumbersActive = false; 
 
@@ -692,16 +852,61 @@
     let csvColMapping = [-1, -1, -1, -1]; 
     let nameIdx = -1;
     let priceIdx = -1;
+    let categoryIdx = -1;
     let currentCatalogItems = [];
+    let activeCategory = 'All';
 
     let headerState = {
         company_details: "Your Company Name<br>123 Business Rd<br>City, State ZIP",
-        issued: "", 
+        issued: "",
+        client_details: "Client Details", 
         valid: "",
         lead: "Project Lead",
         quote_id: "UNASSIGNED", 
         payment: "Bank Name: Global Bank<br>Account No: 0000000000<br>Routing/IFSC: BANK0000<br>Notes: Net 30 terms apply."
     };
+
+    function renderDiscountsSetup() {
+        if(!isEditable) return;
+        const container = document.getElementById('discountsConfigContainer');
+        let html = '<label class="ui-label mt-4 mb-3" style="color: #34D399;">DISCOUNTS</label>';
+        if (documentDiscounts.length === 0) {
+            html += '<div class="small mb-3" style="color: var(--text-muted); font-size: 12px;">No discounts added yet.</div>';
+        }
+        documentDiscounts.forEach((disc, idx) => {
+            html += `
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <input type="text" id="discName_${idx}" class="form-control form-control-sm py-2" value="${disc.name}" onblur="updateDiscountName(${idx}, this.value)" onkeydown="handleDiscountKeydown(event, ${idx})" title="Discount name">
+                    <input type="number" id="discRate_${idx}" class="form-control form-control-sm py-2" value="${disc.rate}" step="0.1" style="width: 80px;" onblur="updateDiscountRate(${idx}, this.value)" onkeydown="handleDiscountKeydown(event, ${idx})" title="Discount percentage">
+                    <span class="fw-bold" style="font-size: 13px; color: var(--text-main);">%</span>
+                    <button class="btn btn-sm text-danger border-0 px-2 shadow-none fs-5 fw-bold" onclick="removeDiscount(${idx})" title="Remove discount">&times;</button>
+                </div>
+            `;
+        });
+        html += `<button class="btn btn-sm w-100 mt-1 mb-3 fw-bold rounded-pill" style="background: rgba(52, 211, 153, 0.1); color: #34D399; border: 1px solid rgba(52, 211, 153, 0.3);" onclick="addDiscount()" title="Add a new discount rule">+ Add Discount</button>`;
+        container.innerHTML = html;
+    }
+
+    window.handleDiscountKeydown = function(event, idx) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            const nameInput = document.getElementById(`discName_${idx}`);
+            const rateInput = document.getElementById(`discRate_${idx}`);
+            if (nameInput && rateInput) {
+                documentDiscounts[idx].name = nameInput.value;
+                documentDiscounts[idx].rate = parseFloat(rateInput.value) || 0;
+            }
+            nameInput.blur();
+            rateInput.blur();
+            renderWorkspace();
+            triggerSave();
+        }
+    };
+
+    window.addDiscount = function() { if(isEditable) { documentDiscounts.push({ name: 'Discount', rate: 10 }); renderDiscountsSetup(); renderWorkspace(); triggerSave(); } };
+    window.updateDiscountName = function(idx, val) { if(isEditable) { documentDiscounts[idx].name = val; renderWorkspace(); triggerSave(); } };
+    window.updateDiscountRate = function(idx, val) { if(isEditable) { documentDiscounts[idx].rate = parseFloat(val) || 0; renderWorkspace(); triggerSave(); } };
+    window.removeDiscount = function(idx) { if(isEditable) { documentDiscounts.splice(idx, 1); renderDiscountsSetup(); renderWorkspace(); triggerSave(); } };
 
     function renderTaxesSetup() {
         if(!isEditable) return;
@@ -710,14 +915,14 @@
         documentTaxes.forEach((tax, idx) => {
             html += `
                 <div class="d-flex align-items-center gap-2 mb-2">
-                    <input type="text" id="taxName_${idx}" class="form-control form-control-sm py-2" value="${tax.name}" onblur="updateTaxName(${idx}, this.value)" onkeydown="handleTaxKeydown(event, ${idx})">
-                    <input type="number" id="taxRate_${idx}" class="form-control form-control-sm py-2" value="${tax.rate}" step="0.1" style="width: 80px;" onblur="updateTaxRate(${idx}, this.value)" onkeydown="handleTaxKeydown(event, ${idx})">
+                    <input type="text" id="taxName_${idx}" class="form-control form-control-sm py-2" value="${tax.name}" onblur="updateTaxName(${idx}, this.value)" onkeydown="handleTaxKeydown(event, ${idx})" title="Tax name">
+                    <input type="number" id="taxRate_${idx}" class="form-control form-control-sm py-2" value="${tax.rate}" step="0.1" style="width: 80px;" onblur="updateTaxRate(${idx}, this.value)" onkeydown="handleTaxKeydown(event, ${idx})" title="Tax rate percentage">
                     <span class="fw-bold" style="font-size: 13px; color: var(--text-main);">%</span>
-                    <button class="btn btn-sm text-danger border-0 px-2 shadow-none fs-5 fw-bold" onclick="removeTax(${idx})">&times;</button>
+                    <button class="btn btn-sm text-danger border-0 px-2 shadow-none fs-5 fw-bold" onclick="removeTax(${idx})" title="Remove tax option">&times;</button>
                 </div>
             `;
         });
-        html += `<button class="btn btn-sm w-100 mt-2 mb-3 fw-bold rounded-pill" style="background: var(--bg-card-hover); color: var(--text-main); border: 1px solid var(--border-hover);" onclick="addTax()">+ Add Tax Option</button>`;
+        html += `<button class="btn btn-sm w-100 mt-2 mb-3 fw-bold rounded-pill" style="background: var(--bg-card-hover); color: var(--text-main); border: 1px solid var(--border-hover);" onclick="addTax()" title="Add a new tax rate">+ Add Tax Option</button>`;
         container.innerHTML = html;
     }
 
@@ -765,7 +970,7 @@
             box.innerHTML = '';
             data.forEach(u => {
                 box.innerHTML += `
-                    <div class="client-search-result" onclick="dispatchQuote(${u.id})">
+                    <div class="client-search-result" onclick="dispatchQuote(${u.id})" title="Click to send quotation to @${u.username}">
                         <div>
                             <div class="fw-bold" style="color: var(--text-main);">@${u.username}</div>
                             <div class="small" style="color: var(--text-muted);">${u.company_name || u.email}</div>
@@ -814,6 +1019,9 @@
 
     function fetchDatabase(id) {
         if(!id) return;
+        const dcContainer = document.getElementById('dynamicColsContainer');
+        if (dcContainer) dcContainer.classList.remove('disabled-section');
+
         fetch('/get_catalog/' + id).then(res => res.json()).then(data => { if(data.status === 'success') parseFetchedCatalog(data.data.headers, data.data.rows); });
     }
 
@@ -833,9 +1041,11 @@
         priceIdx = headers.findIndex(h => h.toLowerCase().includes('price') || h.toLowerCase().includes('cost'));
         if (priceIdx === -1) priceIdx = headers.length - 1;
 
+        categoryIdx = headers.findIndex(h => h.toLowerCase().includes('cat') || h.toLowerCase().includes('dept') || h.toLowerCase().includes('type'));
+
         let availableForDynamic = [];
         for (let i = 0; i < headers.length; i++) {
-            if (i !== nameIdx && i !== priceIdx && i !== 0 && !headers[i].toLowerCase().includes('sr')) availableForDynamic.push(i);
+            if (i !== nameIdx && i !== priceIdx && i !== categoryIdx && i !== 0 && !headers[i].toLowerCase().includes('sr')) availableForDynamic.push(i);
         }
 
         for(let i=0; i<4; i++) {
@@ -847,7 +1057,28 @@
         
         renderColumnSelectors();
         updateCatalogItems();
+        renderCategoryPills();
         renderWorkspace();
+    }
+
+    function renderCategoryPills() {
+        const container = document.getElementById('category-pills');
+        if (!container || !rawCatalogRows.length || categoryIdx === -1) {
+            if(container) container.innerHTML = '';
+            return;
+        }
+        const categories = ['All', ...new Set(rawCatalogRows.map(row => row[categoryIdx] || 'General'))];
+        container.innerHTML = categories.map(cat => `
+            <button onclick="selectCategory('${cat}')" class="btn btn-sm rounded-pill px-3 py-1 fw-semibold" style="font-size: 11px; white-space: nowrap; background: ${activeCategory === cat ? 'var(--accent-blue)' : 'var(--bg-card)'}; color: ${activeCategory === cat ? 'white' : 'var(--text-main)'}; border: 1px solid var(--border-color);" title="Filter items by category: ${cat}">
+                ${cat}
+            </button>
+        `).join('');
+    }
+
+    function selectCategory(cat) {
+        activeCategory = cat;
+        renderCategoryPills();
+        filterInventoryItems();
     }
 
     function renderColumnSelectors() {
@@ -855,7 +1086,7 @@
         if(!availableCsvHeaders.length) { container.innerHTML = ''; return; }
         let html = '';
         for(let i=0; i<numDynamicCols; i++) {
-            html += `<select class="db-select mb-2 py-2" onchange="updateColMapping(${i}, this.value)">`;
+            html += `<select class="db-select mb-2 py-2" onchange="updateColMapping(${i}, this.value)" title="Map CSV column to table column ${i+1}">`;
             html += `<option value="-1">-- Manual Entry (Col ${i+1}) --</option>`;
             availableCsvHeaders.forEach((h, idx) => {
                 let sel = (csvColMapping[i] == idx) ? 'selected' : '';
@@ -886,10 +1117,12 @@
 
     function updateCatalogItems() {
         if (!rawCatalogRows.length) return;
-        currentCatalogItems = rawCatalogRows.map(row => {
+        currentCatalogItems = rawCatalogRows.map((row, idx) => {
             let p = parseFloat((row[priceIdx] || "").replace(/[^0-9.-]+/g,""));
             return {
+                originalIndex: idx,
                 name: row[nameIdx] || 'Item',
+                category: categoryIdx !== -1 ? (row[categoryIdx] || 'General') : 'General',
                 col1: csvColMapping[0] !== -1 ? row[csvColMapping[0]] : '',
                 col2: csvColMapping[1] !== -1 ? row[csvColMapping[1]] : '',
                 col3: csvColMapping[2] !== -1 ? row[csvColMapping[2]] : '',
@@ -897,19 +1130,40 @@
                 price: isNaN(p) ? 0 : p
             };
         });
+        filterInventoryItems();
+    }
 
+    function renderInventoryList(itemsToRender) {
         const list = document.getElementById('inventoryList');
         list.innerHTML = '';
         const symbol = getCurrencySymbol(userCurrency);
-        currentCatalogItems.forEach((item, index) => {
+        const badge = document.getElementById('itemCountBadge');
+        if (badge) badge.innerText = `${itemsToRender.length} items`;
+
+        if (itemsToRender.length === 0) {
+            list.innerHTML = '<div class="small text-center p-3 border rounded-4" style="color: var(--text-muted); border-color: var(--border-color)!important; background: rgba(0,0,0,0.2);">No matching items found.</div>';
+            return;
+        }
+
+        itemsToRender.forEach((item) => {
             list.innerHTML += `
-                <div class="inventory-item" draggable="true" ondragstart="onDragStartPanel(event, ${index})" onclick="toggleItemInQuote(${index})">
+                <div class="inventory-item" draggable="true" ondragstart="onDragStartPanel(event, ${item.originalIndex})" onclick="toggleItemInQuote(${item.originalIndex})" title="Click to add or drag into quote">
                     <div class="inv-name fw-semibold" title="${item.name}">${item.name}</div>
                     <div class="inv-price fw-bold" style="color: var(--text-muted);">${symbol} ${item.price.toFixed(2)}</div>
                 </div>
             `;
         });
         updateInventoryHighlights();
+    }
+
+    function filterInventoryItems() {
+        const query = document.getElementById('inventorySearchInput').value.toLowerCase();
+        const filtered = currentCatalogItems.filter(item => {
+            const matchesSearch = item.name.toLowerCase().includes(query) || item.col1.toLowerCase().includes(query) || item.col2.toLowerCase().includes(query);
+            const matchesCategory = activeCategory === 'All' || item.category === activeCategory;
+            return matchesSearch && matchesCategory;
+        });
+        renderInventoryList(filtered);
     }
 
     function updateInventoryHighlights() {
@@ -920,9 +1174,9 @@
             const itemName = currentCatalogItems[i].name;
             const isInQuote = documentPages[0].items.some(it => it.name === itemName);
             if (isInQuote) {
-                itemsList[i].classList.add('selected');
+                itemsList[i]?.classList.add('selected');
             } else {
-                itemsList[i].classList.remove('selected');
+                itemsList[i]?.classList.remove('selected');
             }
         }
     }
@@ -994,6 +1248,8 @@
     }
 
     window.onload = function() {
+        document.getElementById('zoomWrapper').style.transform = `scale(${currentZoom})`;
+        document.getElementById('zoomLevelDisplay').innerText = Math.round(currentZoom * 100) + '%';
         const savedStr = document.getElementById('savedDocumentData').innerText;
         if (savedStr && savedStr.trim() !== "None" && savedStr.trim() !== "") {
             const parsed = JSON.parse(savedStr);
@@ -1012,6 +1268,10 @@
                 documentTaxes = parsed.taxes;
             } else if (parsed.taxRate !== undefined) {
                 documentTaxes = [{ name: 'Tax', rate: parsed.taxRate }];
+            }
+
+            if(parsed.discounts !== undefined) {
+                documentDiscounts = parsed.discounts;
             }
             
             if(isEditable) {
@@ -1043,6 +1303,7 @@
 
         if(isEditable && needsSave) triggerSave();
 
+        renderDiscountsSetup();
         renderTaxesSetup();
         renderWorkspace();
         if(isEditable) searchClients();
@@ -1050,6 +1311,9 @@
 
     window.changeColCount = function(delta) {
         if(!isEditable) return;
+        const dbSelectVal = document.getElementById('dbSelect')?.value;
+        if (!dbSelectVal) return;
+
         let newCount = numDynamicCols + delta;
         if(newCount >= 0 && newCount <= 4) {
             numDynamicCols = newCount;
@@ -1092,6 +1356,7 @@
             pages: documentPages, header: headerState, headers: dynamicHeaders,
             numCols: numDynamicCols, logo: logoDataUrl, 
             bg: bgDataUrl, bgOpacity: bgOpacityVal, taxes: documentTaxes,
+            discounts: documentDiscounts,
             currency: userCurrency, pageNumbersActive: pageNumbersActive
         };
         fetch(`/save_quote/{{ quote.id }}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ document_data: JSON.stringify(payload) }) });
@@ -1103,7 +1368,7 @@
     window.updateItemQty = function(index, val) { 
         if(isEditable) { 
             let v = parseInt(val); 
-            documentPages[0].items[index].qty = isNaN(v) ? 1 : v; 
+            documentPages[0].items[index].qty = (isNaN(v) || v <= 0) ? 1 : v; 
             renderWorkspace(); 
             triggerSave(); 
         } 
@@ -1137,9 +1402,15 @@
         }
 
         let documentSubtotal = items.reduce((sum, item) => sum + (item.qty * item.price), 0);
+        
+        let totalDiscountAmount = 0;
+        documentDiscounts.forEach(d => totalDiscountAmount += (documentSubtotal * (d.rate / 100)));
+        let adjustedSubtotal = documentSubtotal - totalDiscountAmount;
+        if (adjustedSubtotal < 0) adjustedSubtotal = 0;
+
         let totalTaxAmount = 0;
-        documentTaxes.forEach(t => totalTaxAmount += (documentSubtotal * (t.rate / 100)));
-        let documentGrandTotal = documentSubtotal + totalTaxAmount;
+        documentTaxes.forEach(t => totalTaxAmount += (adjustedSubtotal * (t.rate / 100)));
+        let documentGrandTotal = adjustedSubtotal + totalTaxAmount;
         
         let pagesContent = [];
         let itemIndex = 0;
@@ -1157,38 +1428,51 @@
                 let dynamicTds = '';
                 for(let c = 0; c < numDynamicCols; c++) { 
                     let colKey = 'col' + (c+1); 
-                    dynamicTds += `<td class="text-muted text-end" style="padding-left: 12px;" ${ce} onblur="updateRowField(${item.originalIndex}, '${colKey}', this.innerText)">${item[colKey] || ''}</td>`; 
+                    dynamicTds += `<td class="text-muted text-start" style="padding-left: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" ${ce} onblur="updateRowField(${item.originalIndex}, '${colKey}', this.innerText)" title="Edit column attribute"><span title="${item[colKey] || ''}">${item[colKey] || ''}</span></td>`; 
                 }
+
                 rowsHtml += `
-                    <tr draggable="${isEditable}" ondragstart="onDragStartRow(event, ${item.originalIndex})" ondragend="onDragEndRow(event)" ondragover="onDragOverRow(event, ${item.originalIndex})" ondragleave="onDragLeaveRow(event, ${item.originalIndex})" ondrop="onDropRow(event, ${item.originalIndex})">
-                        <td><div class="item-name" ${ce} onblur="updateRowField(${item.originalIndex}, 'name', this.innerText)">${item.name}</div></td>
+                    <tr draggable="${isEditable}" ondragstart="onDragStartRow(event, ${item.originalIndex})" ondragend="onDragEndRow(event)" ondragover="onDragOverRow(event, ${item.originalIndex})" ondragleave="onDragLeaveRow(event, ${item.originalIndex})" ondrop="onDropRow(event, ${item.originalIndex})" title="Drag to reorder row">
+                        <td><div class="item-name" ${ce} onblur="updateRowField(${item.originalIndex}, 'name', this.innerText)" title="Edit item name">${item.name}</div></td>
                         ${dynamicTds}
-                        <td class="text-center" style="padding-left: 12px;" ${ce} onblur="updateItemQty(${item.originalIndex}, this.innerText)">${item.qty}</td>
-                        <td class="text-end" style="padding-left: 12px;" ${ce} onblur="updateItemPrice(${item.originalIndex}, this.innerText)">${symbol} ${item.price.toFixed(2)}</td>
-                        <td class="text-end fw-bold" style="padding-left: 12px;">${symbol} ${total.toFixed(2)}</td>
-                        <td class="d-print-none text-center align-middle" style="width: 32px; padding: 0;"><button class="delete-btn" title="Delete Row" onclick="deleteRow(${item.originalIndex})">&times;</button></td>
+                        <td class="text-center no-wrap" style="padding-left: 6px; white-space: nowrap;" ${ce} onblur="updateItemQty(${item.originalIndex}, this.innerText)" title="Edit item quantity">${item.qty}</td>
+                        <td class="text-end no-wrap" style="padding-left: 6px; white-space: nowrap;" ${ce} onblur="updateItemPrice(${item.originalIndex}, this.innerText)" title="Edit item rate">${symbol} ${item.price.toFixed(2)}</td>
+                        <td class="text-end fw-bold no-wrap" style="padding-left: 6px; white-space: nowrap;" title="Computed row total">${symbol} ${total.toFixed(2)}</td>
+                        <td class="d-print-none text-center align-middle" style="width: 28px; padding: 0;"><button class="delete-btn" title="Click to remove this row" onclick="deleteRow(${item.originalIndex})">&times;</button></td>
                     </tr>
                 `;
             });
 
             if (p === totalTablePages - 1 && isEditable) {
-                rowsHtml += `<tr class="d-print-none"><td colspan="100%" style="padding: 16px 0;" ondragover="onDragOverTable(event)" ondragleave="onDragLeaveTable(event)" ondrop="onDropTableZone(event)"><div id="mainDropZone" style="border: 1px dashed #CBD5E1; color: #64748B; border-radius: 8px; text-align: center; padding: 12px; font-weight: 600; font-size: 12px; cursor: pointer; transition: 0.2s;" onclick="addBlankRow()">+ Drop item here or click to add a blank row</div></td></tr>`;
+                rowsHtml += `<tr class="d-print-none"><td colspan="100%" style="padding: 16px 0;" ondragover="onDragOverTable(event)" ondragleave="onDragLeaveTable(event)" ondrop="onDropTableZone(event)"><div id="mainDropZone" style="border: 1px dashed #CBD5E1; color: #334155; border-radius: 8px; text-align: center; padding: 12px; font-weight: 600; font-size: 12px; cursor: pointer; transition: 0.2s;" onclick="addBlankRow()" title="Click to add a blank item row">+ Drop item here or click to add a blank row</div></td></tr>`;
             }
 
             let dynamicThs = '';
             for(let c = 0; c < numDynamicCols; c++) { 
-                dynamicThs += `<th class="text-end" style="padding-left: 12px; white-space: nowrap;" ${ce} onblur="updateDynamicHeader(${c}, this.innerText)">${dynamicHeaders[c] || `Col ${c+1}`}</th>`; 
+                dynamicThs += `<th class="text-start no-wrap" style="padding-left: 6px;" ${ce} onblur="updateDynamicHeader(${c}, this.innerText)" title="Click to edit column header"><span title="${dynamicHeaders[c] || `Col ${c+1}`}">${dynamicHeaders[c] || `Col ${c+1}`}</span></th>`; 
             }
 
-            let tableHtml = `<table class="quote-table" style="table-layout: auto;">
+            let itemColWidth = numDynamicCols > 0 ? 30 : 44;
+            let dynamicColWidth = numDynamicCols > 0 ? Math.floor(30 / numDynamicCols) : 0;
+            let remainingWidth = 100 - itemColWidth - (dynamicColWidth * numDynamicCols);
+            let otherColWidth = Math.floor(remainingWidth / 3);
+
+            let colGroupHtml = `<colgroup><col style="width: ${itemColWidth}%;">`;
+            for(let c = 0; c < numDynamicCols; c++) { colGroupHtml += `<col style="width: ${dynamicColWidth}%;">`; }
+            colGroupHtml += `<col style="width: ${otherColWidth}%;"><col style="width: ${otherColWidth}%;"><col style="width: ${otherColWidth}%;">`;
+            if (isEditable) colGroupHtml += `<col style="width: 28px;">`;
+            colGroupHtml += `</colgroup>`;
+
+            let tableHtml = `<table class="quote-table">
+                ${colGroupHtml}
                 <thead>
                     <tr>
-                        <th style="width: auto;">ITEM</th>
+                        <th class="no-wrap" title="Item name column">ITEM</th>
                         ${dynamicThs}
-                        <th class="text-center" style="width: 8%; padding-left: 12px; white-space: nowrap;">QTY</th>
-                        <th class="text-end" style="width: 14%; padding-left: 12px; white-space: nowrap;">RATE (${symbol})</th>
-                        <th class="text-end" style="width: 14%; padding-left: 12px; white-space: nowrap;">TOTAL (${symbol})</th>
-                        <th class="d-print-none" style="width: 32px;"></th>
+                        <th class="text-center no-wrap" style="padding-left: 6px;" title="Quantity column">QTY</th>
+                        <th class="text-end no-wrap" style="padding-left: 6px;" title="Unit rate column">RATE (${symbol})</th>
+                        <th class="text-end no-wrap" style="padding-left: 6px;" title="Total amount column">TOTAL (${symbol})</th>
+                        <th class="d-print-none" style="width: 28px;"></th>
                     </tr>
                 </thead>
                 <tbody>${rowsHtml}</tbody>
@@ -1217,9 +1501,11 @@
             let headerHtml = '';
             let isFullHeader = (i === 0 || i === firstTableIdx);
 
-            let editorPageBadge = `<div class="d-print-none" style="position: absolute; top: 16px; right: 16px; background: #F8FAFC; color: #64748B; border: 1px solid #E2E8F0; padding: 6px 12px; border-radius: 100px; font-size: 11px; font-weight: 700; z-index: 50; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">Page ${i + 1} of ${finalTotalPages}</div>`;
+            let editorPageBadge = `<div class="d-print-none" style="position: absolute; top: 16px; right: 16px; background: #F8FAFC; color: #334155; border: 1px solid #E2E8F0; padding: 6px 12px; border-radius: 100px; font-size: 11px; font-weight: 700; z-index: 50; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">Page ${i + 1} of ${finalTotalPages}</div>`;
             
-            let printPageBadge = pageNumbersActive ? `<div style="position: absolute; bottom: 10mm; left: 0; right: 0; text-align: center; font-size: 10px; color: #94A3B8; font-weight: 600;">${i + 1}</div>` : '';
+            let editNoticeBadge = (isEditable && i === 0) ? `<div class="d-print-none" style="position: absolute; top: 16px; left: 20mm; background: rgba(37, 99, 235, 0.1); color: #2563EB; border: 1px solid rgba(37, 99, 235, 0.2); padding: 5px 12px; border-radius: 100px; font-size: 11px; font-weight: 700; z-index: 50; display: flex; align-items: center; gap: 6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg> Click any underlined text to edit</div>` : '';
+
+            let printPageBadge = pageNumbersActive ? `<div style="position: absolute; bottom: 10mm; left: 0; right: 0; text-align: center; font-size: 10px; color: #334155; font-weight: 600;">${i + 1}</div>` : '';
 
             if (isFullHeader) {
                 const logoHtml = logoDataUrl ? `<img src="${logoDataUrl}" style="max-height: 150px; max-width: 250px; width: auto; border-radius: 2px; object-fit: contain;">` : `<div style="width: 56px; height: 56px; background: #0F172A; color: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 700; font-family: inherit;">Q</div>`;
@@ -1228,9 +1514,9 @@
                     <div class="d-flex justify-content-between align-items-start mb-3">
                         <div>${logoHtml}</div>
                         <div class="text-end">
-                            <div style="font-size: 10px; font-weight: 700; color: #94A3B8; letter-spacing: 1px;">QUOTATION</div>
-                            <div style="font-size: 18px; font-weight: 700; color: #0F172A;" ${ce} onblur="updateHeader('quote_id', this.innerText)">${headerState.quote_id}</div>
-                            <div class="mt-2 text-end" ${ce} style="font-size: 12px; color: #64748B; line-height: 1.4; border: 1px dashed transparent; padding: 2px; min-width: 200px;" onblur="updateHeader('company_details', this.innerHTML)">
+                            <div style="font-size: 10px; font-weight: 700; color: #334155; letter-spacing: 1px;">QUOTATION</div>
+                            <div style="font-size: 18px; font-weight: 700; color: #0F172A;" ${ce} onblur="updateHeader('quote_id', this.innerText)" title="Edit quotation reference number">${headerState.quote_id}</div>
+                            <div class="mt-2 text-end" ${ce} style="font-size: 12px; color: #334155; line-height: 1.4; padding: 2px; min-width: 200px;" onblur="updateHeader('company_details', this.innerHTML)" title="Edit company details">
                                 ${headerState.company_details}
                             </div>
                         </div>
@@ -1239,14 +1525,14 @@
                     <div class="d-flex justify-content-between align-items-start mb-3 gap-5">
                         <div style="flex: 1; min-width: 0;">
                              <div class="meta-label mb-1">PROJECT NAME</div>
-                             <div class="doc-h1" ${ce} style="border: 1px dashed transparent; overflow-wrap: break-word; word-wrap: break-word; line-height: 1.1; padding-bottom: 8px;" onblur="updateHeader('project_name', this.innerText)">
-                                 {{ quote.client_name }}
+                             <div class="doc-h1" ${ce} style="overflow-wrap: break-word; word-wrap: break-word; line-height: 1.1; padding-bottom: 8px;" onblur="updateHeader('project_name', this.innerText)" title="Edit project title">
+                                {{ quote.client_name }}
                              </div>
-                             <div class="mt-2 text-muted" ${ce} style="font-size: 13.5px; font-weight: 500;" onblur="updateHeader('client_details', this.innerHTML)">${headerState.client_details}</div>
+                             <div class="mt-2 text-muted" ${ce} style="font-size: 13.5px; font-weight: 500;" onblur="updateHeader('client_details', this.innerHTML)" title="Edit client details">${headerState.client_details}</div>
                         </div>
                         <div class="d-flex gap-4 flex-shrink-0 align-items-end" style="padding-top: 10px;">
-                             <div class="meta-col text-end"><div class="meta-label">ISSUED</div><div class="meta-value no-wrap" ${ce} onblur="updateHeader('issued', this.innerText)">${headerState.issued}</div></div>
-                             <div class="meta-col text-end"><div class="meta-label">VALID UNTIL</div><div class="meta-value no-wrap" ${ce} onblur="updateHeader('valid', this.innerText)">${headerState.valid}</div></div>
+                             <div class="meta-col text-end"><div class="meta-label">ISSUED</div><div class="meta-value no-wrap" ${ce} onblur="updateHeader('issued', this.innerText)" title="Edit issue date">${headerState.issued}</div></div>
+                             <div class="meta-col text-end"><div class="meta-label">VALID UNTIL</div><div class="meta-value no-wrap" ${ce} onblur="updateHeader('valid', this.innerText)" title="Edit expiry date">${headerState.valid}</div></div>
                         </div>
                     </div>
                 `;
@@ -1256,7 +1542,7 @@
                     <div class="d-flex justify-content-between align-items-end mb-4 pb-3" style="border-bottom: 2px solid #E2E8F0;">
                         <div>
                             <div style="font-size: 16px; font-weight: 700; color: #0F172A;">{{ quote.client_name }}</div>
-                            <div style="font-size: 12px; font-weight: 600; color: #64748B; margin-top: 4px;">${subtext}</div>
+                            <div style="font-size: 12px; font-weight: 600; color: #334155; margin-top: 4px;">${subtext}</div>
                         </div>
                     </div>
                 `;
@@ -1277,8 +1563,17 @@
                     dynamicTotalsHtml += `<div class="totals-row"><span>Subtotal</span><span class="text-dark fw-bold">${symbol} ${documentSubtotal.toFixed(2)}</span></div>`;
                 }
 
+                documentDiscounts.forEach(d => {
+                    let amt = documentSubtotal * (d.rate / 100);
+                    dynamicTotalsHtml += `<div class="totals-row" style="color: #059669; font-weight: 500;"><span>${d.name} (${d.rate}%)</span><span class="fw-bold">-${symbol} ${amt.toFixed(2)}</span></div>`;
+                });
+
+                if (documentDiscounts.length > 0) {
+                    dynamicTotalsHtml += `<div class="totals-row"><span>Discounted Subtotal</span><span class="text-dark fw-bold">${symbol} ${adjustedSubtotal.toFixed(2)}</span></div>`;
+                }
+
                 documentTaxes.forEach(t => {
-                    let amt = documentSubtotal * (t.rate / 100);
+                    let amt = adjustedSubtotal * (t.rate / 100);
                     dynamicTotalsHtml += `<div class="totals-row"><span>${t.name} ${t.rate}%</span><span class="text-dark fw-bold">${symbol} ${amt.toFixed(2)}</span></div>`;
                 });
                 
@@ -1289,7 +1584,7 @@
                 <div class="footer-split">
                     <div class="payment-section" style="width: 35%;">
                         <div class="meta-label mb-2">PAYMENT DETAILS</div>
-                        <div ${ce} style="font-size: 12px; color: #64748B; line-height: 1.6; border: 1px dashed transparent; padding: 4px;" onblur="updateHeader('payment', this.innerHTML)">${headerState.payment}</div>
+                        <div ${ce} style="font-size: 12px; color: #334155; line-height: 1.6; padding: 4px;" onblur="updateHeader('payment', this.innerHTML)" title="Edit payment instructions">${headerState.payment}</div>
                     </div>
                     <div class="signature-section text-center d-flex flex-column align-items-center justify-content-end pb-3" style="width: 30%;">
                         ${sigBlock}
@@ -1306,6 +1601,7 @@
                     <div class="bg-layer" ${bgStyle}></div>
                     <div class="content-layer">
                         ${editorPageBadge}
+                        ${editNoticeBadge}
                         ${headerHtml}
                         ${block.content}
                         ${footerHtml}
@@ -1316,6 +1612,7 @@
         }
 
         container.innerHTML = finalHtml;
+        updateWorkspaceFit();
         
         if(isEditable) updateInventoryHighlights();
         
