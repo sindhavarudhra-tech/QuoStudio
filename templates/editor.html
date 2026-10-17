@@ -226,7 +226,7 @@
             font-family: inherit !important; 
         }
 
-        .bg-layer { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-size: cover; background-position: center; z-index: 0; pointer-events: none; }
+        .bg-layer { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-size: cover; background-position: center; z-index: 0; pointer-events: none; overflow: hidden; }
         .content-layer { position: relative; z-index: 1; display: flex; flex-direction: column; height: 100%; padding: 20mm; box-sizing: border-box; }
 
         {% if is_editable %}
@@ -438,9 +438,17 @@
         }
 
         @media print {
-            @page { size: A4 portrait; margin: 0; }
-            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            .cinematic-bg, .zoom-floating-pill, .d-print-none, .mobile-panel-toggle, .mobile-panel-overlay { display: none !important; }
+            @page { 
+                size: A4 portrait; 
+                margin: 0 !important; /* Forces zero browser margin to fully eliminate default browser header/footer metadata (URL and timestamps) */
+            }
+            * { 
+                -webkit-print-color-adjust: exact !important; 
+                print-color-adjust: exact !important; 
+            }
+            .cinematic-bg, .zoom-floating-pill, .d-print-none, .mobile-panel-toggle, .mobile-panel-overlay { 
+                display: none !important; 
+            }
             
             [contenteditable="true"] {
                 border-bottom: none !important;
@@ -450,11 +458,58 @@
                 padding: 0 !important;
             }
 
-            html, body { background: #ffffff !important; width: 210mm; height: 297mm; margin: 0; padding: 0; overflow: visible; }
-            .app-layout, .main-area, .workspace { display: block; height: auto; width: 100%; overflow: visible; background: none; padding: 0; margin: 0; }
-            #zoomWrapper, #documentContainer { transform: none !important; width: 100% !important; display: block !important; margin: 0 !important; padding: 0 !important; }
-            .page { box-shadow: none !important; margin: 0 !important; width: 210mm !important; height: 297mm !important; max-height: 297mm !important; min-height: 297mm !important; page-break-after: always !important; page-break-inside: avoid !important; break-after: page !important; break-inside: avoid !important; position: relative !important; opacity: 1 !important; transform: none !important; }
-            .bg-layer { display: block !important; position: absolute !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important; z-index: 0 !important; }
+            html, body { 
+                background: #ffffff !important; 
+                width: 210mm; 
+                height: 297mm; 
+                margin: 0 !important; 
+                padding: 0 !important; 
+                overflow: hidden !important; 
+            }
+            .app-layout, .main-area, .workspace { 
+                display: block !important; 
+                height: auto !important; 
+                width: 100% !important; 
+                overflow: visible !important; 
+                background: none !important; 
+                padding: 0 !important; 
+                margin: 0 !important; 
+            }
+            #zoomWrapper, #documentContainer { 
+                transform: none !important; 
+                width: 100% !important; 
+                display: block !important; 
+                margin: 0 !important; 
+                padding: 0 !important; 
+            }
+            .page { 
+                box-shadow: none !important; 
+                margin: 0 !important; 
+                width: 210mm !important; 
+                height: 297mm !important; 
+                max-height: 297mm !important; 
+                min-height: 297mm !important; 
+                page-break-after: always !important; 
+                page-break-inside: avoid !important; 
+                break-after: page !important; 
+                break-inside: avoid !important; 
+                position: relative !important; 
+                opacity: 1 !important; 
+                transform: none !important; 
+                overflow: hidden !important; 
+            }
+            .bg-layer { 
+                display: block !important; 
+                position: absolute !important; 
+                top: 0 !important; 
+                left: 0 !important; 
+                right: 0 !important; 
+                bottom: 0 !important; 
+                z-index: 0 !important; 
+                overflow: hidden !important; 
+                background-size: cover !important;
+                background-position: center !important;
+            }
         }
     </style>
 </head>
