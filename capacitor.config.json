@@ -1,0 +1,9 @@
+{
+  "appId": "com.quostudio.app",
+  "appName": "QuoStudio",
+  "webDir": "www",
+  "server": {
+    "url": "https://quostudio.runs-on.dev",
+    "cleartext": true
+  }
+}
