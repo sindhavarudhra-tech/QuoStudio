@@ -537,20 +537,26 @@
             if (type === 'terms') {
                 titleEl.innerText = 'Terms of Service';
                 bodyEl.innerHTML = `
+                    <p><strong>Effective Date:</strong> October 17, 2026</p>
                     <p>Welcome to QuoStudio. By registering an account and using our platform, you agree to comply with and be bound by the following terms and conditions:</p>
-                    <p><strong>1. Account Security & Responsibilities:</strong> You are responsible for maintaining the confidentiality of your account credentials and password. All activities under your account are your responsibility.</p>
-                    <p><strong>2. Acceptable Use:</strong> You agree not to use QuoStudio for any unlawful activities or to distribute malicious code, spam, or infringing material.</p>
-                    <p><strong>3. Intellectual Property:</strong> All software, branding, and interfaces provided by QuoStudio are the property of QuoStudio and protected by international copyright laws.</p>
+                    <p><strong>1. Acceptance of Terms:</strong> By accessing or using QuoStudio, you agree to be bound by these Terms of Service and our Privacy Policy. If you do not agree to all terms, you may not use our services.</p>
+                    <p><strong>2. Account Security & Responsibilities:</strong> You are responsible for maintaining the confidentiality of your account credentials, password, and for all activities that occur under your account.</p>
+                    <p><strong>3. Acceptable Use Policy:</strong> You agree not to misuse the platform, distribute malicious code, spam, infringe upon intellectual property rights, or conduct unlawful activities using QuoStudio.</p>
+                    <p><strong>4. Intellectual Property:</strong> All software, branding, design assets, and user interfaces provided by QuoStudio are the exclusive property of QuoStudio and protected by copyright and intellectual property laws.</p>
+                    <p><strong>5. Limitation of Liability:</strong> QuoStudio is provided on an "as-is" and "as-available" basis. We are not liable for any indirect, incidental, or consequential damages arising from your use of the platform.</p>
+                    <p><strong>6. Termination:</strong> We reserve the right to suspend or terminate accounts that violate these terms or engage in harmful behavior.</p>
                 `;
             } else {
-                titleEl.innerText = 'Zero-Knowledge & Privacy Policy Agreement';
+                titleEl.innerText = 'Privacy Policy';
                 bodyEl.innerHTML = `
-                    <p>Before creating your account on QuoStudio, please review our zero-knowledge security commitments:</p>
-                    <ul>
-                        <li><strong>Client-Side End-to-End Encryption:</strong> All your inventory catalogs, pricing matrices, and business records are encrypted locally in your browser using AES-GCM before touching any cloud storage.</li>
-                        <li><strong>Zero-Knowledge Storage:</strong> Neither QuoStudio administrators nor any third party can read, view, or access your raw catalog data. Only you hold the decryption keys.</li>
-                        <li><strong>Data Portability & Deletion:</strong> You retain complete ownership and can permanently delete any uploaded database catalog or quotation history from the database at any time with a single click.</li>
-                    </ul>
+                    <p><strong>Effective Date:</strong> October 17, 2026</p>
+                    <p>At QuoStudio, we take your privacy and data security seriously. This Privacy Policy explains how we handle your information:</p>
+                    <p><strong>1. Information We Collect:</strong> We collect account registration details (such as your username, email address, and company name) necessary to provide our quotation and invoicing services.</p>
+                    <p><strong>2. Client-Side End-to-End Encryption:</strong> All your inventory catalogs, pricing matrices, and business records are encrypted locally in your browser using secure cryptographic standards before interacting with storage.</p>
+                    <p><strong>3. Zero-Knowledge Architecture:</strong> QuoStudio administrators and third parties cannot read, view, or access your raw encrypted catalog and quotation data. Only you control the encryption keys.</p>
+                    <p><strong>4. Data Usage:</strong> Your information is used strictly to authenticate your account, maintain your workspace, and deliver core application features. We never sell your personal or business data.</p>
+                    <p><strong>5. Data Portability & Deletion:</strong> You retain complete ownership of your data and can permanently delete any uploaded database catalog or quotation history from the database at any time.</p>
+                    <p><strong>6. Contact Us:</strong> If you have questions regarding this Privacy Policy, please reach out through our official support channels.</p>
                 `;
             }
 
