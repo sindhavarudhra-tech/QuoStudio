@@ -518,8 +518,11 @@ def delete_account():
 # ==========================================
 @app.route('/new_quotation', methods=['POST'])
 def new_quotation():
-    if 'user_id' not in session: return redirect(url_for('login'))
-    client_name = request.form.get('client_name')
+    if 'user_id' not in session: 
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 401
+        
+    client_name = request.form.get('client_name') or (request.json.get('client_name') if request.is_json else 'Untitled Project')
+    
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
@@ -530,7 +533,9 @@ def new_quotation():
     conn.commit()
     cursor.close()
     conn.close()
-    return redirect(url_for('editor', quote_id=new_quote_id))
+    
+    # Return JSON response so frontend can perform window.location.replace()
+    return jsonify({'success': True, 'quote_id': new_quote_id})
 
 @app.route('/editor/<int:quote_id>')
 def editor(quote_id):
@@ -584,13 +589,13 @@ def delete_quote(quote_id):
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    cursor.execute('DELETE FROM quotations WHERE id = %s AND user_id = %s', (quote_id, user_id))
+    cursor.execute('DELETE FROM quotations WHERE id = %s AND (user_id = %s OR recipient_id = %s)', (quote_id, user_id, user_id))
     conn.commit()
     cursor.close()
     conn.close()
     
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest' or request.is_json or request.method in ['POST', 'DELETE']:
-        return jsonify({'success': True, 'message': 'Quote draft deleted successfully.'})
+        return jsonify({'success': True, 'message': 'Quote deleted successfully.'})
         
     return redirect(url_for('dashboard'))
 
@@ -652,6 +657,24 @@ def accept_quote(quote_id):
     cursor.execute(
         "UPDATE quotations SET status = 'accepted', signature_data = %s, signature_ip = %s, signature_user_agent = %s WHERE id = %s AND recipient_id = %s", 
         (signature, ip_address, user_agent, quote_id, session['user_id'])
+    )
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return jsonify({'status': 'success'})
+
+@app.route('/reject_quote/<int:quote_id>', methods=['POST'])
+def reject_quote(quote_id):
+    if 'user_id' not in session: return jsonify({'status': 'error'}), 401
+    
+    data = request.get_json() or {}
+    reason = data.get('reason', '')
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "UPDATE quotations SET status = 'rejected' WHERE id = %s AND recipient_id = %s", 
+        (quote_id, session['user_id'])
     )
     conn.commit()
     cursor.close()

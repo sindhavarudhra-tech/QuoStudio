@@ -105,7 +105,6 @@
             box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2); 
         }
         
-        /* Scrollable Nav Tabs for Mobile */
         .nav-tabs { 
             border-bottom: 1px solid var(--border-color); 
             margin-bottom: 24px; 
@@ -115,11 +114,9 @@
             overflow-x: auto;
             overflow-y: hidden;
             -webkit-overflow-scrolling: touch;
-            scrollbar-width: none; /* Firefox */
+            scrollbar-width: none;
         }
-        .nav-tabs::-webkit-scrollbar {
-            display: none; /* Safari and Chrome */
-        }
+        .nav-tabs::-webkit-scrollbar { display: none; }
         .nav-tabs .nav-link { 
             color: var(--text-muted); 
             border: none; 
@@ -137,9 +134,7 @@
             transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             transform: translateY(10px);
         }
-        .tab-pane.fade.show {
-            transform: translateY(0);
-        }
+        .tab-pane.fade.show { transform: translateY(0); }
 
         .profile-avatar { width: 40px; height: 40px; background: linear-gradient(135deg, #2563EB, #1D4ED8); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; border: 2px solid var(--border-color); color: white; cursor: pointer; text-transform: uppercase; font-family: 'Geist', sans-serif;}
         .profile-avatar::after { display: none !important; }
@@ -148,6 +143,7 @@
         .status-draft { background: rgba(148, 163, 184, 0.1); color: #94A3B8; border: 1px solid rgba(148, 163, 184, 0.2); }
         .status-sent { background: rgba(59, 130, 246, 0.1); color: #3B82F6; border: 1px solid rgba(59, 130, 246, 0.2); }
         .status-accepted { background: rgba(16, 185, 129, 0.1); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.2); }
+        .status-rejected { background: rgba(239, 68, 68, 0.1); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.2); }
         .status-awaiting { background: rgba(245, 158, 11, 0.1); color: #F59E0B; border: 1px solid rgba(245, 158, 11, 0.2); }
 
         .modal-content { 
@@ -160,11 +156,6 @@
         .form-control { background-color: var(--input-bg) !important; color: var(--text-main) !important; border: 1px solid var(--border-color); padding: 12px 16px; border-radius: 12px; transition: 0.3s; }
         .form-control:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 4px rgba(37,99,235,0.1); }
         
-        body:not(.light-theme) .form-control::placeholder { color: #CBD5E1 !important; opacity: 1; }
-        body:not(.light-theme) .form-control::-webkit-input-placeholder { color: #CBD5E1 !important; opacity: 1; }
-        body.light-theme .form-control::placeholder { color: #64748B !important; opacity: 1; }
-        body.light-theme .form-control::-webkit-input-placeholder { color: #64748B !important; opacity: 1; }
-
         .dropdown-menu-custom { 
             background-color: var(--modal-bg); 
             backdrop-filter: blur(24px);
@@ -180,7 +171,6 @@
         .btn-primary { background-color: var(--accent-blue); border: none; font-weight: 600; padding: 10px 24px; transition: 0.2s; }
         .btn-primary:hover { background-color: #1D4ED8; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
 
-        /* Responsive Chat Container */
         .chat-container { display: flex; height: 600px; background: var(--bg-card); backdrop-filter: blur(12px); border: 1px solid var(--border-color); border-radius: 20px; overflow: hidden; box-shadow: 0 30px 60px -15px rgba(0,0,0,0.3); }
         .chat-sidebar { width: 320px; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; background: rgba(0,0,0,0.1); flex-shrink: 0; }
         .chat-user-item { padding: 16px 20px; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: 0.2s; }
@@ -196,51 +186,32 @@
 
         .back-to-chats-btn { display: none; }
 
-        /* Mobile Optimization Media Queries */
         @media (max-width: 991.98px) {
-            .navbar {
-                padding: 12px 16px;
-            }
-            .container {
-                padding-left: 16px !important;
-                padding-right: 16px !important;
-            }
-            .list-row {
-                padding: 16px;
-                gap: 12px;
-            }
-            .chat-container {
-                height: 520px;
-                position: relative;
-            }
-            .chat-sidebar {
-                width: 100%;
-                position: absolute;
-                top: 0; left: 0; bottom: 0;
-                z-index: 10;
-                transition: transform 0.3s ease;
-                background: var(--modal-bg);
-            }
-            .chat-sidebar.mobile-hidden {
-                transform: translateX(-100%);
-            }
-            .chat-main {
-                width: 100%;
-                height: 100%;
-            }
-            .back-to-chats-btn {
-                display: flex !important;
-                align-items: center;
-                gap: 6px;
-                background: transparent;
-                border: 1px solid var(--border-color);
-                color: var(--text-main);
-                padding: 6px 12px;
-                border-radius: 8px;
-                font-size: 13px;
-                font-weight: 500;
-            }
+            .navbar { padding: 12px 16px; }
+            .container { padding-left: 16px !important; padding-right: 16px !important; }
+            .list-row { padding: 16px; gap: 12px; }
+            .chat-container { height: 520px; position: relative; }
+            .chat-sidebar { width: 100%; position: absolute; top: 0; left: 0; bottom: 0; z-index: 10; transition: transform 0.3s ease; background: var(--modal-bg); }
+            .chat-sidebar.mobile-hidden { transform: translateX(-100%); }
+            .chat-main { width: 100%; height: 100%; }
+            .back-to-chats-btn { display: flex !important; align-items: center; gap: 6px; background: transparent; border: 1px solid var(--border-color); color: var(--text-main); padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: 500; }
         }
+    
+        .form-control::placeholder { color: var(--text-muted) !important; opacity: 1; }
+        .form-control::-webkit-input-placeholder { color: var(--text-muted) !important; opacity: 1; }
+        .form-control::-moz-placeholder { color: var(--text-muted) !important; opacity: 1; }
+        .form-control:-ms-input-placeholder { color: var(--text-muted) !important; opacity: 1; }
+
+        .quote-checkbox {
+            background-color: var(--input-bg) !important;
+            border: 1px solid var(--border-color) !important;
+            accent-color: var(--accent-blue);
+        }
+        .quote-checkbox:checked {
+            background-color: var(--accent-blue) !important;
+            border-color: var(--accent-blue) !important;
+        }
+
     </style>
 </head>
 <body>
@@ -275,17 +246,19 @@
     </nav>
 
     <div class="container mt-3" style="max-width: 1320px; padding-bottom: 80px;">
-        {% set my_drafts = [] %}{% set my_sent = [] %}{% set my_signed = [] %}
+        {% set my_drafts = [] %}{% set my_sent = [] %}{% set my_signed = [] %}{% set my_rejected = [] %}
         {% for q in my_quotes %}
             {% if q.status == 'draft' %}{% set _ = my_drafts.append(q) %}
             {% elif q.status == 'sent' %}{% set _ = my_sent.append(q) %}
-            {% elif q.status == 'accepted' %}{% set _ = my_signed.append(q) %}{% endif %}
+            {% elif q.status == 'accepted' %}{% set _ = my_signed.append(q) %}
+            {% elif q.status == 'rejected' %}{% set _ = my_rejected.append(q) %}{% endif %}
         {% endfor %}
         
-        {% set inbox_active = [] %}{% set inbox_signed = [] %}
+        {% set inbox_active = [] %}{% set inbox_signed = [] %}{% set inbox_rejected = [] %}
         {% for q in inbox %}
             {% if q.status == 'sent' %}{% set _ = inbox_active.append(q) %}
-            {% elif q.status == 'accepted' %}{% set _ = inbox_signed.append(q) %}{% endif %}
+            {% elif q.status == 'accepted' %}{% set _ = inbox_signed.append(q) %}
+            {% elif q.status == 'rejected' %}{% set _ = inbox_rejected.append(q) %}{% endif %}
         {% endfor %}
         
         <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -298,7 +271,7 @@
                 </button>
             </li>
             <li class="nav-item"><button class="nav-link d-flex align-items-center gap-2" data-bs-toggle="tab" data-bs-target="#messages" onclick="initChatSystem()"><i data-lucide="message-square" style="width: 16px; height: 16px;"></i> Messages</button></li>
-            <li class="nav-item"><button class="nav-link d-flex align-items-center gap-2" data-bs-toggle="tab" data-bs-target="#signed"><i data-lucide="lock" style="width: 16px; height: 16px;"></i> Signed Quotes</button></li>
+            <li class="nav-item"><button class="nav-link d-flex align-items-center gap-2" data-bs-toggle="tab" data-bs-target="#responses"><i data-lucide="check-circle-2" style="width: 16px; height: 16px;"></i> Responses</button></li>
         </ul>
 
         <div class="tab-content">
@@ -313,7 +286,7 @@
                         
                         <div>
                             {% for quote in my_drafts %}
-                            <div class="list-row">
+                            <div class="list-row"><input type="checkbox" class="form-check-input quote-checkbox me-3" data-quote-id="{{ quote.id }}" onchange="toggleQuoteSelection(this)" style="cursor: pointer; width: 18px; height: 18px;" title="Select quote">
                                 <a href="/editor/{{ quote.id }}" class="d-flex align-items-center gap-3 text-decoration-none flex-grow-1 min-w-0" style="color: var(--text-main);">
                                     <div style="width: 44px; height: 44px; flex-shrink: 0; background: rgba(37,99,235,0.1); color: var(--accent-blue); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
                                         <i data-lucide="file-edit" style="width: 22px; height: 22px;"></i>
@@ -363,7 +336,7 @@
                 <div class="mb-4"><h4 class="m-0 fw-semibold" style="color: var(--text-main);">Pending Signatures</h4></div>
                 <div>
                     {% for quote in my_sent %}
-                    <div class="list-row">
+                    <div class="list-row"><input type="checkbox" class="form-check-input quote-checkbox me-3" data-quote-id="{{ quote.id }}" onchange="toggleQuoteSelection(this)" style="cursor: pointer; width: 18px; height: 18px;" title="Select quote">
                         <a href="/editor/{{ quote.id }}" class="d-flex align-items-center gap-3 text-decoration-none flex-grow-1 min-w-0" style="color: var(--text-main);">
                             <div style="width: 44px; height: 44px; flex-shrink: 0; background: rgba(245, 158, 11, 0.1); color: #F59E0B; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
                                 <i data-lucide="send" style="width: 22px; height: 22px;"></i>
@@ -433,49 +406,100 @@
                 </div>
             </div>
 
-            <!-- 5. Signed Quotes -->
-            <div class="tab-pane fade" id="signed">
-                <div class="mb-4"><h4 class="m-0 fw-semibold" style="color: var(--text-main);">Locked & Completed Documents</h4></div>
-                <div>
-                    {% for quote in my_signed %}
-                    <div class="list-row">
-                        <a href="/editor/{{ quote.id }}" class="d-flex align-items-center gap-3 text-decoration-none flex-grow-1 min-w-0" style="color: var(--text-main);">
-                            <div style="width: 44px; height: 44px; flex-shrink: 0; background: rgba(16,185,129,0.1); color: #10B981; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                                <i data-lucide="lock" style="width: 22px; height: 22px;"></i>
+            <!-- 5. Responses (Accepted / Rejected Quotes) - 2 Column Layout -->
+            <div class="tab-pane fade" id="responses">
+                <div class="row gx-4">
+                    <!-- Left Column: Sent by Me -->
+                    <div class="col-lg-6 mb-4 mb-lg-0">
+                        <div class="mb-4"><h4 class="m-0 fw-semibold" style="color: var(--text-main);">Sent by Me</h4></div>
+                        <div>
+                            {% for quote in my_signed %}
+                            <div class="list-row"><input type="checkbox" class="form-check-input quote-checkbox me-3" data-quote-id="{{ quote.id }}" onchange="toggleQuoteSelection(this)" style="cursor: pointer; width: 18px; height: 18px;" title="Select quote">
+                                <a href="/editor/{{ quote.id }}" class="d-flex align-items-center gap-3 text-decoration-none flex-grow-1 min-w-0" style="color: var(--text-main);">
+                                    <div style="width: 44px; height: 44px; flex-shrink: 0; background: rgba(16,185,129,0.1); color: #10B981; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                        <i data-lucide="check-circle" style="width: 22px; height: 22px;"></i>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <h6 class="fw-semibold m-0 fs-6 fs-md-5 brand-text text-truncate" style="letter-spacing: -0.01em; color: var(--text-main);">{{ quote.client_name }}</h6>
+                                        <small style="color: var(--text-muted);">Accepted by @{{ quote.recipient_name }}</small>
+                                    </div>
+                                </a>
+                                <div class="d-flex align-items-center gap-2 ms-2">
+                                    <span class="status-badge status-accepted d-none d-sm-inline-block">Accepted</span>
+                                    <button class="delete-btn" onclick="deleteDraft(event, '{{ quote.id }}')" title="Delete History Item"><i data-lucide="trash-2" style="width: 18px; height: 18px;"></i></button>
+                                </div>
                             </div>
-                            <div class="min-w-0">
-                                <h6 class="fw-semibold m-0 fs-6 fs-md-5 brand-text text-truncate" style="letter-spacing: -0.01em; color: var(--text-main);">{{ quote.client_name }}</h6>
-                                <small style="color: var(--text-muted);">Locked • Signed by @{{ quote.recipient_name }}</small>
-                            </div>
-                        </a>
-                        <div class="d-flex align-items-center gap-2 ms-2">
-                            <span class="status-badge status-accepted d-none d-sm-inline-block">Accepted</span>
-                            <button class="delete-btn" onclick="deleteDraft(event, '{{ quote.id }}')" title="Delete History Item"><i data-lucide="trash-2" style="width: 18px; height: 18px;"></i></button>
-                        </div>
-                    </div>
-                    {% endfor %}
+                            {% endfor %}
 
-                    {% for quote in inbox_signed %}
-                    <div class="list-row">
-                        <a href="/editor/{{ quote.id }}" class="d-flex align-items-center gap-3 text-decoration-none flex-grow-1 min-w-0" style="color: var(--text-main);">
-                            <div style="width: 44px; height: 44px; flex-shrink: 0; background: rgba(16,185,129,0.1); color: #10B981; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                                <i data-lucide="lock" style="width: 22px; height: 22px;"></i>
+                            {% for quote in my_rejected %}
+                            <div class="list-row"><input type="checkbox" class="form-check-input quote-checkbox me-3" data-quote-id="{{ quote.id }}" onchange="toggleQuoteSelection(this)" style="cursor: pointer; width: 18px; height: 18px;" title="Select quote">
+                                <a href="/editor/{{ quote.id }}" class="d-flex align-items-center gap-3 text-decoration-none flex-grow-1 min-w-0" style="color: var(--text-main);">
+                                    <div style="width: 44px; height: 44px; flex-shrink: 0; background: rgba(239, 68, 68, 0.1); color: #EF4444; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                        <i data-lucide="x-circle" style="width: 22px; height: 22px;"></i>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <h6 class="fw-semibold m-0 fs-6 fs-md-5 brand-text text-truncate" style="letter-spacing: -0.01em; color: var(--text-main);">{{ quote.client_name }}</h6>
+                                        <small style="color: var(--text-muted);">Rejected by @{{ quote.recipient_name }}</small>
+                                    </div>
+                                </a>
+                                <div class="d-flex align-items-center gap-2 ms-2">
+                                    <span class="status-badge status-rejected d-none d-sm-inline-block">Rejected</span>
+                                    <button class="delete-btn" onclick="deleteDraft(event, '{{ quote.id }}')" title="Delete History Item"><i data-lucide="trash-2" style="width: 18px; height: 18px;"></i></button>
+                                </div>
                             </div>
-                            <div class="min-w-0">
-                                <h6 class="fw-semibold m-0 fs-6 fs-md-5 brand-text text-truncate" style="letter-spacing: -0.01em; color: var(--text-main);">{{ quote.client_name }}</h6>
-                                <small style="color: var(--text-muted);">Locked • Signed by You</small>
-                            </div>
-                        </a>
-                        <div class="d-flex align-items-center gap-2 ms-2">
-                            <span class="status-badge status-accepted d-none d-sm-inline-block">Accepted</span>
-                            <button class="delete-btn" onclick="deleteDraft(event, '{{ quote.id }}')" title="Delete History Item"><i data-lucide="trash-2" style="width: 18px; height: 18px;"></i></button>
+                            {% endfor %}
+                            
+                            {% if my_signed|length == 0 and my_rejected|length == 0 %}
+                            <div class="text-center py-5 border rounded-4" style="color: var(--text-main); border-color: var(--border-color) !important; background: var(--bg-card); backdrop-filter: blur(12px);">No responses for quotes sent by you yet.</div>
+                            {% endif %}
                         </div>
                     </div>
-                    {% endfor %}
-                    
-                    {% if my_signed|length == 0 and inbox_signed|length == 0 %}
-                    <div class="text-center py-5 border rounded-4" style="color: var(--text-main); border-color: var(--border-color) !important; background: var(--bg-card); backdrop-filter: blur(12px);">No signed documents yet.</div>
-                    {% endif %}
+
+                    <!-- Right Column: Sent by Others to Me -->
+                    <div class="col-lg-6">
+                        <div class="mb-4"><h4 class="m-0 fw-semibold" style="color: var(--text-main);">Sent by Others to Me</h4></div>
+                        <div>
+                            {% for quote in inbox_signed %}
+                            <div class="list-row"><input type="checkbox" class="form-check-input quote-checkbox me-3" data-quote-id="{{ quote.id }}" onchange="toggleQuoteSelection(this)" style="cursor: pointer; width: 18px; height: 18px;" title="Select quote">
+                                <a href="/editor/{{ quote.id }}" class="d-flex align-items-center gap-3 text-decoration-none flex-grow-1 min-w-0" style="color: var(--text-main);">
+                                    <div style="width: 44px; height: 44px; flex-shrink: 0; background: rgba(16,185,129,0.1); color: #10B981; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                        <i data-lucide="check-circle" style="width: 22px; height: 22px;"></i>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <h6 class="fw-semibold m-0 fs-6 fs-md-5 brand-text text-truncate" style="letter-spacing: -0.01em; color: var(--text-main);">{{ quote.client_name }}</h6>
+                                        <small style="color: var(--text-muted);">Accepted by You</small>
+                                    </div>
+                                </a>
+                                <div class="d-flex align-items-center gap-2 ms-2">
+                                    <span class="status-badge status-accepted d-none d-sm-inline-block">Accepted</span>
+                                    <button class="delete-btn" onclick="deleteDraft(event, '{{ quote.id }}')" title="Delete History Item"><i data-lucide="trash-2" style="width: 18px; height: 18px;"></i></button>
+                                </div>
+                            </div>
+                            {% endfor %}
+
+                            {% for quote in inbox_rejected %}
+                            <div class="list-row"><input type="checkbox" class="form-check-input quote-checkbox me-3" data-quote-id="{{ quote.id }}" onchange="toggleQuoteSelection(this)" style="cursor: pointer; width: 18px; height: 18px;" title="Select quote">
+                                <a href="/editor/{{ quote.id }}" class="d-flex align-items-center gap-3 text-decoration-none flex-grow-1 min-w-0" style="color: var(--text-main);">
+                                    <div style="width: 44px; height: 44px; flex-shrink: 0; background: rgba(239, 68, 68, 0.1); color: #EF4444; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                        <i data-lucide="x-circle" style="width: 22px; height: 22px;"></i>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <h6 class="fw-semibold m-0 fs-6 fs-md-5 brand-text text-truncate" style="letter-spacing: -0.01em; color: var(--text-main);">{{ quote.client_name }}</h6>
+                                        <small style="color: var(--text-muted);">Rejected by You</small>
+                                    </div>
+                                </a>
+                                <div class="d-flex align-items-center gap-2 ms-2">
+                                    <span class="status-badge status-rejected d-none d-sm-inline-block">Rejected</span>
+                                    <button class="delete-btn" onclick="deleteDraft(event, '{{ quote.id }}')" title="Delete History Item"><i data-lucide="trash-2" style="width: 18px; height: 18px;"></i></button>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            
+                            {% if inbox_signed|length == 0 and inbox_rejected|length == 0 %}
+                            <div class="text-center py-5 border rounded-4" style="color: var(--text-main); border-color: var(--border-color) !important; background: var(--bg-card); backdrop-filter: blur(12px);">No responses for quotes received from others yet.</div>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -485,14 +509,14 @@
     <div class="modal fade" id="newQuoteModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <form action="/new_quotation" method="POST">
+                <form id="newQuoteForm" action="/new_quotation" method="POST">
                     <div class="modal-header border-0 pb-0 mt-2">
                         <h5 class="modal-title fw-semibold brand-text fs-4" style="color: var(--text-main);">Create Quote</h5>
                         <button type="button" class="btn-close" style="filter: var(--invert-close, invert(1));" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body py-4">
                         <label class="small fw-semibold mb-2 text-uppercase" style="letter-spacing: 0.5px; color: var(--text-main);">Project Name</label>
-                        <input type="text" name="client_name" class="form-control" required placeholder="e.g. Acme Corp Migration">
+                        <input type="text" name="client_name" class="form-control" required placeholder="e.g. QS Corp Migration">
                     </div>
                     <div class="modal-footer border-0 pt-0 mb-2">
                         <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fs-6">Create Document</button>
@@ -530,6 +554,59 @@
     <script>
         lucide.createIcons();
 
+        let selectedQuotes = new Set();
+
+        function toggleSelectAll(source, listId) {
+            const checkboxes = document.querySelectorAll(`#${listId} .quote-checkbox`);
+            checkboxes.forEach(cb => {
+                cb.checked = source.checked;
+                const id = cb.dataset.quoteId;
+                if (source.checked) {
+                    selectedQuotes.add(id);
+                } else {
+                    selectedQuotes.delete(id);
+                }
+            });
+            updateBulkToolbar();
+        }
+
+        function toggleQuoteSelection(cb) {
+            const id = cb.dataset.quoteId;
+            if (cb.checked) {
+                selectedQuotes.add(id);
+            } else {
+                selectedQuotes.delete(id);
+            }
+            updateBulkToolbar();
+        }
+
+        function updateBulkToolbar() {
+            let toolbar = document.getElementById('bulkDeleteToolbar');
+            if (selectedQuotes.size > 0) {
+                if (!toolbar) {
+                    toolbar = document.createElement('div');
+                    toolbar.id = 'bulkDeleteToolbar';
+                    toolbar.style.cssText = 'position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--modal-bg); backdrop-filter: blur(24px); border: 1px solid var(--border-color); padding: 12px 24px; border-radius: 100px; display: flex; align-items: center; gap: 16px; z-index: 1050; box-shadow: 0 20px 40px rgba(0,0,0,0.4);';
+                    toolbar.innerHTML = `
+                        <span id="selectedCountText" style="font-size: 13px; font-weight: 600; color: var(--text-main);">0 selected</span>
+                        <button class="btn btn-sm btn-danger rounded-pill px-3 fw-bold" onclick="bulkDeleteQuotes()">Delete Selected</button>
+                    `;
+                    document.body.appendChild(toolbar);
+                }
+                document.getElementById('selectedCountText').innerText = `${selectedQuotes.size} selected`;
+            } else {
+                if (toolbar) toolbar.remove();
+            }
+        }
+
+        function bulkDeleteQuotes() {
+            if (!confirm(`Are you sure you want to permanently delete ${selectedQuotes.size} selected document(s)?`)) return;
+            const promises = Array.from(selectedQuotes).map(id => fetch(`/delete_quote/${id}`, { method: 'POST' }));
+            Promise.all(promises).then(() => {
+                window.location.reload();
+            });
+        }
+
         const currentTheme = localStorage.getItem('theme') || 'dark';
         if (currentTheme === 'light') enableLightMode();
 
@@ -539,8 +616,11 @@
                 localStorage.setItem('theme', 'dark');
                 document.documentElement.style.setProperty('--invert-close', 'invert(1)');
                 
-                document.getElementById('themeIconWrapper').innerHTML = '<i data-lucide="moon" style="width: 16px; height: 16px;"></i>';
-                lucide.createIcons();
+                const wrapper = document.getElementById('themeIconWrapper');
+                if(wrapper) {
+                    wrapper.innerHTML = '<i data-lucide="moon" style="width: 16px; height: 16px;"></i>';
+                    lucide.createIcons();
+                }
             } else {
                 enableLightMode();
             }
@@ -603,7 +683,6 @@
             document.getElementById('chatHeaderTitle').innerText = '@' + username;
             document.getElementById('chatInputArea').style.display = 'block';
             
-            // On mobile, slide out the sidebar so chat main is visible
             if (window.innerWidth < 992) {
                 document.getElementById('chatSidebar').classList.add('mobile-hidden');
             }
@@ -659,6 +738,44 @@
                 loadMessages();
             });
         }
+
+        // Intercept quote creation form: close modal, clear backdrops, and redirect
+        document.addEventListener('DOMContentLoaded', () => {
+            const createForm = document.getElementById('newQuoteForm');
+            if (createForm) {
+                createForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    // Immediately close modal & clean up backdrops
+                    const modalEl = document.getElementById('newQuoteModal');
+                    const modalInstance = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+                    modalInstance.hide();
+                    
+                    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+                    document.body.classList.remove('modal-open');
+                    document.body.style.overflow = '';
+                    document.body.style.paddingRight = '';
+
+                    const formData = new FormData(this);
+                    
+                    try {
+                        const response = await fetch('/new_quotation', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        const data = await response.json();
+                        
+                        if (data.success && data.quote_id) {
+                            window.location.href = '/editor/' + data.quote_id;
+                        } else {
+                            alert('Failed to create quotation.');
+                        }
+                    } catch (err) {
+                        console.error('Error creating quote:', err);
+                    }
+                });
+            }
+        });
     </script>
 </body>
 </html>

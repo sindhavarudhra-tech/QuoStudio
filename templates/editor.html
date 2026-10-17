@@ -11,6 +11,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts for Cursive Signature -->
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- html2pdf Library for direct PDF downloading -->
@@ -93,6 +95,7 @@
         .btn-primary-custom { background: var(--accent-blue); border: none; color: white; padding: 8px 20px; border-radius: 100px; font-size: 13px; font-weight: 600; transition: 0.2s;}
         .btn-primary-custom:hover { background: #1D4ED8; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
         .btn-success-custom { background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #10B981; padding: 8px 20px; border-radius: 100px; font-size: 13px; font-weight: 600; }
+        .btn-danger-custom { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #EF4444; padding: 8px 20px; border-radius: 100px; font-size: 13px; font-weight: 600; }
         .btn-warning-custom { background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); color: #F59E0B; padding: 8px 20px; border-radius: 100px; font-size: 13px; font-weight: 600; }
         
         .avatar { width: 34px; height: 34px; background: var(--accent-blue); border-radius: 50%; border: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: white; margin-left: 8px; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
@@ -112,7 +115,7 @@
             color: #EF4444 !important;
         }
 
-        /* Workspace and Zoom containment */
+        /* Workspace containment */
         .workspace { 
             flex-grow: 1; 
             overflow-y: auto; 
@@ -144,57 +147,6 @@
             align-items: center;
             width: 100%;
             margin-bottom: 0;
-        }
-
-        .zoom-floating-pill {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: var(--modal-bg);
-            backdrop-filter: var(--blur-val);
-            -webkit-backdrop-filter: var(--blur-val);
-            border: 1px solid var(--border-color);
-            padding: 6px 14px;
-            border-radius: 100px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            z-index: 1020;
-        }
-        .zoom-floating-pill button {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            font-size: 16px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: 0.2s;
-            outline: none;
-            padding: 0;
-            line-height: 1;
-        }
-        .zoom-floating-pill button:hover {
-            background: var(--bg-card-hover);
-            border-color: var(--accent-blue);
-            transform: scale(1.05);
-        }
-        #zoomLevelDisplay {
-            color: var(--text-main);
-            font-size: 13px;
-            font-weight: 600;
-            min-width: 48px;
-            text-align: center;
-        }
-
-        @media (min-width: 992px) {
-            .zoom-floating-pill { left: calc(50% - 180px); transform: translateX(-50%); }
         }
 
         input[type="number"] { color-scheme: dark; }
@@ -250,13 +202,13 @@
         {% else %}
         [contenteditable="true"] { outline: none; border-bottom: none; cursor: default; }
         {% endif %}
-        .no-wrap[contenteditable="true"] { white-space: nowrap; overflow: hidden; }
+        .no-wrap[contenteditable="true"] { white-space: nowrap !important; overflow: hidden; }
 
         .doc-h1 { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.02em; margin: 0; color: #0F172A; padding: 4px; }
         .meta-row { display: flex; padding: 12px 0; margin-bottom: 16px; gap: 32px; }
-        .meta-col { flex: 1; }
-        .meta-label { font-size: 9px; font-weight: 700; color: #334155; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; font-family: inherit; }
-        .meta-value { font-size: 13px; font-weight: 600; color: #0F172A; }
+        .meta-col { flex: 0 0 auto; min-width: max-content; }
+        .meta-label { font-size: 9px; font-weight: 700; color: #334155; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; font-family: inherit; white-space: nowrap !important; }
+        .meta-value { font-size: 13px; font-weight: 600; color: #0F172A; white-space: nowrap !important; }
 
         .quote-table { width: 100%; font-size: 12.5px; border-collapse: collapse; color: #0F172A; table-layout: fixed; }
         .quote-table th { padding: 12px 6px; font-weight: 600; text-transform: uppercase; font-size: 10px; color: #334155; border-bottom: 1px solid rgba(226, 232, 240, 0.8); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -338,6 +290,12 @@
             backdrop-filter: var(--blur-val); -webkit-backdrop-filter: var(--blur-val);
             color: var(--text-main); border: 1px solid var(--border-color); border-radius: 24px;
         }
+        @media (max-width: 576px) {
+            .modal-dialog { margin: 16px; max-width: calc(100% - 32px); }
+            .modal-content { border-radius: 20px; padding: 4px; }
+            .modal-body { padding: 16px !important; }
+            .form-control { font-size: 16px !important; }
+        }
         .form-control { background-color: var(--input-bg) !important; color: var(--text-main) !important; border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 16px; transition: 0.3s; }
         .form-control:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 4px rgba(37,99,235,0.15); }
         
@@ -356,7 +314,7 @@
         }
         .client-search-result:hover { border-color: var(--accent-blue); background: rgba(37,99,235,0.15); transform: translateY(-1px); }
         
-        .signature-box { border: 2px dashed #CBD5E1; border-radius: 12px; height: 100px; display: flex; align-items: center; justify-content: center; font-family: 'Brush Script MT', cursive; font-size: 32px; color: #0F172A; margin-top: 16px; cursor: pointer; background: white; transition: 0.2s; }
+        .signature-box { border: 2px dashed #CBD5E1; border-radius: 12px; height: 90px; display: flex; align-items: center; justify-content: center; font-family: 'Great Vibes', cursive; font-size: 28px; color: #0F172A; margin-top: 12px; cursor: pointer; background: white; transition: 0.2s; }
         .signature-box:hover { border-color: var(--accent-blue); background: #F8FAFC; }
 
         .scroll-section { will-change: opacity, transform; }
@@ -427,12 +385,6 @@
                 align-items: center;
                 gap: 6px;
             }
-            .zoom-floating-pill {
-                left: 20px;
-                transform: none;
-                bottom: 20px;
-                padding: 4px 10px;
-            }
             .top-header { padding: 12px 16px; min-height: 64px; }
             .workspace { padding: 12px 8px 30px 8px; }
         }
@@ -440,13 +392,13 @@
         @media print {
             @page { 
                 size: A4 portrait; 
-                margin: 0 !important; /* Forces zero browser margin to fully eliminate default browser header/footer metadata (URL and timestamps) */
+                margin: 0 !important; 
             }
             * { 
                 -webkit-print-color-adjust: exact !important; 
                 print-color-adjust: exact !important; 
             }
-            .cinematic-bg, .zoom-floating-pill, .d-print-none, .mobile-panel-toggle, .mobile-panel-overlay { 
+            .cinematic-bg, .d-print-none, .mobile-panel-toggle, .mobile-panel-overlay { 
                 display: none !important; 
             }
             
@@ -532,12 +484,13 @@
                         <span class="status-dot locked"></span> <span style="color: #F59E0B; font-size: 12px; font-weight: 600;" class="d-none d-md-inline">Locked • Sent</span>
                     {% elif quote.status == 'accepted' %}
                         <span class="status-dot"></span> <span style="color: #10B981; font-size: 12px; font-weight: 600;" class="d-none d-md-inline">Locked • Signed</span>
+                    {% elif quote.status == 'rejected' %}
+                        <span class="status-dot locked" style="background: #EF4444; box-shadow: 0 0 8px rgba(239,68,68,0.6);"></span> <span style="color: #EF4444; font-size: 12px; font-weight: 600;" class="d-none d-md-inline">Rejected</span>
                     {% endif %}
                 </div>
             </div>
             
             <div class="header-actions">
-                <!-- Optimized responsive text: displays "Print / Download" on medium+ screens and "PDF" on mobile phones -->
                 <button class="btn-outline-darker px-3 px-sm-4" onclick="window.print()" title="Print document or save as PDF">
                     <span class="d-none d-md-inline">Print / Download</span>
                     <span class="d-inline d-md-none">PDF</span>
@@ -550,14 +503,28 @@
                         <span class="btn-warning-custom small px-3">Pending</span>
                     {% elif quote.status == 'accepted' %}
                         <span class="btn-success-custom small px-3">Signed</span>
+                    {% elif quote.status == 'rejected' %}
+                        <span class="btn-danger-custom small px-3">Rejected</span>
                     {% endif %}
                 {% endif %}
                 
                 {% if is_recipient %}
                     {% if quote.status == 'sent' %}
-                        <button class="btn-primary-custom" data-bs-toggle="modal" data-bs-target="#acceptModal" style="background: #10B981;" title="Review terms and sign quotation">Review & Accept</button>
+                        <!-- Desktop Text Buttons -->
+                        <button class="btn-primary-custom d-none d-md-inline-block" data-bs-toggle="modal" data-bs-target="#acceptModal" style="background: #10B981;" title="Review terms and sign quotation">Review & Accept</button>
+                        <button class="btn-danger-custom d-none d-md-inline-block" data-bs-toggle="modal" data-bs-target="#rejectModal" title="Reject quotation">Reject</button>
+
+                        <!-- Mobile Icon Buttons (Green Check & Red X) -->
+                        <button class="btn btn-sm text-white d-inline-block d-md-none rounded-circle p-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#acceptModal" style="background: #10B981; width: 38px; height: 38px; display: inline-flex; align-items: center; justify-content: center;" title="Accept">
+                            <i data-lucide="check" style="width: 20px; height: 20px;"></i>
+                        </button>
+                        <button class="btn btn-sm text-white d-inline-block d-md-none rounded-circle p-2 shadow-sm ms-2" data-bs-toggle="modal" data-bs-target="#rejectModal" style="background: #EF4444; width: 38px; height: 38px; display: inline-flex; align-items: center; justify-content: center;" title="Reject">
+                            <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+                        </button>
                     {% elif quote.status == 'accepted' %}
                         <span class="btn-success-custom">Accepted</span>
+                    {% elif quote.status == 'rejected' %}
+                        <span class="btn-danger-custom">Rejected</span>
                     {% endif %}
                 {% endif %}
                 
@@ -579,14 +546,6 @@
             </div>
         </div>
 
-        <!-- Fixed Zoom Indicator on the LEFT side -->
-        <div class="zoom-floating-pill d-print-none">
-            <button onclick="adjustZoom(-0.1)" title="Zoom out document view">−</button>
-            <span id="zoomLevelDisplay">100%</span>
-            <button onclick="adjustZoom(0.1)" title="Zoom in document view">+</button>
-        </div>
-
-        <!-- Mobile Drawer Toggle Button on the RIGHT side -->
         {% if is_editable %}
         <button class="mobile-panel-toggle d-print-none" onclick="toggleMobilePanel()" title="Open editor controls & catalog inventory">
             <i data-lucide="sliders-horizontal" style="width: 16px; height: 16px;"></i> Customize
@@ -620,7 +579,6 @@
                     {% endfor %}
                 </select>
 
-                <!-- Sleek Expandable Upload Accordion with Explicit Text -->
                 <div class="mb-4">
                     <button type="button" class="btn w-100 d-flex align-items-center justify-content-between p-3 rounded-4 fw-bold" style="background: rgba(255, 255, 255, 0.03); border: 1px dashed var(--border-color); color: var(--text-main); font-size: 13px; transition: 0.2s;" onclick="toggleUploadAccordion()" title="Upload a new CSV product catalog">
                         <span class="d-flex align-items-center gap-2">
@@ -645,7 +603,6 @@
                     </div>
                 </div>
 
-                <!-- Dynamic Columns & Mapping (Disabled by default until a catalog is selected) -->
                 <div id="dynamicColsContainer" class="disabled-section">
                     <label class="ui-label">Dynamic Columns</label>
                     <div class="d-flex align-items-center gap-2 mt-1 p-1 rounded-pill mb-3" style="background: var(--bg-card); border: 1px solid var(--border-color);">
@@ -657,12 +614,9 @@
                     <div id="colMappingContainer" class="mb-4"></div>
                 </div>
 
-                <!-- Search bar & Category filter pills -->
                 <input type="text" id="inventorySearchInput" class="form-control mb-3 py-2" placeholder="Search catalog items..." oninput="filterInventoryItems()" title="Filter items by name or attributes">
 
-                <div id="category-pills" class="flex items-center space-x-2 overflow-x-auto pb-2 mb-3 scrollbar-none" style="display: flex; gap: 6px; overflow-x: auto; white-space: nowrap;">
-                    <!-- Dynamically populated filter pills -->
-                </div>
+                <div id="category-pills" class="flex items-center space-x-2 overflow-x-auto pb-2 mb-3 scrollbar-none" style="display: flex; gap: 6px; overflow-x: auto; white-space: nowrap;"></div>
 
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <label class="ui-label mb-0">Inventory Items</label>
@@ -747,23 +701,32 @@
             <div class="modal-body text-center py-4">
                 <p class="small mb-4 fw-medium" style="color: var(--text-muted);">By signing, you officially accept the terms and totals of this document.</p>
                 
-                <div class="d-flex justify-content-center gap-2 mb-4">
-                    <button class="btn btn-sm fw-bold px-4 rounded-pill" style="background: var(--bg-card-hover); color: var(--text-main); border: 1px solid var(--border-hover);" onclick="document.getElementById('typeSigBox').style.display='block'; document.getElementById('uploadSigBox').style.display='none'; sigType='text';" title="Type your name signature">Type Name</button>
-                    <button class="btn btn-sm fw-bold px-4 rounded-pill" style="background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color);" onclick="document.getElementById('typeSigBox').style.display='none'; document.getElementById('uploadSigBox').style.display='block'; sigType='image';" title="Upload signature image file">Upload Image</button>
-                </div>
-
                 <div id="typeSigBox">
                     <div class="signature-box bg-white" id="sigBox" onclick="document.getElementById('sigInput').focus()">Type to sign...</div>
                     <input type="text" id="sigInput" class="form-control mt-3 text-center" placeholder="Type your full name" onkeyup="document.getElementById('sigBox').innerText = this.value || 'Type to sign...'" title="Type your signature">
                 </div>
-
-                <div id="uploadSigBox" style="display: none;">
-                    <input type="file" id="sigFileInput" accept="image/*" class="form-control p-2 mb-2" onchange="previewSignature(this)" title="Upload signature image">
-                    <img id="sigPreview" style="max-height: 100px; display: none; margin: 0 auto; border-radius: 8px; background: white; padding: 4px;">
-                </div>
             </div>
             <div class="modal-footer border-0 pt-0 mb-2 mt-2">
                 <button type="button" class="btn w-100 fw-bold py-3 rounded-pill text-white" style="background: #10B981; font-size: 15px;" onclick="submitSignature()" title="Confirm acceptance and sign document">Confirm Acceptance</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reject Quote Modal -->
+<div class="modal fade d-print-none" id="rejectModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0 mt-2">
+                <h5 class="modal-title fw-bold brand-text fs-4" style="color: var(--text-main);">Decline Quotation</h5>
+                <button type="button" class="btn-close" style="filter: var(--invert-close, invert(1));" data-bs-dismiss="modal" title="Close modal"></button>
+            </div>
+            <div class="modal-body py-4">
+                <p class="small mb-3 fw-medium" style="color: var(--text-muted);">Please provide feedback or the reason for declining this quotation (optional).</p>
+                <textarea id="rejectReasonInput" class="form-control mb-3" rows="3" placeholder="Enter reason for rejection..."></textarea>
+            </div>
+            <div class="modal-footer border-0 pt-0 mb-2 mt-2">
+                <button type="button" class="btn w-100 fw-bold py-3 rounded-pill text-white" style="background: #EF4444; font-size: 15px;" onclick="submitRejection()" title="Confirm rejection of quotation">Decline & Reject</button>
             </div>
         </div>
     </div>
@@ -776,7 +739,6 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // Initialize Lucide Icons
     lucide.createIcons();
 
     function toggleUploadAccordion() {
@@ -791,7 +753,6 @@
         }
     }
 
-    // Mobile Panel Drawer Toggle
     function toggleMobilePanel() {
         const panel = document.getElementById('rightPanel');
         const overlay = document.getElementById('mobileOverlay');
@@ -801,47 +762,44 @@
         }
     }
 
-    // Currency symbol mapping
+    // Auto Mobile Zoom / Fit-to-Screen for A4 Page Layout
+    function adjustMobileZoom() {
+        const wrapper = document.getElementById('zoomWrapper');
+        if (!wrapper) return;
+
+        if (window.innerWidth < 794) {
+            const availableWidth = window.innerWidth - 20;
+            const scale = availableWidth / 794;
+            wrapper.style.transform = `scale(${scale})`;
+            wrapper.style.transformOrigin = 'top center';
+            
+            const pages = wrapper.querySelectorAll('.page');
+            let totalScaledHeight = 0;
+            pages.forEach(p => {
+                totalScaledHeight += (p.offsetHeight * scale) + 16;
+            });
+            wrapper.style.marginBottom = `-${(pages.length * 1123) * (1 - scale)}px`;
+        } else {
+            wrapper.style.transform = 'none';
+            wrapper.style.marginBottom = '0';
+        }
+    }
+
+    window.addEventListener('load', adjustMobileZoom);
+    window.addEventListener('resize', adjustMobileZoom);
+
     const currencySymbols = {
-        'EUR': '€',
-        'USD': '$',
-        'GBP': '£',
-        'INR': '₹',
-        'CAD': '$',
-        'AUD': '$',
-        'CHF': 'CHF',
-        'JPY': '¥'
+        'EUR': '€', 'USD': '$', 'GBP': '£', 'INR': '₹', 'CAD': '$', 'AUD': '$', 'CHF': 'CHF', 'JPY': '¥'
     };
 
     function getCurrencySymbol(code) {
         return currencySymbols[code] || code;
     }
 
-    // User Selected Currency from Settings or Document state
     let userCurrency = "{{ user_settings.currency if user_settings and user_settings.currency else 'EUR' }}";
 
-    // Optimized Zoom Level Management for Mobile vs Desktop
-    let currentZoom = window.innerWidth < 992 ? Math.min(0.72, (window.innerWidth - 24) / 794) : 1.0;
-    function adjustZoom(delta) {
-        currentZoom = Math.round((currentZoom + delta) * 10) / 10;
-        if (currentZoom < 0.35) currentZoom = 0.35;
-        if (currentZoom > 2.0) currentZoom = 2.0;
-        
-        document.getElementById('zoomWrapper').style.transform = `scale(${currentZoom})`;
-        document.getElementById('zoomLevelDisplay').innerText = Math.round(currentZoom * 100) + '%';
-        updateWorkspaceFit();
-    }
+    let currentZoom = 1.0;
 
-    function updateWorkspaceFit() {
-        const wrapper = document.getElementById('zoomWrapper');
-        const container = document.getElementById('documentContainer');
-        if (wrapper && container) {
-            const scaledHeight = container.offsetHeight * currentZoom;
-            wrapper.style.height = scaledHeight + 'px';
-        }
-    }
-
-    // Fade & Roll Scroll Animation specifically for pages in the workspace
     const scrollObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             const rect = entry.boundingClientRect;
@@ -1037,37 +995,61 @@
         });
     }
 
+    let isSending = false;
     function dispatchQuote(id) {
-        fetch(`/send_quote/{{ quote.id }}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ recipient_id: id }) })
-        .then(() => window.location.href = '/dashboard');
-    }
+        if (isSending) return;
+        isSending = true;
 
-    let sigType = 'text';
-    let uploadedSigBase64 = '';
+        const sendModalEl = document.getElementById('sendModal');
+        const modalInstance = bootstrap.Modal.getInstance(sendModalEl);
+        if (modalInstance) modalInstance.hide();
 
-    function previewSignature(input) {
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                uploadedSigBase64 = e.target.result;
-                document.getElementById('sigPreview').src = uploadedSigBase64;
-                document.getElementById('sigPreview').style.display = 'block';
+        fetch(`/send_quote/{{ quote.id }}`, { 
+            method: 'POST', 
+            headers: {'Content-Type': 'application/json'}, 
+            body: JSON.stringify({ recipient_id: id }) 
+        })
+        .then(res => {
+            if (res.ok) {
+                window.location.href = '/dashboard';
+            } else {
+                isSending = false;
+                alert("Failed to send quote. Please try again.");
             }
-            reader.readAsDataURL(input.files[0]);
-        }
+        })
+        .catch(err => {
+            isSending = false;
+            console.error("Send error:", err);
+            window.location.href = '/dashboard';
+        });
     }
 
     function submitSignature() {
-        let sigFinal = '';
-        if (sigType === 'text') {
-            sigFinal = document.getElementById('sigInput').value;
-            if(!sigFinal) return alert("Please type your signature.");
-        } else {
-            sigFinal = uploadedSigBase64;
-            if(!sigFinal) return alert("Please upload a signature image.");
-        }
+        const sigFinal = document.getElementById('sigInput').value;
+        if(!sigFinal) return alert("Please type your signature.");
+        
         fetch(`/accept_quote/{{ quote.id }}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ signature: sigFinal }) })
-        .then(() => window.location.reload());
+        .then(() => window.location.href = '/dashboard');
+    }
+
+    function submitRejection() {
+        const reason = document.getElementById('rejectReasonInput').value;
+        fetch(`/reject_quote/{{ quote.id }}`, { 
+            method: 'POST', 
+            headers: {'Content-Type': 'application/json'}, 
+            body: JSON.stringify({ reason: reason }) 
+        })
+        .then(res => {
+            if (res.ok) {
+                window.location.href = '/dashboard';
+            } else {
+                alert("Failed to submit rejection. Please try again.");
+            }
+        })
+        .catch(err => {
+            console.error("Rejection error:", err);
+            alert("Failed to submit rejection. Please try again.");
+        });
     }
 
     window.togglePageNumbers = function(isActive) { if(isEditable) { pageNumbersActive = isActive; renderWorkspace(); triggerSave(); } };
@@ -1303,8 +1285,6 @@
     }
 
     window.onload = function() {
-        document.getElementById('zoomWrapper').style.transform = `scale(${currentZoom})`;
-        document.getElementById('zoomLevelDisplay').innerText = Math.round(currentZoom * 100) + '%';
         const savedStr = document.getElementById('savedDocumentData').innerText;
         if (savedStr && savedStr.trim() !== "None" && savedStr.trim() !== "") {
             const parsed = JSON.parse(savedStr);
@@ -1448,8 +1428,8 @@
         let ce = isEditable ? 'contenteditable="true"' : '';
         const symbol = getCurrencySymbol(userCurrency);
         
-        const ITEMS_FIRST_PAGE = 7; 
-        const ITEMS_PER_PAGE = 10;
+        const ITEMS_FIRST_PAGE = 8; 
+        const ITEMS_PER_PAGE = 11;
 
         let totalTablePages = 1;
         if (items.length > ITEMS_FIRST_PAGE) {
@@ -1542,9 +1522,9 @@
         let sigBlock = '';
         if (signatureData) {
             if (signatureData.startsWith('data:image')) {
-                sigBlock = `<div class="meta-label text-success mb-2">ACCEPTED & SIGNED</div><img src="${signatureData}" style="max-height: 50px; max-width: 100%; object-fit: contain;">`;
+                sigBlock = `<div class="meta-label text-success mb-1">ACCEPTED & SIGNED</div><img src="${signatureData}" style="max-height: 40px; max-width: 100%; object-fit: contain;">`;
             } else {
-                sigBlock = `<div class="meta-label text-success mb-2">ACCEPTED & SIGNED</div><div style="font-family: 'Brush Script MT', cursive; font-size: 26px; color: #0F172A;">${signatureData}</div>`;
+                sigBlock = `<div class="meta-label text-success mb-1">ACCEPTED & SIGNED</div><div style="font-family: 'Great Vibes', cursive !important; font-size: 22px; line-height: 1.1; color: #0F172A; white-space: nowrap;">${signatureData}</div>`;
             }
         }
 
@@ -1667,7 +1647,6 @@
         }
 
         container.innerHTML = finalHtml;
-        updateWorkspaceFit();
         
         if(isEditable) updateInventoryHighlights();
         
@@ -1678,7 +1657,5 @@
         lucide.createIcons();
     }
 </script>
-<!-- Include CryptoManager -->
-<script src="{{ url_for('static', filename='crypto.js') }}"></script>
 </body>
 </html>
