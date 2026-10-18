@@ -222,7 +222,8 @@
 
         .quote-table { width: 100%; font-size: 12.5px; border-collapse: collapse; color: #0F172A; table-layout: fixed; }
         .quote-table th { padding: 12px 6px; font-weight: 600; text-transform: uppercase; font-size: 10px; color: #334155; border-bottom: 1px solid rgba(226, 232, 240, 0.8); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .quote-table td { padding: 12px 6px; vertical-align: middle; border-bottom: 1px solid rgba(241, 245, 249, 0.5); transition: background-color 0.2s; }
+        .quote-table td { padding: 12px 6px; vertical-align: middle; border-bottom: 1px solid rgba(241, 245, 249, 0.5); transition: background-color 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 0; }
+        .quote-table td:first-child { white-space: normal; overflow: visible; word-break: break-word; max-width: none; }
         
         {% if is_editable %}
         .quote-table tbody tr { cursor: grab; }
@@ -559,7 +560,7 @@
                 <div id="documentContainer"></div>
             </div>
 
-            <!-- FLOATING ZOOM PILL (MATCHING CUSTOMIZE BUTTON SIZE & PADDING) -->
+            <!-- FLOATING ZOOM PILL -->
             <div class="d-print-none position-sticky bottom-0 mt-auto pt-3 d-flex justify-content-center w-100" id="zoomBarContainer" style="z-index: 30; pointer-events: none;">
                 <div class="d-flex align-items-center gap-1 bg-dark bg-opacity-75 border border-secondary rounded-pill px-3 py-2 shadow-lg" style="pointer-events: auto; backdrop-filter: blur(12px); font-size: 13px; font-weight: 600;">
                     <button class="btn btn-sm btn-link text-white p-0 px-2 text-decoration-none fw-bold" onclick="zoomDoc(-0.1)" title="Zoom Out">−</button>
@@ -1477,11 +1478,11 @@
         img.src = dataUrl;
     }
 
-    // Automatic Background Image Cropping to A4 Aspect Ratio (Fill Page, Crop Excess)
+    // Automatic Background Image Cropping to A4 Aspect Ratio
     function cropBgImageToA4(dataUrl, callback) {
         const img = new Image();
         img.onload = function() {
-            const targetRatio = 210 / 297; // A4 portrait ratio
+            const targetRatio = 210 / 297;
             const imgRatio = img.width / img.height;
             
             let sWidth = img.width;
@@ -1490,18 +1491,16 @@
             let sY = 0;
 
             if (imgRatio > targetRatio) {
-                // Image is wider than A4, crop sides
                 sWidth = img.height * targetRatio;
                 sX = (img.width - sWidth) / 2;
             } else {
-                // Image is taller than A4, crop top/bottom
                 sHeight = img.width / targetRatio;
                 sY = (img.height - sHeight) / 2;
             }
 
             const canvas = document.createElement('canvas');
-            canvas.width = 1240; // High quality width for A4
-            canvas.height = 1754; // High quality height for A4
+            canvas.width = 1240; 
+            canvas.height = 1754; 
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, sX, sY, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
             callback(canvas.toDataURL('image/jpeg', 0.95));
@@ -1600,16 +1599,16 @@
                 let dynamicTds = '';
                 for(let c = 0; c < numDynamicCols; c++) { 
                     let colKey = 'col' + (c+1); 
-                    dynamicTds += `<td class="text-muted text-start" style="padding-left: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" ${ce} onblur="updateRowField(${item.originalIndex}, '${colKey}', this.innerText)" title="Edit column attribute"><span title="${item[colKey] || ''}">${item[colKey] || ''}</span></td>`; 
+                    dynamicTds += `<td class="text-muted text-start" style="padding-left: 6px;" ${ce} onblur="updateRowField(${item.originalIndex}, '${colKey}', this.innerText)" title="Edit column attribute"><span title="${item[colKey] || ''}">${item[colKey] || ''}</span></td>`; 
                 }
 
                 rowsHtml += `
                     <tr draggable="${isEditable}" ondragstart="onDragStartRow(event, ${item.originalIndex})" ondragend="onDragEndRow(event)" ondragover="onDragOverRow(event, ${item.originalIndex})" ondragleave="onDragLeaveRow(event, ${item.originalIndex})" ondrop="onDropRow(event, ${item.originalIndex})" title="Drag to reorder row">
                         <td><div class="item-name" ${ce} onblur="updateRowField(${item.originalIndex}, 'name', this.innerText)" title="Edit item name">${item.name}</div></td>
                         ${dynamicTds}
-                        <td class="text-center no-wrap" style="padding-left: 6px; white-space: nowrap;" ${ce} onblur="updateItemQty(${item.originalIndex}, this.innerText)" title="Edit item quantity">${item.qty}</td>
-                        <td class="text-end no-wrap" style="padding-left: 6px; white-space: nowrap;" ${ce} onblur="updateItemPrice(${item.originalIndex}, this.innerText)" title="Edit item rate">${symbol} ${item.price.toFixed(2)}</td>
-                        <td class="text-end fw-bold no-wrap" style="padding-left: 6px; white-space: nowrap;" title="Computed row total">${symbol} ${total.toFixed(2)}</td>
+                        <td class="text-center no-wrap" style="padding-left: 6px;" ${ce} onblur="updateItemQty(${item.originalIndex}, this.innerText)" title="Edit item quantity">${item.qty}</td>
+                        <td class="text-end no-wrap" style="padding-left: 6px;" ${ce} onblur="updateItemPrice(${item.originalIndex}, this.innerText)" title="Edit item rate">${symbol} ${item.price.toFixed(2)}</td>
+                        <td class="text-end fw-bold no-wrap" style="padding-left: 6px;" title="Computed row total">${symbol} ${total.toFixed(2)}</td>
                         <td class="d-print-none text-center align-middle" style="width: 28px; padding: 0;"><button class="delete-btn" title="Click to remove this row" onclick="deleteRow(${item.originalIndex})">&times;</button></td>
                     </tr>
                 `;
@@ -1624,14 +1623,28 @@
                 dynamicThs += `<th class="text-start no-wrap" style="padding-left: 6px;" ${ce} onblur="updateDynamicHeader(${c}, this.innerText)" title="Click to edit column header"><span title="${dynamicHeaders[c] || `Col ${c+1}`}">${dynamicHeaders[c] || `Col ${c+1}`}</span></th>`; 
             }
 
-            let itemColWidth = numDynamicCols > 0 ? 30 : 44;
-            let dynamicColWidth = numDynamicCols > 0 ? Math.floor(30 / numDynamicCols) : 0;
-            let remainingWidth = 100 - itemColWidth - (dynamicColWidth * numDynamicCols);
-            let otherColWidth = Math.floor(remainingWidth / 3);
+            // Fixed columns (QTY, RATE, TOTAL)
+            let qtyWidth = 8;
+            let rateWidth = 14;
+            let totalWidth = 16;
+            
+            // Allow dynamic columns to expand comfortably into available space (up to ~20% each) so text never truncates prematurely
+            let dynamicColWidths = [];
+            let totalDynamicWidth = 0;
+            for(let c = 0; c < numDynamicCols; c++) {
+                let hText = dynamicHeaders[c] || `Col ${c+1}`;
+                let colW = Math.max(12, Math.min(20, hText.length * 2.2)); 
+                dynamicColWidths.push(colW);
+                totalDynamicWidth += colW;
+            }
+
+            // ITEM column takes all remaining space
+            let itemColWidth = 100 - qtyWidth - rateWidth - totalWidth - totalDynamicWidth;
+            if (itemColWidth < 25) itemColWidth = 25; // Safety floor for ITEM
 
             let colGroupHtml = `<colgroup><col style="width: ${itemColWidth}%;">`;
-            for(let c = 0; c < numDynamicCols; c++) { colGroupHtml += `<col style="width: ${dynamicColWidth}%;">`; }
-            colGroupHtml += `<col style="width: ${otherColWidth}%;"><col style="width: ${otherColWidth}%;"><col style="width: ${otherColWidth}%;">`;
+            for(let c = 0; c < numDynamicCols; c++) { colGroupHtml += `<col style="width: ${dynamicColWidths[c]}%;">`; }
+            colGroupHtml += `<col style="width: ${qtyWidth}%;"><col style="width: ${rateWidth}%;"><col style="width: ${totalWidth}%;">`;
             if (isEditable) colGroupHtml += `<col style="width: 28px;">`;
             colGroupHtml += `</colgroup>`;
 

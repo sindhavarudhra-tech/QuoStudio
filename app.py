@@ -165,13 +165,20 @@ def init_db():
 init_db()
 
 # ==========================================
-# AUTHENTICATION
+# AUTHENTICATION & LAUNCH
 # ==========================================
 @app.route('/')
 def index():
     logged_in = 'user_id' in session
     initials = "".join([w[0].upper() for w in session.get('username', '').split()[:2]]) if session.get('username') else "Q"
     return render_template('index.html', logged_in=logged_in, initials=initials)
+
+@app.route('/launch')
+def launch_app():
+    if 'user_id' in session:
+        return redirect(url_for('dashboard'))
+    else:
+        return redirect(url_for('login'))
 
 @app.route('/check_username', methods=['GET'])
 def check_username():
@@ -534,7 +541,6 @@ def new_quotation():
     cursor.close()
     conn.close()
     
-    # Return JSON response so frontend can perform window.location.replace()
     return jsonify({'success': True, 'quote_id': new_quote_id})
 
 @app.route('/editor/<int:quote_id>')

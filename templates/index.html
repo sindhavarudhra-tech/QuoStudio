@@ -508,7 +508,7 @@
         {% if logged_in %}
             <a href="/dashboard" class="mobile-nav-link">Dashboard</a>
         {% endif %}
-        <a href="/dashboard" class="btn-accent">Get Started</a>
+        <a href="{{ url_for('launch_app') }}" class="btn-accent">Get Started</a>
     </div>
 
     <div class="footer-modal-backdrop" id="footerModalBackdrop">
@@ -556,7 +556,7 @@
                 <a href="/login" class="btn-login">Log In</a>
             {% endif %}
             
-            <a href="/dashboard" class="btn-accent desktop-only">Get Started</a>
+            <a href="{{ url_for('launch_app') }}" class="btn-accent desktop-only">Get Started</a>
             
             <button class="hamburger-btn" id="hamburgerBtn">
                 <i data-lucide="menu"></i>
@@ -584,23 +584,10 @@
                 <div class="platform-btns">
                     <div class="platform-group">
                         <span class="status-label">Available Now</span>
-                        <a href="/dashboard" class="btn-platform btn-web">
+                        <a href="{{ url_for('launch_app') }}" class="btn-platform btn-web">
                             <svg viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
                             Launch Web App
                         </a>
-                    </div>
-                    <div class="downloads-container">
-                        <span class="status-label">Coming Soon</span>
-                        <div class="downloads-row">
-                            <a href="#" onclick="alert('Coming Soon!')" class="btn-platform">
-                                <svg viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.3 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.3zM242 98.4c21.5-26 31.7-60.5 27.6-98.4-32.6 1.5-70.5 22.3-93.1 48.4-18.2 20.9-30 47.9-26.3 75.7 35.8 2.5 70.3-25.7 91.8-25.7z"/></svg>
-                                Download macOS
-                            </a>
-                            <a href="#" onclick="alert('Coming Soon!')" class="btn-platform">
-                                <svg viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M0 93.7l183.6-25.3v177.4H0V93.7zm0 324.6l183.6 25.3V268.4H0v149.9zm203.8 28L448 480V268.4H203.8v177.9zm0-380.6v180.1H448V32L203.8 65.7z"/></svg>
-                                Download Windows
-                            </a>
-                        </div>
                     </div>
                 </div>
             </div>
