@@ -122,7 +122,7 @@
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            padding: 20px 16px 40px 16px; 
+            padding: 20px 16px 20px 16px; 
             background-color: transparent; 
             transition: 0.3s; 
             perspective: 1000px; 
@@ -178,7 +178,7 @@
             font-family: inherit !important; 
         }
 
-        .bg-layer { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-size: cover; background-position: center; z-index: 0; pointer-events: none; overflow: hidden; }
+        .bg-layer { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-size: cover; background-position: center; background-repeat: no-repeat; z-index: 0; pointer-events: none; overflow: hidden; }
         .content-layer { position: relative; z-index: 1; display: flex; flex-direction: column; height: 100%; padding: 20mm; box-sizing: border-box; }
 
         {% if is_editable %}
@@ -202,6 +202,16 @@
         {% else %}
         [contenteditable="true"] { outline: none; border-bottom: none; cursor: default; }
         {% endif %}
+
+        /* Remove editable styling during PDF export or print */
+        body.pdf-exporting [contenteditable="true"] {
+            border-bottom: none !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            padding: 0 !important;
+        }
+
         .no-wrap[contenteditable="true"] { white-space: nowrap !important; overflow: hidden; }
 
         .doc-h1 { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.02em; margin: 0; color: #0F172A; padding: 4px; }
@@ -386,7 +396,12 @@
                 gap: 6px;
             }
             .top-header { padding: 12px 16px; min-height: 64px; }
-            .workspace { padding: 12px 8px 30px 8px; }
+            .workspace { padding: 12px 8px 20px 8px; }
+            
+            #zoomBarContainer {
+                justify-content: flex-start !important;
+                padding-left: 12px !important;
+            }
         }
 
         @media print {
@@ -413,10 +428,10 @@
             html, body { 
                 background: #ffffff !important; 
                 width: 210mm; 
-                height: 297mm; 
+                height: auto !important; 
                 margin: 0 !important; 
                 padding: 0 !important; 
-                overflow: hidden !important; 
+                overflow: visible !important; 
             }
             .app-layout, .main-area, .workspace { 
                 display: block !important; 
@@ -461,6 +476,7 @@
                 overflow: hidden !important; 
                 background-size: cover !important;
                 background-position: center !important;
+                background-repeat: no-repeat !important;
             }
         }
     </style>
@@ -491,9 +507,9 @@
             </div>
             
             <div class="header-actions">
-                <button class="btn-outline-darker px-3 px-sm-4" onclick="window.print()" title="Print document or save as PDF">
+                <button class="btn-outline-darker px-3 px-sm-4" onclick="handlePrintOrDownload()" title="Print document or save as PDF">
                     <span class="d-none d-md-inline">Print / Download</span>
-                    <span class="d-inline d-md-none">PDF</span>
+                    <span class="d-inline d-md-none">Print</span>
                 </button>
                 
                 {% if is_owner %}
@@ -510,11 +526,9 @@
                 
                 {% if is_recipient %}
                     {% if quote.status == 'sent' %}
-                        <!-- Desktop Text Buttons -->
                         <button class="btn-primary-custom d-none d-md-inline-block" data-bs-toggle="modal" data-bs-target="#acceptModal" style="background: #10B981;" title="Review terms and sign quotation">Review & Accept</button>
                         <button class="btn-danger-custom d-none d-md-inline-block" data-bs-toggle="modal" data-bs-target="#rejectModal" title="Reject quotation">Reject</button>
 
-                        <!-- Mobile Icon Buttons (Green Check & Red X) -->
                         <button class="btn btn-sm text-white d-inline-block d-md-none rounded-circle p-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#acceptModal" style="background: #10B981; width: 38px; height: 38px; display: inline-flex; align-items: center; justify-content: center;" title="Accept">
                             <i data-lucide="check" style="width: 20px; height: 20px;"></i>
                         </button>
@@ -543,6 +557,15 @@
         <div class="workspace" id="workspaceContainer">
             <div id="zoomWrapper">
                 <div id="documentContainer"></div>
+            </div>
+
+            <!-- FLOATING ZOOM PILL (MATCHING CUSTOMIZE BUTTON SIZE & PADDING) -->
+            <div class="d-print-none position-sticky bottom-0 mt-auto pt-3 d-flex justify-content-center w-100" id="zoomBarContainer" style="z-index: 30; pointer-events: none;">
+                <div class="d-flex align-items-center gap-1 bg-dark bg-opacity-75 border border-secondary rounded-pill px-3 py-2 shadow-lg" style="pointer-events: auto; backdrop-filter: blur(12px); font-size: 13px; font-weight: 600;">
+                    <button class="btn btn-sm btn-link text-white p-0 px-2 text-decoration-none fw-bold" onclick="zoomDoc(-0.1)" title="Zoom Out">−</button>
+                    <span id="zoomLevelDisplay" class="small fw-semibold px-1 text-white" style="font-size: 13px; min-width: 42px; text-align: center;">100%</span>
+                    <button class="btn btn-sm btn-link text-white p-0 px-2 text-decoration-none fw-bold" onclick="zoomDoc(0.1)" title="Zoom In">+</button>
+                </div>
             </div>
         </div>
 
@@ -741,6 +764,25 @@
 <script>
     lucide.createIcons();
 
+    let currentZoom = window.innerWidth < 794 ? 0.4 : 1.0;
+
+    function zoomDoc(delta) {
+        currentZoom = Math.min(Math.max(currentZoom + delta, 0.2), 2.0);
+        const wrapper = document.getElementById('zoomWrapper');
+        if (wrapper) {
+            wrapper.style.transform = `scale(${currentZoom})`;
+            wrapper.style.transformOrigin = 'top center';
+        }
+        const display = document.getElementById('zoomLevelDisplay');
+        if (display) {
+            display.innerText = `${Math.round(currentZoom * 100)}%`;
+        }
+    }
+
+    function handlePrintOrDownload() {
+        window.print();
+    }
+
     function toggleUploadAccordion() {
         const content = document.getElementById('uploadAccordionContent');
         const chevron = document.getElementById('uploadChevron');
@@ -762,31 +804,24 @@
         }
     }
 
-    // Auto Mobile Zoom / Fit-to-Screen for A4 Page Layout
-    function adjustMobileZoom() {
+    function initZoom() {
         const wrapper = document.getElementById('zoomWrapper');
         if (!wrapper) return;
 
         if (window.innerWidth < 794) {
-            const availableWidth = window.innerWidth - 20;
-            const scale = availableWidth / 794;
-            wrapper.style.transform = `scale(${scale})`;
-            wrapper.style.transformOrigin = 'top center';
-            
-            const pages = wrapper.querySelectorAll('.page');
-            let totalScaledHeight = 0;
-            pages.forEach(p => {
-                totalScaledHeight += (p.offsetHeight * scale) + 16;
-            });
-            wrapper.style.marginBottom = `-${(pages.length * 1123) * (1 - scale)}px`;
+            currentZoom = 0.4;
         } else {
-            wrapper.style.transform = 'none';
-            wrapper.style.marginBottom = '0';
+            currentZoom = 1.0;
         }
+
+        wrapper.style.transform = `scale(${currentZoom})`;
+        wrapper.style.transformOrigin = 'top center';
+
+        const display = document.getElementById('zoomLevelDisplay');
+        if (display) display.innerText = `${Math.round(currentZoom * 100)}%`;
     }
 
-    window.addEventListener('load', adjustMobileZoom);
-    window.addEventListener('resize', adjustMobileZoom);
+    window.addEventListener('load', initZoom);
 
     const currencySymbols = {
         'EUR': '€', 'USD': '$', 'GBP': '£', 'INR': '₹', 'CAD': '$', 'AUD': '$', 'CHF': 'CHF', 'JPY': '¥'
@@ -797,8 +832,6 @@
     }
 
     let userCurrency = "{{ user_settings.currency if user_settings and user_settings.currency else 'EUR' }}";
-
-    let currentZoom = 1.0;
 
     const scrollObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -1359,17 +1392,121 @@
         }
     };
 
+    // Automatic Logo Cropping
     window.loadBase64 = function(input, target) {
         if(!isEditable) return;
         if (input.files && input.files[0]) {
             var reader = new FileReader();
             reader.onload = function(e) {
-                if(target === 'logo') logoDataUrl = e.target.result;
-                if(target === 'bg') bgDataUrl = e.target.result;
-                renderWorkspace(); triggerSave();
+                if (target === 'logo') {
+                    cropLogoImage(e.target.result, function(croppedUrl) {
+                        logoDataUrl = croppedUrl;
+                        renderWorkspace(); triggerSave();
+                    });
+                } else if (target === 'bg') {
+                    cropBgImageToA4(e.target.result, function(croppedBgUrl) {
+                        bgDataUrl = croppedBgUrl;
+                        renderWorkspace(); triggerSave();
+                    });
+                }
             }
             reader.readAsDataURL(input.files[0]);
         }
+    };
+
+    function cropLogoImage(dataUrl, callback) {
+        const img = new Image();
+        img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            
+            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imgData.data;
+            let r = canvas.height, c = canvas.width, top = 0, bottom = 0, left = 0, right = 0;
+            
+            outerTop: for(let y=0; y<r; y++) {
+                for(let x=0; x<c; x++) {
+                    let idx = (y*c + x)*4;
+                    if(data[idx + 3] > 20 && (data[idx] < 245 || data[idx+1] < 245 || data[idx+2] < 245)) {
+                        top = y; break outerTop;
+                    }
+                }
+            }
+            outerBottom: for(let y=r-1; y>=0; y--) {
+                for(let x=0; x<c; x++) {
+                    let idx = (y*c + x)*4;
+                    if(data[idx + 3] > 20 && (data[idx] < 245 || data[idx+1] < 245 || data[idx+2] < 245)) {
+                        bottom = y; break outerBottom;
+                    }
+                }
+            }
+            outerLeft: for(let x=0; x<c; x++) {
+                for(let y=0; y<r; y++) {
+                    let idx = (y*c + x)*4;
+                    if(data[idx + 3] > 20 && (data[idx] < 245 || data[idx+1] < 245 || data[idx+2] < 245)) {
+                        left = x; break outerLeft;
+                    }
+                }
+            }
+            outerRight: for(let x=c-1; x>=0; x--) {
+                for(let y=0; y<r; y++) {
+                    let idx = (y*c + x)*4;
+                    if(data[idx + 3] > 20 && (data[idx] < 245 || data[idx+1] < 245 || data[idx+2] < 245)) {
+                        right = x; break outerRight;
+                    }
+                }
+            }
+            
+            if(bottom <= top || right <= left) {
+                callback(dataUrl);
+                return;
+            }
+            
+            const width = right - left + 1;
+            const height = bottom - top + 1;
+            const croppedCanvas = document.createElement('canvas');
+            croppedCanvas.width = width;
+            croppedCanvas.height = height;
+            const croppedCtx = croppedCanvas.getContext('2d');
+            croppedCtx.drawImage(canvas, left, top, width, height, 0, 0, width, height);
+            callback(croppedCanvas.toDataURL());
+        };
+        img.src = dataUrl;
+    }
+
+    // Automatic Background Image Cropping to A4 Aspect Ratio (Fill Page, Crop Excess)
+    function cropBgImageToA4(dataUrl, callback) {
+        const img = new Image();
+        img.onload = function() {
+            const targetRatio = 210 / 297; // A4 portrait ratio
+            const imgRatio = img.width / img.height;
+            
+            let sWidth = img.width;
+            let sHeight = img.height;
+            let sX = 0;
+            let sY = 0;
+
+            if (imgRatio > targetRatio) {
+                // Image is wider than A4, crop sides
+                sWidth = img.height * targetRatio;
+                sX = (img.width - sWidth) / 2;
+            } else {
+                // Image is taller than A4, crop top/bottom
+                sHeight = img.width / targetRatio;
+                sY = (img.height - sHeight) / 2;
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = 1240; // High quality width for A4
+            canvas.height = 1754; // High quality height for A4
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, sX, sY, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
+            callback(canvas.toDataURL('image/jpeg', 0.95));
+        };
+        img.src = dataUrl;
     }
 
     window.clearBase64 = function(target) {
@@ -1543,7 +1680,7 @@
             let printPageBadge = pageNumbersActive ? `<div style="position: absolute; bottom: 10mm; left: 0; right: 0; text-align: center; font-size: 10px; color: #334155; font-weight: 600;">${i + 1}</div>` : '';
 
             if (isFullHeader) {
-                const logoHtml = logoDataUrl ? `<img src="${logoDataUrl}" style="max-height: 150px; max-width: 250px; width: auto; border-radius: 2px; object-fit: contain;">` : `<div style="width: 56px; height: 56px; background: #0F172A; color: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 700; font-family: inherit;">Q</div>`;
+                const logoHtml = logoDataUrl ? `<img src="${logoDataUrl}" style="max-height: 90px; max-width: 200px; width: auto; border-radius: 2px; object-fit: contain;">` : `<div style="width: 56px; height: 56px; background: #0F172A; color: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 700; font-family: inherit;">Q</div>`;
                 
                 headerHtml = `
                     <div class="d-flex justify-content-between align-items-start mb-3">
