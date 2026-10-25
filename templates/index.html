@@ -300,14 +300,30 @@
         .section-header h2 { font-size: clamp(3rem, 5vw, 4.5rem); font-weight: 600; letter-spacing: -0.02em; margin-bottom: 24px; line-height: 1.1; }
         .text-gradient { background: linear-gradient(135deg, #60A5FA, #8B5CF6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; padding-right: 0.1em; display: inline-block; }
 
-        .features-scroll-wrapper { display: block; position: relative; }
-        .features-sticky-container { display: block; position: relative; }
-        .bento-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; max-width: var(--max-width); margin: 0 auto; padding: 0 40px 180px; }
-        .bento-slide { display: contents; }
+        /* Original Asymmetric Bento Grid (3-column layout with spans) */
+        .bento-grid { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 32px; 
+            max-width: var(--max-width); 
+            margin: 0 auto; 
+            padding: 0 40px 180px; 
+        }
         
-        .bento-card { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 28px; padding: 48px 40px; position: relative; overflow: hidden; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .bento-card { 
+            background: var(--glass); 
+            border: 1px solid var(--glass-border); 
+            border-radius: 28px; 
+            padding: 48px 40px; 
+            position: relative; 
+            overflow: hidden; 
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
         .bento-card:hover { transform: translateY(-8px); border-color: rgba(37, 99, 235, 0.5); background: rgba(255, 255, 255, 0.04); box-shadow: 0 30px 60px -15px rgba(0,0,0,0.6); }
-        .bento-icon { width: 56px; height: 56px; background: rgba(37, 99, 235, 0.15); color: var(--accent-blue); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 32px; }
+        .bento-icon { width: 56px; height: 56px; background: rgba(37, 99, 235, 0.15); color: var(--accent-blue); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 32px; flex-shrink: 0; }
         .bento-card h3 { font-size: 1.75rem; font-weight: 500; margin-bottom: 16px; color: #FFFFFF; }
         .bento-card p { color: var(--text-muted); font-size: 1.1rem; line-height: 1.7; margin: 0; }
 
@@ -416,57 +432,15 @@
             .mockup-sidebar { width: 280px !important; border-left: 1px solid var(--glass-border) !important; border-top: none !important; }
             .drag-item { display: none !important; }
 
-            .features-scroll-wrapper {
-                height: 400vh;
-                position: relative;
-                display: block;
-            }
-            .features-sticky-container {
-                position: sticky;
-                top: 0;
-                height: 100vh;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                overflow: hidden;
-            }
-            .features-header {
-                padding-top: 100px;
-                padding-bottom: 20px;
-                flex-shrink: 0;
-                text-align: left;
-            }
-            .features-header h2 { margin-bottom: 0; font-size: clamp(2.5rem, 8vw, 3.5rem); }
-            
-            .features-track-container {
-                width: 100%;
-                overflow: hidden; 
-                display: flex;
-                align-items: center;
-                flex-grow: 1;
-            }
-            .bento-grid.features-track {
-                display: flex;
-                flex-wrap: nowrap;
-                width: max-content; 
-                padding: 0; margin: 0; gap: 0;
-                will-change: transform;
-            }
-            .bento-slide {
-                display: flex;
-                width: 100vw;
-                flex-shrink: 0;
-                padding: 0 20px;
-                align-items: center;
-                justify-content: center;
-                box-sizing: border-box;
+            /* Mobile Bento Grid: Stacked 1-column */
+            .bento-grid {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 24px;
+                padding: 0 20px 80px;
             }
             .bento-card {
-                width: 100%;
-                margin: 0;
-                padding: 32px 24px;
-                transform: none !important; 
-                box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+                padding: 36px 28px;
             }
 
             .use-cases-container { grid-template-columns: 1fr; gap: 32px; padding: 0 20px 80px; }
@@ -621,57 +595,43 @@
         </div>
     </div>
 
-    <div class="features-scroll-wrapper" id="features">
-        <div class="features-sticky-container">
+    <!-- Restored Original 4-Card Bento Grid Section -->
+    <div id="features">
+        <div class="section-header">
+            <h2>Powerful alone.<br><span style="color: var(--accent-blue);">Unstoppable together.</span></h2>
+            <p style="color: var(--text-muted); font-size: 1.35rem; line-height: 1.7; max-width: 700px; margin: 0 auto;">Everything you need to close deals faster, built seamlessly into one elegant platform.</p>
+        </div>
+
+        <div class="bento-grid">
+            <div class="bento-card scroll-section" style="grid-column: span 1;">
+                <div class="bento-icon"><i data-lucide="layout-grid"></i></div>
+                <h3>Block-based Design</h3>
+                <p>Construct complex quotes in seconds. Drag, drop, and reorder rich text blocks, tables, and variables directly on an A4 canvas.</p>
+            </div>
             
-            <div class="section-header features-header">
-                <h2>Powerful alone.<br><span style="color: var(--accent-blue);">Unstoppable together.</span></h2>
-                <p class="desktop-only" style="color: var(--text-muted); font-size: 1.35rem; line-height: 1.7;">Everything you need to close deals faster, built seamlessly into one elegant platform.</p>
+            <div class="bento-card scroll-section" style="grid-column: span 2;">
+                <div class="bento-icon"><i data-lucide="database-zap"></i></div>
+                <h3>Live Database Sync</h3>
+                <p>Upload your CSV inventory catalogs and let the engine do the work. Instantly search, filter, and inject products with their exact pricing straight into your proposals.</p>
             </div>
 
-            <div class="features-track-container">
-                <section class="bento-grid features-track">
-                    
-                    <div class="bento-slide" style="grid-column: span 1;">
-                        <div class="bento-card scroll-section">
-                            <div class="bento-icon"><i data-lucide="layout-grid"></i></div>
-                            <h3>Block-based Design</h3>
-                            <p>Construct complex quotes in seconds. Drag, drop, and reorder rich text blocks, tables, and variables directly on an A4 canvas.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="bento-slide" style="grid-column: span 2;">
-                        <div class="bento-card scroll-section">
-                            <div class="bento-icon"><i data-lucide="database-zap"></i></div>
-                            <h3>Live Database Sync</h3>
-                            <p>Upload your CSV inventory catalogs and let the engine do the work. Instantly search, filter, and inject products with their exact pricing straight into your proposals.</p>
-                        </div>
-                    </div>
+            <div class="bento-card scroll-section" style="grid-column: span 2;">
+                <div class="bento-icon"><i data-lucide="pie-chart"></i></div>
+                <h3>Dynamic Margins</h3>
+                <p>Take control of your financials. Add custom multi-tier taxes, calculate automatic subtotals, and analyze your net profit margins in real-time before you hit send.</p>
+            </div>
 
-                    <div class="bento-slide" style="grid-column: span 2;">
-                        <div class="bento-card scroll-section">
-                            <div class="bento-icon"><i data-lucide="pie-chart"></i></div>
-                            <h3>Dynamic Margins</h3>
-                            <p>Take control of your financials. Add custom multi-tier taxes, calculate automatic subtotals, and analyze your net profit margins in real-time before you hit send.</p>
-                        </div>
-                    </div>
-
-                    <div class="bento-slide" style="grid-column: span 1;">
-                        <div class="bento-card scroll-section">
-                            <div class="bento-icon"><i data-lucide="pen-tool"></i></div>
-                            <h3>Instant Signatures</h3>
-                            <p>Send quotes securely through the platform. Clients can review, accept, and sign dynamically on any device to instantly lock the document.</p>
-                        </div>
-                    </div>
-                    
-                </section>
+            <div class="bento-card scroll-section" style="grid-column: span 1;">
+                <div class="bento-icon"><i data-lucide="pen-tool"></i></div>
+                <h3>Instant Signatures</h3>
+                <p>Send quotes securely through the platform. Clients can review, accept, and sign dynamically on any device to instantly lock the document.</p>
             </div>
         </div>
     </div>
 
     <div id="use-cases" class="section-header scroll-section">
         <h2>Built for every<br><span class="text-gradient">workflow.</span></h2>
-        <p class="desktop-only" style="color: var(--text-muted); font-size: 1.35rem; line-height: 1.7;">Whether you are an independent creator or a scaling enterprise, QuoStudio adapts to your exact quoting needs.</p>
+        <p style="color: var(--text-muted); font-size: 1.35rem; line-height: 1.7; max-width: 700px; margin: 0 auto;">Whether you are an independent creator or a scaling enterprise, QuoStudio adapts to your exact quoting needs.</p>
     </div>
 
     <section class="use-cases-container scroll-section">
@@ -915,9 +875,6 @@
             const seqContainer = document.querySelector('.hero-scroll-container');
             const textLayer = document.querySelector('.hero-text-layer');
             const mockupLayer = document.querySelector('.hero-mockup-layer');
-            
-            const featuresWrapper = document.querySelector('.features-scroll-wrapper');
-            const featuresTrack = document.querySelector('.features-track');
 
             window.addEventListener('scroll', () => {
                 if (window.innerWidth > 1024) {
@@ -936,21 +893,7 @@
                         mockupLayer.style.transform = `translateY(${40 * (1 - mockProgress)}vh) scale(${0.9 + (mockProgress * 0.1)})`;
                         mockProgress > 0.95 ? mockupLayer.classList.add('interactive') : mockupLayer.classList.remove('interactive');
                     }
-                    if (featuresTrack) featuresTrack.style.transform = 'none'; 
                 } 
-                else {
-                    if (featuresWrapper && featuresTrack) {
-                        const rect = featuresWrapper.getBoundingClientRect();
-                        const maxScroll = featuresWrapper.offsetHeight - window.innerHeight;
-                        
-                        let progress = -rect.top / maxScroll;
-                        progress = Math.max(0, Math.min(1, progress));
-                        
-                        const maxScrollLeft = featuresTrack.scrollWidth - window.innerWidth;
-                        const translateX = progress * -maxScrollLeft;
-                        featuresTrack.style.transform = `translate3d(${translateX}px, 0, 0)`;
-                    }
-                }
             });
         });
 
